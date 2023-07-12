@@ -6,6 +6,8 @@ import (
 	"path"
 	db "socialnetwork/pkg/db/sqlite"
 	"testing"
+
+	_ "github.com/mattn/go-sqlite3"
 )
 
 func TestInitialiseDatabase(t *testing.T) {

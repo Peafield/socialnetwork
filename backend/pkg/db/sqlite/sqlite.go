@@ -5,6 +5,8 @@ import (
 	"log"
 	"os"
 	"path"
+
+	_ "github.com/mattn/go-sqlite3"
 )
 
 /*
@@ -16,6 +18,7 @@ creates the file. It then opens the database using an sqlite3 driver and sets th
 to be on. It then closes the database.
 
 Parameters:
+  - dir: the directory file path in which the database should be created
   - name: the database name as a string
 
 Errors:
@@ -27,6 +30,7 @@ Example:
   - InitialiseDatabase is only used once, called when the database is initially created.
 */
 func InitialiseDatabase(dir string, name string) {
+	//check validity of file name (alpha-numeric)
 	filepath := path.Join(dir, name+".db")
 	_, err := os.Stat(filepath)
 	if os.IsNotExist(err) {

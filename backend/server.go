@@ -3,5 +3,5 @@ package main
 import db "socialnetwork/pkg/db/sqlite"
 
 func main() {
-	db.InitialiseDatabase("monkey")
+	db.InitialiseDatabase("./pkg/db", "socialNetworkDB")
 }

@@ -1,7 +1,6 @@
 package helpers
 
 import (
-	"log"
 	"os"
 )
 
@@ -22,8 +21,7 @@ Example:
   - Testing the directory file path for file storage (e.g databases, images, etc)
 */
 func IsValidPath(path string) (bool, error) {
-	info, err := os.Stat(path)
-	log.Println(info)
+	_, err := os.Stat(path)
 	if os.IsNotExist(err) {
 		return false, err
 	}

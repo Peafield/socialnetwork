@@ -10,6 +10,13 @@ import (
 	_ "github.com/mattn/go-sqlite3"
 )
 
+func TestInitialiseDatabase(t *testing.T) {
+	tempPath := t.TempDir()
+	cases := []struct {
+		in string
+	}
+}
+
 func TestCreateDatabase(t *testing.T) {
 	tempPath := t.TempDir()
 	testDBName := "testDB"

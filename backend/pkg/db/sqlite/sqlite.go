@@ -11,13 +11,36 @@ import (
 	_ "github.com/mattn/go-sqlite3"
 )
 
-func InitialiseDatabase(dbFilePath models.DatabaseInit) {
-	isDBNameValid, err := helpers.IsAlphaNumeric(dbFilePath.GetDBName())
-	if isDBNameValid {
+/*
+InitialiseDatabase validates the name and the file path of the given database.
 
-	} else {
+If the conditions are met, proceed to create the database.
+
+Parameters:
+  - dbFilePath: An interface containing the basic requirements to initialise a database.
+
+Errors:
+  - If the db name is not valid, exit the program and log the error.
+  - If the db directory file path is not valid, exit the program and log the error.
+*/
+func InitialiseDatabase(dbFilePath models.DatabaseInit) {
+	dbName := dbFilePath.GetDBName()
+	dbDirectory := dbFilePath.GetDirectory()
+
+	isDBNameValid, err := helpers.IsAlphaNumeric(dbName)
+
+	if !isDBNameValid {
 		log.Fatalf("DB name contains non alpha-numeric characters. Err: %s", err)
 	}
+
+	isFilePathValid, err := helpers.IsValidPath(dbDirectory)
+
+	if !isFilePathValid {
+		log.Fatalf("DB directory is not valid. Err: %s", err)
+	}
+
+	CreateDatabase(dbDirectory, dbName)
+
 }
 
 /*

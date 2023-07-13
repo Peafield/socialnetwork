@@ -10,10 +10,10 @@ import (
 	_ "github.com/mattn/go-sqlite3"
 )
 
-func TestInitialiseDatabase(t *testing.T) {
+func TestCreateDatabase(t *testing.T) {
 	tempPath := t.TempDir()
 	testDBName := "testDB"
-	db.InitialiseDatabase(tempPath, testDBName)
+	db.CreateDatabase(tempPath, testDBName)
 	filepath := path.Join(tempPath, testDBName)
 	_, err := os.Stat(filepath)
 	if os.IsNotExist(err) {

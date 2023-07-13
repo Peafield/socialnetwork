@@ -5,12 +5,23 @@ import (
 	"log"
 	"os"
 	"path"
+	"socialnetwork/pkg/helpers"
+	"socialnetwork/pkg/models"
 
 	_ "github.com/mattn/go-sqlite3"
 )
 
+func InitialiseDatabase(dbFilePath models.DatabaseInit) {
+	isDBNameValid, err := helpers.IsAlphaNumeric(dbFilePath.GetDBName())
+	if isDBNameValid {
+
+	} else {
+		log.Fatalf("DB name contains non alpha-numeric characters. Err: %s", err)
+	}
+}
+
 /*
-InitialiseDatabase initialises the database.
+CreateDatabase initialises the database.
 
 It defines a file path to where the database should be stored. It then checks
 if the the database already exists at the this file path. If it does not, it then
@@ -27,10 +38,9 @@ Errors:
   - if the database fails to open.
 
 Example:
-  - InitialiseDatabase is only used once, called when the database is initially created.
+  - CreateDatabase is only used once, called when the database is initially created.
 */
-func InitialiseDatabase(dir string, name string) {
-	//check validity of file name (alpha-numeric)
+func CreateDatabase(dir string, name string) {
 	filepath := path.Join(dir, name+".db")
 	_, err := os.Stat(filepath)
 	if os.IsNotExist(err) {

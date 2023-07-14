@@ -4,13 +4,31 @@ import (
 	"database/sql"
 	"errors"
 	"os"
-	db "socialnetwork/pkg/db/sqlite"
+	db "socialnetwork/pkg/db/dbutils"
 	"socialnetwork/pkg/models/dbmodels"
 	"socialnetwork/pkg/models/helpermodels"
 	"testing"
 
 	_ "github.com/mattn/go-sqlite3"
 )
+
+/*
+the following function simulates the failed process of CREATING a file for testing purposes.
+*/
+type MockFileCreator struct{}
+
+func (f *MockFileCreator) Create(name string) (*os.File, error) {
+	return nil, errors.New("cannot create file")
+}
+
+/*
+the following function simulates the failed process of OPENING a file for testing purposes.
+*/
+type MockSQLDBOpener struct{}
+
+func (o *MockSQLDBOpener) Open(driveName, dataSourceName string) (*sql.DB, error) {
+	return nil, errors.New("cannot open database")
+}
 
 func TestInitialiseDatabase(t *testing.T) {
 	// Create a temporary directory for testing
@@ -56,7 +74,7 @@ func TestInitialiseDatabase(t *testing.T) {
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
 			// Perform the test
-			dbFilePath := &dbmodels.BasicDatabaseInit{
+			dbFilePath := &dbmodels.DatabaseFilePathComponents{
 				DBName:    tc.dbName,
 				Directory: tc.dbDirectory,
 			}
@@ -70,18 +88,6 @@ func TestInitialiseDatabase(t *testing.T) {
 			}
 		})
 	}
-}
-
-type MockFileCreator struct{}
-
-func (f *MockFileCreator) Create(name string) (*os.File, error) {
-	return nil, errors.New("cannot create file")
-}
-
-type MockSQLDBOpener struct{}
-
-func (o *MockSQLDBOpener) Open(driveName, dataSourceName string) (*sql.DB, error) {
-	return nil, errors.New("cannot open database")
 }
 
 func TestCreateDatabase(t *testing.T) {
@@ -133,7 +139,7 @@ func TestCreateDatabase(t *testing.T) {
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
 			// Perform the test
-			dbFilePath := &dbmodels.BasicDatabaseInit{
+			dbFilePath := &dbmodels.DatabaseFilePathComponents{
 				DBName:    tc.dbName,
 				Directory: tc.dbDirectory,
 			}

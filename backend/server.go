@@ -2,7 +2,7 @@ package main
 
 import (
 	"flag"
-	db "socialnetwork/pkg/db/sqlite"
+	db "socialnetwork/pkg/db/dbutils"
 	"socialnetwork/pkg/models/dbmodels"
 )
 
@@ -13,12 +13,20 @@ func main() {
 	dbinit := flag.Bool("dbinit", false, "Initialises a database")
 	if *dbinit {
 		dbName := flag.Arg(0)
-		dbFilePath := &dbmodels.BasicDatabaseInit{
+		dbFilePath := &dbmodels.DatabaseFilePathComponents{
 			Directory: DATABASE_FILE_PATH,
 			DBName:    dbName,
 		}
 		db.InitialiseDatabase(dbFilePath)
-
 	}
 
+	dbup := flag.Bool("dbup", false, "Migrate database changes up")
+	if *dbup {
+		dbName := flag.Arg(0)
+		dbFilePath := &dbmodels.DatabaseFilePathComponents{
+			Directory: DATABASE_FILE_PATH,
+			DBName:    dbName,
+		}
+		db.MigrateChangesUp(dbFilePath)
+	}
 }

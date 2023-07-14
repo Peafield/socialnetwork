@@ -25,7 +25,7 @@ Errors:
   - If the db name is not valid, exit the program and log the error.
   - If the db directory file path is not valid, exit the program and log the error.
 */
-func InitialiseDatabase(dbFilePath dbmodels.DatabaseInit) error {
+func InitialiseDatabase(dbFilePath dbmodels.DatabaseManager) error {
 	dbName := dbFilePath.GetDBName()
 	dbDirectory := dbFilePath.GetDirectory()
 

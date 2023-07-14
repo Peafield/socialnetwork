@@ -2,7 +2,8 @@ package db
 
 import (
 	"database/sql"
-	"log"
+	"errors"
+	"fmt"
 	"os"
 	"path"
 	"socialnetwork/pkg/helpers"
@@ -10,6 +11,10 @@ import (
 
 	_ "github.com/mattn/go-sqlite3"
 )
+
+type DatabaseManager struct {
+	Helpers models.Helper
+}
 
 /*
 InitialiseDatabase validates the name and the file path of the given database.
@@ -19,28 +24,30 @@ If the conditions are met, proceed to create the database.
 Parameters:
   - dbFilePath: An interface containing the basic requirements to initialise a database.
 
+Returns:
+  - error: returns a specified error
+
 Errors:
   - If the db name is not valid, exit the program and log the error.
   - If the db directory file path is not valid, exit the program and log the error.
 */
-func InitialiseDatabase(dbFilePath models.DatabaseInit) {
+func InitialiseDatabase(dbFilePath models.DatabaseInit) error {
 	dbName := dbFilePath.GetDBName()
 	dbDirectory := dbFilePath.GetDirectory()
 
 	isDBNameValid, err := helpers.IsAlphaNumeric(dbName)
 
 	if !isDBNameValid {
-		log.Fatalf("DB name contains non alpha-numeric characters. Err: %s", err)
+		return errors.New(fmt.Sprintf("DB name contains non alpha-numeric characters. Err: %s", err))
 	}
 
 	isFilePathValid, err := helpers.IsValidPath(dbDirectory)
 
 	if !isFilePathValid {
-		log.Fatalf("DB directory is not valid. Err: %s", err)
+		return errors.New(fmt.Sprintf("DB directory is not valid. Err: %s", err))
 	}
 
-	CreateDatabase(dbDirectory, dbName)
-
+	return CreateDatabase(dbDirectory, dbName)
 }
 
 /*
@@ -63,21 +70,24 @@ Errors:
 Example:
   - CreateDatabase is only used once, called when the database is initially created.
 */
-func CreateDatabase(dir string, name string) {
+func CreateDatabase(dir string, name string) error {
 	filepath := path.Join(dir, name+".db")
-	_, err := os.Stat(filepath)
-	if os.IsNotExist(err) {
-		file, err := os.Create(filepath)
-		if err != nil {
-			log.Fatalf("failed to create file path: %s", err)
-		}
-		file.Close()
-	} else {
-		log.Printf("File path error: %s", err)
-	}
-	db, err := sql.Open("sqlite3", filepath+"/?_foreign_keys=on")
+
+	//removed file path validator as we do it in the helpers
+
+	file, err := os.Create(filepath)
+	defer file.Close()
+
 	if err != nil {
-		log.Fatalf("failed to open database: %s", err)
+		return errors.New(fmt.Sprintf("failed to create file path: %s", err))
 	}
+
+	db, err := sql.Open("sqlite3", filepath+"/?_foreign_keys=on")
 	defer db.Close()
+
+	if err != nil {
+		return errors.New(fmt.Sprintf("failed to open database: %s", err))
+	}
+
+	return nil
 }

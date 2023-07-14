@@ -1,0 +1,13 @@
+CREATE TABLE Users (
+  user_id TEXT UNIQUE NOTNULL PRIMARY KEY,
+  isLoggedIn INTEGER NOTNULL DEFAULT 0,
+  email TEXT UNIQUE NOTNULL,
+  password TEXT NOTNULL,
+  first_name TEXT NOTNULL,
+  last_name TEXT NOTNULL,
+  date_of_birth DATE NOTNULL,
+  avatar_path TEXT NOTNULL,
+  nickname TEXT UNIQUE,
+  about_me TEXT,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);

@@ -2,7 +2,6 @@ package db
 
 import (
 	"database/sql"
-	"errors"
 	"fmt"
 	"os"
 	"path"
@@ -11,10 +10,6 @@ import (
 
 	_ "github.com/mattn/go-sqlite3"
 )
-
-type DatabaseManager struct {
-	Helpers models.Helper
-}
 
 /*
 InitialiseDatabase validates the name and the file path of the given database.
@@ -38,13 +33,13 @@ func InitialiseDatabase(dbFilePath models.DatabaseInit) error {
 	isDBNameValid, err := helpers.IsAlphaNumeric(dbName)
 
 	if !isDBNameValid {
-		return errors.New(fmt.Sprintf("DB name contains non alpha-numeric characters. Err: %s", err))
+		return fmt.Errorf("DB name contains non alpha-numeric characters. Err: %s", err)
 	}
 
 	isFilePathValid, err := helpers.IsValidPath(dbDirectory)
 
 	if !isFilePathValid {
-		return errors.New(fmt.Sprintf("DB directory is not valid. Err: %s", err))
+		return fmt.Errorf("DB directory is not valid. Err: %s", err)
 	}
 
 	return CreateDatabase(dbDirectory, dbName)
@@ -73,21 +68,17 @@ Example:
 func CreateDatabase(dir string, name string) error {
 	filepath := path.Join(dir, name+".db")
 
-	//removed file path validator as we do it in the helpers
-
 	file, err := os.Create(filepath)
+	if err != nil {
+		return fmt.Errorf("failed to create file path: %s", err)
+	}
 	defer file.Close()
 
-	if err != nil {
-		return errors.New(fmt.Sprintf("failed to create file path: %s", err))
-	}
-
 	db, err := sql.Open("sqlite3", filepath+"/?_foreign_keys=on")
-	defer db.Close()
-
 	if err != nil {
-		return errors.New(fmt.Sprintf("failed to open database: %s", err))
+		return fmt.Errorf("failed to open database: %s", err)
 	}
+	defer db.Close()
 
 	return nil
 }

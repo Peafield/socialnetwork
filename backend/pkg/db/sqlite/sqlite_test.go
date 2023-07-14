@@ -1,8 +1,12 @@
 package db_test
 
 import (
+	"database/sql"
+	"errors"
+	"os"
 	db "socialnetwork/pkg/db/sqlite"
-	"socialnetwork/pkg/models"
+	"socialnetwork/pkg/models/dbmodels"
+	"socialnetwork/pkg/models/helpermodels"
 	"testing"
 
 	_ "github.com/mattn/go-sqlite3"
@@ -52,7 +56,7 @@ func TestInitialiseDatabase(t *testing.T) {
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
 			// Perform the test
-			dbFilePath := &models.BasicDatabaseInit{
+			dbFilePath := &dbmodels.BasicDatabaseInit{
 				DBName:    tc.dbName,
 				Directory: tc.dbDirectory,
 			}
@@ -68,6 +72,18 @@ func TestInitialiseDatabase(t *testing.T) {
 	}
 }
 
+type MockFileCreator struct{}
+
+func (f *MockFileCreator) Create(name string) (*os.File, error) {
+	return nil, errors.New("cannot create file")
+}
+
+type MockSQLDBOpener struct{}
+
+func (o *MockSQLDBOpener) Open(driveName, dataSourceName string) (*sql.DB, error) {
+	return nil, errors.New("cannot open database")
+}
+
 func TestCreateDatabase(t *testing.T) {
 	tempPath := t.TempDir()
 
@@ -75,6 +91,8 @@ func TestCreateDatabase(t *testing.T) {
 		name          string
 		dbName        string
 		dbDirectory   string
+		fileCreator   helpermodels.FileCreator
+		dbOpener      dbmodels.DBOpener
 		dbFileCreated bool
 		dbFileOpened  bool
 		expectError   bool
@@ -83,6 +101,8 @@ func TestCreateDatabase(t *testing.T) {
 			name:          "Database created and opened",
 			dbName:        "mydatabase",
 			dbDirectory:   tempPath,
+			fileCreator:   &helpermodels.OSFileCreator{},
+			dbOpener:      &dbmodels.SQLDBOpener{},
 			dbFileCreated: true,
 			dbFileOpened:  true,
 			expectError:   false,
@@ -91,14 +111,18 @@ func TestCreateDatabase(t *testing.T) {
 			name:          "Database not created",
 			dbName:        "mydatabase",
 			dbDirectory:   tempPath,
+			fileCreator:   &MockFileCreator{},
+			dbOpener:      &dbmodels.SQLDBOpener{},
 			dbFileCreated: false,
 			dbFileOpened:  false,
 			expectError:   true,
 		},
 		{
-			name:          "Database not created",
+			name:          "Database created but not opened",
 			dbName:        "mydatabase",
 			dbDirectory:   tempPath,
+			fileCreator:   &helpermodels.OSFileCreator{},
+			dbOpener:      &MockSQLDBOpener{},
 			dbFileCreated: true,
 			dbFileOpened:  false,
 			expectError:   true,
@@ -109,11 +133,11 @@ func TestCreateDatabase(t *testing.T) {
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
 			// Perform the test
-			dbFilePath := &models.BasicDatabaseInit{
+			dbFilePath := &dbmodels.BasicDatabaseInit{
 				DBName:    tc.dbName,
 				Directory: tc.dbDirectory,
 			}
-			err := db.InitialiseDatabase(dbFilePath)
+			err := db.CreateDatabase(dbFilePath.Directory, dbFilePath.DBName, tc.fileCreator, tc.dbOpener)
 
 			// Assertions
 			if tc.expectError && err == nil {
@@ -123,20 +147,4 @@ func TestCreateDatabase(t *testing.T) {
 			}
 		})
 	}
-
-	// db.CreateDatabase(tempPath, testDBName)
-	// filepath := path.Join(tempPath, testDBName)
-	// _, err := os.Stat(filepath)
-	// if os.IsNotExist(err) {
-	// 	file, err := os.Create(filepath)
-	// 	if err != nil {
-	// 		t.Fatalf("file does not exist: %s", err)
-	// 	}
-	// 	file.Close()
-	// }
-	// db, err := sql.Open("sqlite3", filepath+"/.db?_foreign_keys=on")
-	// if err != nil {
-	// 	t.Fatalf("failed to open database: %s", err)
-	// }
-	// db.Close()
 }

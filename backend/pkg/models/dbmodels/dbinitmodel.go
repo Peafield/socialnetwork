@@ -1,4 +1,4 @@
-package models
+package dbmodels
 
 // DatabaseInit is an interface that provides methods to retrieve the database directory and name.
 type DatabaseInit interface {

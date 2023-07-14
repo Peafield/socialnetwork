@@ -1,12 +1,11 @@
 package db
 
 import (
-	"database/sql"
 	"fmt"
-	"os"
 	"path"
 	"socialnetwork/pkg/helpers"
-	"socialnetwork/pkg/models"
+	"socialnetwork/pkg/models/dbmodels"
+	"socialnetwork/pkg/models/helpermodels"
 
 	_ "github.com/mattn/go-sqlite3"
 )
@@ -17,7 +16,7 @@ InitialiseDatabase validates the name and the file path of the given database.
 If the conditions are met, proceed to create the database.
 
 Parameters:
-  - dbFilePath: An interface containing the basic requirements to initialise a database.
+  - dbFilePath (string): An interface containing the basic requirements to initialise a database.
 
 Returns:
   - error: returns a specified error
@@ -26,7 +25,7 @@ Errors:
   - If the db name is not valid, exit the program and log the error.
   - If the db directory file path is not valid, exit the program and log the error.
 */
-func InitialiseDatabase(dbFilePath models.DatabaseInit) error {
+func InitialiseDatabase(dbFilePath dbmodels.DatabaseInit) error {
 	dbName := dbFilePath.GetDBName()
 	dbDirectory := dbFilePath.GetDirectory()
 
@@ -42,7 +41,14 @@ func InitialiseDatabase(dbFilePath models.DatabaseInit) error {
 		return fmt.Errorf("DB directory is not valid. Err: %s", err)
 	}
 
-	return CreateDatabase(dbDirectory, dbName)
+	osFileCreator := helpermodels.OSFileCreator{}
+
+	SQLDBOpener := dbmodels.SQLDBOpener{
+		DriveName:      "sqlite3",
+		DataSourceName: dbDirectory + "/?_foreign_keys=on",
+	}
+
+	return CreateDatabase(dbDirectory, dbName, &osFileCreator, &SQLDBOpener)
 }
 
 /*
@@ -54,8 +60,10 @@ creates the file. It then opens the database using an sqlite3 driver and sets th
 to be on. It then closes the database.
 
 Parameters:
-  - dir: the directory file path in which the database should be created
-  - name: the database name as a string
+  - dir (string): the directory file path in which the database should be created
+  - name (string): the database name
+  - fileCreator (struct):  has a Create() method
+  - dbOpener (struct): has a Open() method
 
 Errors:
   - if the file path is invalid.
@@ -65,16 +73,17 @@ Errors:
 Example:
   - CreateDatabase is only used once, called when the database is initially created.
 */
-func CreateDatabase(dir string, name string) error {
+
+func CreateDatabase(dir string, name string, fileCreator helpermodels.FileCreator, dbOpener dbmodels.DBOpener) error {
 	filepath := path.Join(dir, name+".db")
 
-	file, err := os.Create(filepath)
+	file, err := fileCreator.Create(filepath)
 	if err != nil {
 		return fmt.Errorf("failed to create file path: %s", err)
 	}
 	defer file.Close()
 
-	db, err := sql.Open("sqlite3", filepath+"/?_foreign_keys=on")
+	db, err := dbOpener.Open("sqlite3", filepath+"/?_foreign_keys=on")
 	if err != nil {
 		return fmt.Errorf("failed to open database: %s", err)
 	}

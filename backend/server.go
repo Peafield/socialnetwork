@@ -27,6 +27,8 @@ func main() {
 			Directory: DATABASE_FILE_PATH,
 			DBName:    dbName,
 		}
-		db.MigrateChangesUp(dbFilePath)
+		migrationConstructor := &dbmodels.NativeMigrate{}
+		migrateUpDown := &dbmodels.NativeMigrateUpdates{}
+		db.MigrateChangesUp(dbFilePath, migrationConstructor, migrateUpDown)
 	}
 }

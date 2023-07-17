@@ -28,7 +28,7 @@ Parameters:
 Returns:
   - error: if the file path is not valid; migration initialisaing failed; migration failed.
 */
-func MigrateChangesUp(dbFilePath dbmodels.DatabaseManager, migrationConstructor dbmodels.MigrationConstructor, migrateUpDown dbmodels.MigrationUpdates) error {
+func MigrateChangesUp(dbFilePath dbmodels.DatabaseManager, migrationsPath string, migrationConstructor dbmodels.MigrationConstructor, migrateUpDown dbmodels.MigrationUpdates) error {
 	dbDir := dbFilePath.GetDirectory()
 	dbName := dbFilePath.GetDBName() + ".db"
 	filePath := path.Join(dbDir, dbName)
@@ -39,7 +39,7 @@ func MigrateChangesUp(dbFilePath dbmodels.DatabaseManager, migrationConstructor 
 	}
 
 	m, err := migrationConstructor.New(
-		"file://./pkg/db/migrations",
+		"file://"+migrationsPath,
 		"sqlite3://"+filePath)
 	if err != nil {
 		return fmt.Errorf("migration initialization failed: %v, %v", err, filePath)

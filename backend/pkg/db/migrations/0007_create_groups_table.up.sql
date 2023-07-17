@@ -1,7 +1,7 @@
 CREATE TABLE Groups (
-  group_id TEXT UNIQUE NOTNULL PRIMARY KEY,
-  title TEXT NOTNULL,
+  group_id TEXT UNIQUE NOT NULL PRIMARY KEY,
+  title TEXT NOT NULL,
   description TEXT,
-  creator_id TEXT NOTNULL,
+  creator_id TEXT NOT NULL,
   FOREIGN KEY(creator_id) REFERENCES Users(user_id)
 );

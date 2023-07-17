@@ -2,6 +2,7 @@ package db
 
 import (
 	"fmt"
+	"log"
 	"path"
 	"socialnetwork/pkg/helpers"
 	"socialnetwork/pkg/models/dbmodels"
@@ -24,21 +25,29 @@ Returns:
 Errors:
   - If the db name is not valid, exit the program and log the error.
   - If the db directory file path is not valid, exit the program and log the error.
+  - If the db already exists, exit the program and log the error.
 */
 func InitialiseDatabase(dbFilePath dbmodels.DatabaseManager) error {
 	dbName := dbFilePath.GetDBName()
 	dbDirectory := dbFilePath.GetDirectory()
 
 	isDBNameValid, err := helpers.IsAlphaNumeric(dbName)
-
+	log.Println(isDBNameValid)
 	if !isDBNameValid {
 		return fmt.Errorf("DB name contains non alpha-numeric characters. Err: %s", err)
 	}
 
-	isFilePathValid, err := helpers.IsValidPath(dbDirectory)
+	isValidDirPath, err := helpers.IsValidPath(dbDirectory)
 
-	if !isFilePathValid {
+	if !isValidDirPath {
 		return fmt.Errorf("DB directory is not valid. Err: %s", err)
+	}
+
+	fullPath := path.Join(dbDirectory, dbName+".db")
+	dbExists, _ := helpers.IsValidPath(fullPath)
+
+	if dbExists {
+		return fmt.Errorf("DB already exists")
 	}
 
 	osFileCreator := helpermodels.OSFileCreator{}
@@ -78,6 +87,7 @@ func CreateDatabase(dir string, name string, fileCreator helpermodels.FileCreato
 	filepath := path.Join(dir, name+".db")
 
 	file, err := fileCreator.Create(filepath)
+	log.Println(filepath)
 	if err != nil {
 		return fmt.Errorf("failed to create file path: %s", err)
 	}

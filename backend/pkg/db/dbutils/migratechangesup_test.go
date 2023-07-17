@@ -2,6 +2,7 @@ package db_test
 
 import (
 	"errors"
+	"log"
 	db "socialnetwork/pkg/db/dbutils"
 	"socialnetwork/pkg/models/dbmodels"
 	"testing"
@@ -27,6 +28,7 @@ func (e *MockMigrationUpDown) Down(m *migrate.Migrate) error { return errors.New
 
 func TestMigrateChangesUp(t *testing.T) {
 	tempPath := t.TempDir()
+	log.Println(tempPath)
 
 	testCases := []struct {
 		name                 string
@@ -97,7 +99,7 @@ func TestMigrateChangesUp(t *testing.T) {
 			if dberr != nil && tc.isValidPath {
 				t.Errorf("db.CreateDatabase error: %s", dberr)
 			}
-			err := db.MigrateChangesUp(dbFilePath, tc.migrationConstructor, tc.migrateUpDown)
+			err := db.MigrateChangesUp(dbFilePath, "../migrations", tc.migrationConstructor, tc.migrateUpDown)
 
 			// Assertions
 			if tc.expectError && err == nil {

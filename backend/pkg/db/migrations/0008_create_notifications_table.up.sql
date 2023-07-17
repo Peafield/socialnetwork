@@ -1,6 +1,6 @@
 
 CREATE TABLE Notifications (
-  notification_id TEXT NOTNULL PRIMARY KEY,
+  notification_id TEXT NOT NULL PRIMARY KEY,
   sender_id TEXT,
   receiver_id TEXT,
   group_id TEXT,
@@ -9,7 +9,7 @@ CREATE TABLE Notifications (
   comment_id TEXT,
   chat_id TEXT,
   reaction_type TEXT,
-  read_status INTEGER NOTNULL DEFAULT 0,
+  read_status INTEGER NOT NULL DEFAULT 0,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   FOREIGN KEY(sender_id) REFERENCES Users(user_id),
   FOREIGN KEY(receiver_id) REFERENCES Users(user_id),

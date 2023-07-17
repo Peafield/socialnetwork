@@ -34,6 +34,21 @@ func IsValidPath(path string) (bool, error) {
 	return true, nil
 }
 
+/*
+CheckValidPath checks a given file path to see whether it is valid.
+It will test that the file name only contains alpahnumeric characters,
+that the directory exists, and that entire path does not already exist.
+
+Parameters:
+  - filePath (FilePathManager): an interface of file components
+
+Returns:
+  - bool: a bool to see if any of the tests are valid
+  - error: if any of the steps fail.
+
+Example:
+  - Testing the validity of a database or image file path
+*/
 func CheckValidPath(filePath helpermodels.FilePathManager) (bool, error) {
 	fileName := filePath.GetFileName()
 	directory := filePath.GetDirectory()

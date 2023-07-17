@@ -6,26 +6,9 @@ import (
 	db "socialnetwork/pkg/db/dbutils"
 	"socialnetwork/pkg/models/dbmodels"
 	"testing"
-
-	"github.com/golang-migrate/migrate/v4"
 )
 
-//what do we need to test
-//test validation of path whether success or fail
-
-//Simulate an error for the initialization of "migrate"
-
-// simulate an error for the Up migration
-
-type MockMigrationInit struct{}
-type MockMigrationUpDown struct{}
-
-func (e *MockMigrationInit) New(sourceURL string, databaseURL string) (*migrate.Migrate, error) {
-	return nil, errors.New("stfu")
-}
-func (e *MockMigrationUpDown) Up(m *migrate.Migrate) error   { return errors.New("up") }
-func (e *MockMigrationUpDown) Down(m *migrate.Migrate) error { return errors.New("Down") }
-
+// Simulate migration changes up in a temporary database.
 func TestMigrateChangesUp(t *testing.T) {
 	tempPath := t.TempDir()
 	log.Println(tempPath)
@@ -67,7 +50,7 @@ func TestMigrateChangesUp(t *testing.T) {
 			name:                 "Migration initialisation failure",
 			dbName:               "mydatabase",
 			dbDirectory:          tempPath,
-			migrationConstructor: &MockMigrationInit{},
+			migrationConstructor: &dbmodels.MockMigrationInit{},
 			migrateUpDown:        &dbmodels.NativeMigrateUpdates{},
 			isValidPath:          true,
 			migrationInitiliased: false,
@@ -79,13 +62,16 @@ func TestMigrateChangesUp(t *testing.T) {
 			dbName:               "mydatabase",
 			dbDirectory:          tempPath,
 			migrationConstructor: &dbmodels.NativeMigrate{},
-			migrateUpDown:        &MockMigrationUpDown{},
+			migrateUpDown:        &dbmodels.MockMigrationUpDown{},
 			isValidPath:          true,
 			migrationInitiliased: true,
 			migrationSucceeded:   false,
 			expectError:          true,
 		},
 	}
+
+	var ErrDatabaseExists = errors.New("database already exists")
+	var ErrInvalidPath = errors.New("invalid directory path")
 
 	// Run test cases
 	for _, tc := range testCases {
@@ -96,16 +82,18 @@ func TestMigrateChangesUp(t *testing.T) {
 				Directory: tc.dbDirectory,
 			}
 			dberr := db.InitialiseDatabase(dbFilePath)
-			if dberr != nil && tc.isValidPath {
-				t.Errorf("db.CreateDatabase error: %s", dberr)
+			if errors.Is(dberr, ErrInvalidPath) && tc.isValidPath {
+				t.Errorf("db.InitialiseDatabase error: %s", dberr)
 			}
-			err := db.MigrateChangesUp(dbFilePath, "../migrations", tc.migrationConstructor, tc.migrateUpDown)
-
-			// Assertions
-			if tc.expectError && err == nil {
-				t.Error("Expected an error, but got nil")
-			} else if !tc.expectError && err != nil {
-				t.Errorf("Unexpected error: %s", err)
+			// Continue onto migrations if the error is ErrDatabaseExists
+			if dberr == nil || errors.Is(dberr, ErrDatabaseExists) {
+				err := db.MigrateChangesUp(dbFilePath, "../migrations", tc.migrationConstructor, tc.migrateUpDown)
+				// Assertions
+				if tc.expectError && err == nil {
+					t.Error("Expected an error, but got nil")
+				} else if !tc.expectError && err != nil {
+					t.Errorf("Unexpected error: %s", err)
+				}
 			}
 		})
 	}

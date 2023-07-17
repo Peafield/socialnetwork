@@ -40,14 +40,14 @@ func InitialiseDatabase(dbFilePath dbmodels.DatabaseManager) error {
 	isValidDirPath, err := helpers.IsValidPath(dbDirectory)
 
 	if !isValidDirPath {
-		return fmt.Errorf("DB directory is not valid. Err: %s", err)
+		return fmt.Errorf("database directory is not valid. Err: %s", err)
 	}
 
 	fullPath := path.Join(dbDirectory, dbName+".db")
 	dbExists, _ := helpers.IsValidPath(fullPath)
 
 	if dbExists {
-		return fmt.Errorf("DB already exists")
+		return fmt.Errorf("database already exists")
 	}
 
 	osFileCreator := helpermodels.OSFileCreator{}

@@ -22,11 +22,14 @@ occurs and error will be returned.
 
 Parameters:
   - dbFilePath (DatabaseManager): contains methods to retrieve directory and file name of a database.
+  - migrationsPath (string): a relative path to the migrations folder.
+  - migrationConstructor (MigrationConstructor): an interface to abstract new migrations.
+  - migrateUpDown (MigrationUpdates): an interface to abstract migration database changes up or down.
 
 Returns:
   - error: if the file path is not valid; migration initialisaing failed; migration failed.
 */
-func MigrateChangesDown(dbFilePath dbmodels.DatabaseManager) error {
+func MigrateChangesDown(dbFilePath dbmodels.DatabaseManager, migrationsPath string, migrationConstructor dbmodels.MigrationConstructor, migrateUpDown dbmodels.MigrationUpdates) error {
 	dbDir := dbFilePath.GetDirectory()
 	dbName := dbFilePath.GetDBName() + ".db"
 	filePath := path.Join(dbDir, dbName)
@@ -36,14 +39,14 @@ func MigrateChangesDown(dbFilePath dbmodels.DatabaseManager) error {
 		return fmt.Errorf("file path is not valid. Err: %s", err)
 	}
 
-	m, err := migrate.New(
-		"file://./pkg/db/migrations",
+	m, err := migrationConstructor.New(
+		"file://"+migrationsPath,
 		"sqlite3://"+filePath)
 	if err != nil {
-		return fmt.Errorf("migration initialization failed: %v", err)
+		return fmt.Errorf("migration initialization failed: %v, %v", err, filePath)
 	}
 
-	if err := m.Down(); err != nil && err != migrate.ErrNoChange {
+	if err := migrateUpDown.Up(m); err != nil && err != migrate.ErrNoChange {
 		return fmt.Errorf("down migration failed: %v", err)
 	} else {
 		log.Println("Migration succeeded")

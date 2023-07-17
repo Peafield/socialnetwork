@@ -33,9 +33,9 @@ func MigrateChangesUp(dbFilePath dbmodels.DatabaseManager, migrationsPath string
 	dbName := dbFilePath.GetDBName() + ".db"
 	filePath := path.Join(dbDir, dbName)
 
-	isValidPath, err := helpers.IsValidPath(filePath)
+	isValidPath, _ := helpers.IsValidPath(filePath)
 	if !isValidPath {
-		return fmt.Errorf("file path is not valid. Err: %s", err)
+		return fmt.Errorf("invalid directory path")
 	}
 
 	m, err := migrationConstructor.New(

@@ -1,6 +1,10 @@
 package dbmodels
 
-import "github.com/golang-migrate/migrate/v4"
+import (
+	"errors"
+
+	"github.com/golang-migrate/migrate/v4"
+)
 
 type MigrationConstructor interface {
 	New(sourceURL string, databaseURL string) (*migrate.Migrate, error)
@@ -26,3 +30,12 @@ func (mup *NativeMigrateUpdates) Up(m *migrate.Migrate) error {
 func (mup *NativeMigrateUpdates) Down(m *migrate.Migrate) error {
 	return m.Down()
 }
+
+type MockMigrationInit struct{}
+type MockMigrationUpDown struct{}
+
+func (e *MockMigrationInit) New(sourceURL string, databaseURL string) (*migrate.Migrate, error) {
+	return nil, errors.New("stfu")
+}
+func (e *MockMigrationUpDown) Up(m *migrate.Migrate) error   { return errors.New("up") }
+func (e *MockMigrationUpDown) Down(m *migrate.Migrate) error { return errors.New("Down") }

@@ -34,6 +34,23 @@ func IsValidPath(path string) (bool, error) {
 	return true, nil
 }
 
+/*
+CheckValidPath validates the format and the existence of a given path.
+The function returns true and nil if the following conditions are satisfied:
+
+  - Must be alphanumeric
+  - Must provide a valid directory
+  - Must be unique within the specified directory
+
+Otherwise, the function returns false along its corresponding error.
+
+Parameters:
+  - Filepath (FilePathManager): An interface which provides information related to the ressource (e.g: file name, directory and/or file extension) .
+
+Returns:
+  - bool
+  - error
+*/
 func CheckValidPath(filePath helpermodels.FilePathManager) (bool, error) {
 	fileName := filePath.GetFileName()
 	directory := filePath.GetDirectory()

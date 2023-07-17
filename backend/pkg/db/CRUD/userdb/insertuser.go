@@ -25,10 +25,10 @@ Errors:
 Example:
   - InsertUser is called when a new user is created on the application, to insert the new user's data into the database.
 */
-func InsertUser(dbOpener dbmodels.DBOpener, user *dbmodels.User) (*dbmodels.User, error) {
+func InsertUser(dbOpener dbmodels.DBOpener, user *dbmodels.User) error {
 	db, err := dbOpener.Open(dbOpener.GetDriveName(), dbOpener.GetDataSourceName())
 	if err != nil {
-		return &dbmodels.User{}, fmt.Errorf("failed to open database when inserting user: %w", err)
+		return fmt.Errorf("failed to open database when inserting user: %w", err)
 	}
 	defer db.Close()
 
@@ -48,23 +48,23 @@ func InsertUser(dbOpener dbmodels.DBOpener, user *dbmodels.User) (*dbmodels.User
 		?, ?, ?, ?, ?, ?, ?, ?, ?, ?
 	)`)
 	if err != nil {
-		return &dbmodels.User{}, fmt.Errorf("failed to prepare insert user statement: %w", err)
+		return fmt.Errorf("failed to prepare insert user statement: %w", err)
 	}
 	defer statement.Close()
 
 	result, err := statement.Exec(user.UserId, user.IsLoggedIn, user.Email, user.HashedPassword, user.FirstName, user.LastName, user.DOB, user.AvatarPath, user.DisplayName, user.AboutMe)
 	if err != nil {
-		return &dbmodels.User{}, fmt.Errorf("failed to execute insert user statement: %w", err)
+		return fmt.Errorf("failed to execute insert user statement: %w", err)
 	}
 
 	rowsAffected, err := result.RowsAffected()
 	if err != nil {
-		return &dbmodels.User{}, fmt.Errorf("failed to retrieve affected rows: %w", err)
+		return fmt.Errorf("failed to retrieve affected rows: %w", err)
 	}
 
 	if rowsAffected == 0 {
-		return &dbmodels.User{}, fmt.Errorf("no rows affected when inserting user: %w", err)
+		return fmt.Errorf("no rows affected when inserting user: %w", err)
 	}
 
-	return user, nil
+	return nil
 }

@@ -2,102 +2,45 @@ package db
 
 import (
 	"fmt"
-	"log"
 	"path"
 	"socialnetwork/pkg/helpers"
-	"socialnetwork/pkg/models/dbmodels"
 	"socialnetwork/pkg/models/helpermodels"
 
 	_ "github.com/mattn/go-sqlite3"
 )
 
 /*
-InitialiseDatabase validates the name and the file path of the given database.
+CreateDatabase initializes the creation of a SQLite database file.
 
-If the conditions are met, proceed to create the database.
-
-Parameters:
-  - dbFilePath (string): An interface containing the basic requirements to initialise a database.
-
-Returns:
-  - error: returns a specified error
-
-Errors:
-  - If the db name is not valid, exit the program and log the error.
-  - If the db directory file path is not valid, exit the program and log the error.
-  - If the db already exists, exit the program and log the error.
-*/
-func InitialiseDatabase(dbFilePath dbmodels.DatabaseManager) error {
-	dbName := dbFilePath.GetDBName()
-	dbDirectory := dbFilePath.GetDirectory()
-
-	isDBNameValid, err := helpers.IsAlphaNumeric(dbName)
-	log.Println(isDBNameValid)
-	if !isDBNameValid {
-		return fmt.Errorf("DB name contains non alpha-numeric characters. Err: %s", err)
-	}
-
-	isValidDirPath, err := helpers.IsValidPath(dbDirectory)
-
-	if !isValidDirPath {
-		return fmt.Errorf("database directory is not valid. Err: %s", err)
-	}
-
-	fullPath := path.Join(dbDirectory, dbName+".db")
-	dbExists, _ := helpers.IsValidPath(fullPath)
-
-	if dbExists {
-		return fmt.Errorf("database already exists")
-	}
-
-	osFileCreator := helpermodels.OSFileCreator{}
-
-	SQLDBOpener := dbmodels.SQLDBOpener{
-		DriveName:      "sqlite3",
-		DataSourceName: dbDirectory + "/?_foreign_keys=on",
-	}
-
-	return CreateDatabase(dbDirectory, dbName, &osFileCreator, &SQLDBOpener)
-}
-
-/*
-CreateDatabase initialises the database.
-
-It defines a file path to where the database should be stored. It then checks
-if the the database already exists at the this file path. If it does not, it then
-creates the file. It then opens the database using an sqlite3 driver and sets the foreign keys
-to be on. It then closes the database.
+It takes as input an object that implements the FilePathManager interface. This interface
+should provide methods to retrieve the directory and file name of the database file.
+It constructs a full path from these components, checks if a valid file can be created at
+that location, and if so, creates the file.
 
 Parameters:
-  - dir (string): the directory file path in which the database should be created
-  - name (string): the database name
-  - fileCreator (struct):  has a Create() method
-  - dbOpener (struct): has a Open() method
+  - dbFilePath (helpermodels.FilePathManager): An object that provides the directory and
+    file name to construct the full path for the SQLite database file.
 
 Errors:
-  - if the file path is invalid.
-  - if the file fails to be created.
-  - if the database fails to open.
+  - Returns an error if the file path is invalid or if the database file fails to be created.
 
 Example:
-  - CreateDatabase is only used once, called when the database is initially created.
+  - CreateDatabase is called when the application starts, to ensure that a valid SQLite
+    database file is available for further database operations.
 */
-
-func CreateDatabase(dir string, name string, fileCreator helpermodels.FileCreator, dbOpener dbmodels.DBOpener) error {
-	filepath := path.Join(dir, name+".db")
-
-	file, err := fileCreator.Create(filepath)
-	log.Println(filepath)
-	if err != nil {
-		return fmt.Errorf("failed to create file path: %s", err)
+func CreateDatabase(dbFilePath helpermodels.FilePathManager) error {
+	isValidDatabaseFilePath, err := helpers.CheckValidPath(dbFilePath)
+	if !isValidDatabaseFilePath {
+		return fmt.Errorf("invalid database: %s", err)
 	}
-	defer file.Close()
 
-	db, err := dbOpener.Open("sqlite3", filepath+"/?_foreign_keys=on")
+	dbFullPath := path.Join(dbFilePath.GetDirectory(), dbFilePath.GetFileName()+dbFilePath.GetFileExtension())
+	osFileCreator := &helpermodels.OSFileCreator{}
+
+	err = helpers.FileCreator(dbFullPath, osFileCreator)
 	if err != nil {
-		return fmt.Errorf("failed to open database: %s", err)
+		return fmt.Errorf("failed to create database file: %s", err)
 	}
-	defer db.Close()
 
 	return nil
 }

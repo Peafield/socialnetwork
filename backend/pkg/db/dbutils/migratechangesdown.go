@@ -1,13 +1,6 @@
 package db
 
 import (
-	"fmt"
-	"log"
-	"path"
-	"socialnetwork/pkg/helpers"
-	"socialnetwork/pkg/models/dbmodels"
-
-	"github.com/golang-migrate/migrate/v4"
 	_ "github.com/golang-migrate/migrate/v4/database/sqlite3"
 	_ "github.com/golang-migrate/migrate/v4/source/file"
 	_ "github.com/mattn/go-sqlite3"
@@ -29,27 +22,27 @@ Parameters:
 Returns:
   - error: if the file path is not valid; migration initialisaing failed; migration failed.
 */
-func MigrateChangesDown(dbFilePath dbmodels.DatabaseManager, migrationsPath string, migrationConstructor dbmodels.MigrationConstructor, migrateUpDown dbmodels.MigrationUpdates) error {
-	dbDir := dbFilePath.GetDirectory()
-	dbName := dbFilePath.GetDBName() + ".db"
-	filePath := path.Join(dbDir, dbName)
+// func MigrateChangesDown(dbFilePath dbmodels.DatabaseManager, migrationsPath string, migrationConstructor dbmodels.MigrationConstructor, migrateUpDown dbmodels.MigrationUpdates) error {
+// 	dbDir := dbFilePath.GetDirectory()
+// 	dbName := dbFilePath.GetDBName() + ".db"
+// 	filePath := path.Join(dbDir, dbName)
 
-	isValidPath, err := helpers.IsValidPath(filePath)
-	if !isValidPath {
-		return fmt.Errorf("file path is not valid. Err: %s", err)
-	}
+// 	isValidPath, err := helpers.IsValidPath(filePath)
+// 	if !isValidPath {
+// 		return fmt.Errorf("file path is not valid. Err: %s", err)
+// 	}
 
-	m, err := migrationConstructor.New(
-		"file://"+migrationsPath,
-		"sqlite3://"+filePath)
-	if err != nil {
-		return fmt.Errorf("migration initialization failed: %v, %v", err, filePath)
-	}
+// 	m, err := migrationConstructor.New(
+// 		"file://"+migrationsPath,
+// 		"sqlite3://"+filePath)
+// 	if err != nil {
+// 		return fmt.Errorf("migration initialization failed: %v, %v", err, filePath)
+// 	}
 
-	if err := migrateUpDown.Up(m); err != nil && err != migrate.ErrNoChange {
-		return fmt.Errorf("down migration failed: %v", err)
-	} else {
-		log.Println("Migration succeeded")
-	}
-	return nil
-}
+// 	if err := migrateUpDown.Down(m); err != nil && err != migrate.ErrNoChange {
+// 		return fmt.Errorf("down migration failed: %v", err)
+// 	} else {
+// 		log.Println("Migration succeeded")
+// 	}
+// 	return nil
+// }

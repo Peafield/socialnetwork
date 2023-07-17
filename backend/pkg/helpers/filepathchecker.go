@@ -1,7 +1,12 @@
 package helpers
 
 import (
+	"errors"
+	"fmt"
+	"log"
 	"os"
+	"path"
+	"socialnetwork/pkg/models/helpermodels"
 )
 
 /*
@@ -21,9 +26,36 @@ Example:
   - Testing the directory file path for file storage (e.g databases, images, etc)
 */
 func IsValidPath(path string) (bool, error) {
-	_, err := os.Stat(path)
-	if os.IsNotExist(err) {
+	if _, err := os.Stat(path); err == nil {
+		return true, err
+	} else if errors.Is(err, os.ErrNotExist) {
 		return false, err
 	}
-	return true, err
+	return true, nil
+}
+
+func CheckValidPath(filePath helpermodels.FilePathManager) (bool, error) {
+	fileName := filePath.GetFileName()
+	directory := filePath.GetDirectory()
+	extension := filePath.GetFileExtension()
+
+	isFileNameValid, err := IsAlphaNumeric(fileName)
+	if !isFileNameValid {
+		return false, fmt.Errorf("file name contains non alpha-numeric characters. Err: %s", err)
+	}
+
+	isValidDirPath, err := IsValidPath(directory)
+
+	if !isValidDirPath {
+		return false, fmt.Errorf("directory is not valid. Err: %s", err)
+	}
+
+	fullPath := path.Join(directory, fileName+extension)
+	log.Println(fullPath)
+	fullPathExists, err := IsValidPath(fullPath)
+
+	if fullPathExists && err == nil {
+		return false, fmt.Errorf("file path already exists: %s", err)
+	}
+	return true, nil
 }

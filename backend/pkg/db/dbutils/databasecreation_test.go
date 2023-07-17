@@ -5,7 +5,6 @@ import (
 	"errors"
 	"os"
 	db "socialnetwork/pkg/db/dbutils"
-	"socialnetwork/pkg/models/dbmodels"
 	"socialnetwork/pkg/models/helpermodels"
 	"testing"
 
@@ -24,70 +23,21 @@ func (f *MockFileCreator) Create(name string) (*os.File, error) {
 /*
 the following function simulates the failed process of OPENING a file for testing purposes.
 */
-type MockSQLDBOpener struct{}
+type MockSQLDBOpener struct {
+	DriveName      string
+	DataSourceName string
+}
+
+func (o *MockSQLDBOpener) GetDriveName() string {
+	return o.DriveName
+}
+
+func (o *MockSQLDBOpener) GetDataSourceName() string {
+	return o.DataSourceName
+}
 
 func (o *MockSQLDBOpener) Open(driveName, dataSourceName string) (*sql.DB, error) {
 	return nil, errors.New("cannot open database")
-}
-
-func TestInitialiseDatabase(t *testing.T) {
-	// Create a temporary directory for testing
-	tmpDir := t.TempDir()
-
-	// Define test cases
-	testCases := []struct {
-		name            string
-		dbName          string
-		dbDirectory     string
-		isDBNameValid   bool
-		isFilePathValid bool
-		expectError     bool
-	}{
-		{
-			name:            "Valid database name and directory",
-			dbName:          "mydatabase",
-			dbDirectory:     tmpDir,
-			isDBNameValid:   true,
-			isFilePathValid: true,
-			expectError:     false,
-		},
-		{
-			name:            "Invalid database name",
-			dbName:          "my-database",
-			dbDirectory:     tmpDir,
-			isDBNameValid:   false,
-			isFilePathValid: true,
-			expectError:     true,
-		},
-		{
-			name:            "Invalid database directory",
-			dbName:          "mydatabase",
-			dbDirectory:     "/invalid/directory",
-			isDBNameValid:   true,
-			isFilePathValid: false,
-			expectError:     true,
-		},
-		// Add more test cases as needed
-	}
-
-	// Run test cases
-	for _, tc := range testCases {
-		t.Run(tc.name, func(t *testing.T) {
-			// Perform the test
-			dbFilePath := &dbmodels.DatabaseFilePathComponents{
-				DBName:    tc.dbName,
-				Directory: tc.dbDirectory,
-			}
-			err := db.InitialiseDatabase(dbFilePath)
-
-			// Assertions
-			if tc.expectError && err == nil {
-				t.Error("Expected an error, but got nil")
-			} else if !tc.expectError && err != nil {
-				t.Errorf("Unexpected error: %s", err)
-			}
-		})
-	}
 }
 
 func TestCreateDatabase(t *testing.T) {
@@ -97,40 +47,40 @@ func TestCreateDatabase(t *testing.T) {
 		name          string
 		dbName        string
 		dbDirectory   string
-		fileCreator   helpermodels.FileCreator
-		dbOpener      dbmodels.DBOpener
-		dbFileCreated bool
-		dbFileOpened  bool
+		isValidPath   bool
+		isFileCreated bool
 		expectError   bool
 	}{
 		{
-			name:          "Database created and opened",
+			name:          "Database valid and created",
 			dbName:        "mydatabase",
 			dbDirectory:   tempPath,
-			fileCreator:   &helpermodels.OSFileCreator{},
-			dbOpener:      &dbmodels.SQLDBOpener{},
-			dbFileCreated: true,
-			dbFileOpened:  true,
+			isValidPath:   true,
+			isFileCreated: true,
 			expectError:   false,
 		},
 		{
-			name:          "Database not created",
-			dbName:        "mydatabase",
+			name:          "Invalid database name",
+			dbName:        "@+][",
 			dbDirectory:   tempPath,
-			fileCreator:   &MockFileCreator{},
-			dbOpener:      &dbmodels.SQLDBOpener{},
-			dbFileCreated: false,
-			dbFileOpened:  false,
+			isValidPath:   false,
+			isFileCreated: false,
 			expectError:   true,
 		},
 		{
-			name:          "Database created but not opened",
-			dbName:        "mydatabase",
+			name:          "invalid database directory",
+			dbName:        "mydatabase1",
+			dbDirectory:   "/invalid/directory",
+			isValidPath:   false,
+			isFileCreated: false,
+			expectError:   true,
+		},
+		{
+			name:          "Database already exists",
+			dbName:        "mydatabase2",
 			dbDirectory:   tempPath,
-			fileCreator:   &helpermodels.OSFileCreator{},
-			dbOpener:      &MockSQLDBOpener{},
-			dbFileCreated: true,
-			dbFileOpened:  false,
+			isValidPath:   false,
+			isFileCreated: false,
 			expectError:   true,
 		},
 	}
@@ -139,12 +89,15 @@ func TestCreateDatabase(t *testing.T) {
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
 			// Perform the test
-			dbFilePath := &dbmodels.DatabaseFilePathComponents{
-				DBName:    tc.dbName,
+			dbFilePath := &helpermodels.FilePathComponents{
 				Directory: tc.dbDirectory,
+				FileName:  tc.dbName,
+				Extension: ".db",
 			}
-			err := db.CreateDatabase(dbFilePath.Directory, dbFilePath.DBName, tc.fileCreator, tc.dbOpener)
-
+			err := db.CreateDatabase(dbFilePath)
+			if tc.name == "Database already exists" {
+				err = db.CreateDatabase(dbFilePath)
+			}
 			// Assertions
 			if tc.expectError && err == nil {
 				t.Error("Expected an error, but got nil")

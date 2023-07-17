@@ -7,7 +7,7 @@ CREATE TABLE Users (
   last_name TEXT NOT NULL,
   date_of_birth DATE NOT NULL,
   avatar_path TEXT NOT NULL,
-  nickname TEXT UNIQUE,
+  display_name TEXT UNIQUE,
   about_me TEXT,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );

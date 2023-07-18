@@ -1,6 +1,7 @@
 package db
 
 import (
+	"database/sql"
 	"fmt"
 	"socialnetwork/pkg/models/dbmodels"
 )
@@ -15,7 +16,7 @@ with the database. The User object contains all necessary data for a new user re
 Upon a successful operation, the function returns the User object that was passed as an input.
 
 Parameters:
-  - dbOpener (dbmodels.DBOpener): An object that provides the driver name and the data source name for the database connection.
+  - db (*sql.DB): An open database to access and interact with.
   - user (*dbmodels.User): A pointer to the User object that contains data for the new user record.
 
 Errors:
@@ -25,13 +26,7 @@ Errors:
 Example:
   - InsertUser is called when a new user is created on the application, to insert the new user's data into the database.
 */
-func InsertUser(dbOpener dbmodels.DBOpener, user *dbmodels.User) error {
-	db, err := dbOpener.Open(dbOpener.GetDriveName(), dbOpener.GetDataSourceName())
-	if err != nil {
-		return fmt.Errorf("failed to open database when inserting user: %w", err)
-	}
-	defer db.Close()
-
+func InsertUser(db *sql.DB, user *dbmodels.User) error {
 	statement, err := db.Prepare(`
 	INSERT INTO Users (
 		user_id,

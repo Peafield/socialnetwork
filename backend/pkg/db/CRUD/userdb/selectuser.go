@@ -3,14 +3,14 @@ package db
 import (
 	"database/sql"
 	"fmt"
-	"socialnetwork/pkg/helpers"
+	"socialnetwork/pkg/db/dbutils"
 	"socialnetwork/pkg/models/dbmodels"
 )
 
 /*
 SelectUser returns a user from the database given a column value and a search value.
 
-Firstly, validates that the column value is present in the struct, so that it can query the database properly.
+Firstly, validates that the column value is present in the database table, so that it can query the database properly.
 Then, opens the database, prepares the statement, and finally queries the row before returning the user as a User struct.
 
 Parameters:
@@ -34,9 +34,9 @@ Examples:
 func SelectUser(db *sql.DB, columnName, searchValue string) (dbmodels.User, error) {
 	var user dbmodels.User
 
-	isValidColumnValue, err := helpers.IsValidStructField(columnName, user)
-	if !isValidColumnValue && err != nil {
-		return user, fmt.Errorf("failed to validate column value within struct when inserting user: %w", err)
+	doesColumnExist, err := dbutils.DoesColumnExist(db, "Users", columnName)
+	if !doesColumnExist {
+		return user, fmt.Errorf("search column doesn't exist when selecting user: %w", err)
 	}
 
 	stm, err := db.Prepare("SELECT * FROM Users WHERE " + columnName + " = ?")

@@ -1,4 +1,4 @@
-package db_test
+package dbutils_test
 
 import (
 	"errors"

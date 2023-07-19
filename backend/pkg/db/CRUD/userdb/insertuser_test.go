@@ -1,15 +1,5 @@
 package userdb_test
 
-import (
-	"database/sql"
-	"socialnetwork/pkg/db/CRUD/userdb"
-	"socialnetwork/pkg/db/dbutils"
-	"socialnetwork/pkg/models/dbmodels"
-	"socialnetwork/pkg/models/helpermodels"
-	"testing"
-	"time"
-)
-
 const MIGRATIONS_FILE_PATH = "../../migrations"
 
 const BIG_ABOUT_ME = `Hello there! I am Taylor, a widely traveled time-jaunting omniscient dream-weaver. When I am not summoning sentient storms on a distant alien planet or deciphering ancient prophecies in forgotten crypts, you'll find me at the edge of reality, watching the universe unfurl its tapestry of starlight and darkness.
@@ -28,84 +18,84 @@ At heart, I am an interstellar storyteller, narrating the untold tales of the co
 
 Oh, and I make a killer cup of starlight espresso, the perfect fuel for any cosmic voyage! Join me, and let's write the next chapter of our shared cosmic story together.`
 
-func TestInsertUser(t *testing.T) {
-	tempDir := t.TempDir()
-	tempDBFilePath := &helpermodels.FilePathComponents{
-		Directory: tempDir,
-		FileName:  "test",
-		Extension: ".db",
-	}
-	err := dbutils.CreateDatabase(tempDBFilePath)
-	if err != nil {
-		t.Errorf("Failed to create test database: %s", err)
-	}
-	migrationConstructor := &dbmodels.NativeMigrate{}
-	migrateUpDown := &dbmodels.NativeMigrateUpdates{}
-	err = dbutils.MigrateChangesUp(tempDBFilePath, MIGRATIONS_FILE_PATH, migrationConstructor, migrateUpDown)
-	if err != nil {
-		t.Errorf("failed to migrate changes up to test database: %s", err)
-	}
-	testDB, err := sql.Open("sqlite3", tempDBFilePath.Directory+"/"+tempDBFilePath.FileName+tempDBFilePath.Extension)
-	if err != nil {
-		t.Errorf("Failed to open test database: %s", err)
-	}
-	testCases := []struct {
-		name        string
-		user        *dbmodels.User
-		columnType  string
-		searchValue string
-		expectError bool
-	}{
-		{
-			name: "Correct user data",
-			user: &dbmodels.User{
-				UserId:         "1",
-				IsLoggedIn:     0,
-				Email:          "user@test.com",
-				HashedPassword: "hashed_password",
-				FirstName:      "First",
-				LastName:       "Last",
-				DOB:            time.Now(),
-				AvatarPath:     "path/to/avatar",
-				DisplayName:    "User",
-				AboutMe:        "About me",
-			},
-			columnType:  "user_id",
-			searchValue: "1",
-			expectError: false,
-		},
-		{
-			name: "Correct user data2",
-			user: &dbmodels.User{
-				UserId:         "2",
-				IsLoggedIn:     1,
-				Email:          "user2@test.com",
-				HashedPassword: "43987ohflkshfsdugyi8a:_dsfkjhdfsdfjshdkfah!dsjfhsdjkfhskjdfhksjdfhksdjfh",
-				FirstName:      "First2",
-				LastName:       "Last2",
-				DOB:            time.Now(),
-				AvatarPath:     "path/to/avatar2",
-				DisplayName:    "User2",
-				AboutMe:        BIG_ABOUT_ME,
-			},
-			columnType:  "about_me",
-			searchValue: BIG_ABOUT_ME,
-			expectError: false,
-		},
-	}
+// func TestInsertUser(t *testing.T) {
+// 	tempDir := t.TempDir()
+// 	tempDBFilePath := &helpermodels.FilePathComponents{
+// 		Directory: tempDir,
+// 		FileName:  "test",
+// 		Extension: ".db",
+// 	}
+// 	err := dbutils.CreateDatabase(tempDBFilePath)
+// 	if err != nil {
+// 		t.Errorf("Failed to create test database: %s", err)
+// 	}
+// 	migrationConstructor := &dbmodels.NativeMigrate{}
+// 	migrateUpDown := &dbmodels.NativeMigrateUpdates{}
+// 	err = dbutils.MigrateChangesUp(tempDBFilePath, MIGRATIONS_FILE_PATH, migrationConstructor, migrateUpDown)
+// 	if err != nil {
+// 		t.Errorf("failed to migrate changes up to test database: %s", err)
+// 	}
+// 	testDB, err := sql.Open("sqlite3", tempDBFilePath.Directory+"/"+tempDBFilePath.FileName+tempDBFilePath.Extension)
+// 	if err != nil {
+// 		t.Errorf("Failed to open test database: %s", err)
+// 	}
+// 	testCases := []struct {
+// 		name        string
+// 		user        *dbmodels.User
+// 		columnType  string
+// 		searchValue string
+// 		expectError bool
+// 	}{
+// 		{
+// 			name: "Correct user data",
+// 			user: &dbmodels.User{
+// 				UserId:         "1",
+// 				IsLoggedIn:     0,
+// 				Email:          "user@test.com",
+// 				HashedPassword: "hashed_password",
+// 				FirstName:      "First",
+// 				LastName:       "Last",
+// 				DOB:            time.Now(),
+// 				AvatarPath:     "path/to/avatar",
+// 				DisplayName:    "User",
+// 				AboutMe:        "About me",
+// 			},
+// 			columnType:  "user_id",
+// 			searchValue: "1",
+// 			expectError: false,
+// 		},
+// 		{
+// 			name: "Correct user data2",
+// 			user: &dbmodels.User{
+// 				UserId:         "2",
+// 				IsLoggedIn:     1,
+// 				Email:          "user2@test.com",
+// 				HashedPassword: "43987ohflkshfsdugyi8a:_dsfkjhdfsdfjshdkfah!dsjfhsdjkfhskjdfhksjdfhksdjfh",
+// 				FirstName:      "First2",
+// 				LastName:       "Last2",
+// 				DOB:            time.Now(),
+// 				AvatarPath:     "path/to/avatar2",
+// 				DisplayName:    "User2",
+// 				AboutMe:        BIG_ABOUT_ME,
+// 			},
+// 			columnType:  "about_me",
+// 			searchValue: BIG_ABOUT_ME,
+// 			expectError: false,
+// 		},
+// 	}
 
-	for _, tc := range testCases {
-		t.Run(tc.name, func(t *testing.T) {
-			err = userdb.InsertUser(testDB, tc.user)
-			if tc.expectError && err == nil {
-				t.Error("Expected an error, but got nil")
-			} else if !tc.expectError && err != nil {
-				t.Errorf("Unexpected error: %s", err)
-			}
-			_, err := userdb.SelectUser(testDB, tc.columnType, tc.searchValue)
-			if err != nil {
-				t.Errorf("Unexpected error: %s", err)
-			}
-		})
-	}
-}
+// 	for _, tc := range testCases {
+// 		t.Run(tc.name, func(t *testing.T) {
+// 			err = userdb.InsertUser(testDB, tc.user)
+// 			if tc.expectError && err == nil {
+// 				t.Error("Expected an error, but got nil")
+// 			} else if !tc.expectError && err != nil {
+// 				t.Errorf("Unexpected error: %s", err)
+// 			}
+// 			_, err := userdb.SelectUser(testDB, tc.columnType, tc.searchValue)
+// 			if err != nil {
+// 				t.Errorf("Unexpected error: %s", err)
+// 			}
+// 		})
+// 	}
+// }

@@ -1,11 +1,16 @@
 package main
 
 import (
+	"database/sql"
 	"flag"
+	"fmt"
 	"log"
+	"reflect"
+	"socialnetwork/pkg/db/CRUD/userdb"
 	"socialnetwork/pkg/db/dbutils"
 	"socialnetwork/pkg/models/dbmodels"
 	"socialnetwork/pkg/models/helpermodels"
+	"time"
 )
 
 const DATABASE_FILE_PATH = "./pkg/db/"
@@ -65,18 +70,47 @@ func main() {
 			log.Fatalf("Failed to migrate changes down: %s", err)
 		}
 	}
-	// db, _ := sql.Open("sqlite3", "./pkg/db/socialNetwork.db")
-	// user := &dbmodels.User{
-	// 	UserId:         "1",
-	// 	IsLoggedIn:     0,
-	// 	Email:          "user@test.com",
-	// 	HashedPassword: "hashed_password",
-	// 	FirstName:      "First",
-	// 	LastName:       "Last",
-	// 	DOB:            time.Now(),
-	// 	AvatarPath:     "path/to/avatar",
-	// 	DisplayName:    "User",
-	// 	AboutMe:        "About me",
-	// }
-	// userDB.InsertUser(db, user)
+	db, err := sql.Open("sqlite3", "./pkg/db/socialNetwork.db")
+	if err != nil {
+		log.Fatalf("err %s", err)
+	}
+	user := &dbmodels.User{
+		UserId:         "2",
+		IsLoggedIn:     1,
+		Email:          "user@test.com2",
+		HashedPassword: "hashed_password2",
+		FirstName:      "First2",
+		LastName:       "Last2",
+		DOB:            time.Now(),
+		AvatarPath:     "path/to/avatar2",
+		DisplayName:    "User2",
+		AboutMe:        "About me2",
+	}
+	addressOfValues := StructFieldAddresses(user)
+	for i, v := range addressOfValues {
+		fmt.Println(i, v)
+	}
+	log.Println(len(addressOfValues))
+	err = userdb.InsertUser(db, addressOfValues)
+	if err != nil {
+		log.Fatalf("err: %s", err)
+	}
+}
+
+func StructFieldAddresses(s interface{}) []interface{} {
+	v := reflect.ValueOf(s)
+	if v.Kind() != reflect.Ptr || v.Elem().Kind() != reflect.Struct {
+		panic("input must be a pointer to a struct")
+	}
+
+	v = v.Elem() // de-reference the pointer to get the underlying struct
+	var values []interface{}
+	for i := 0; i < v.NumField(); i++ {
+		fieldType := v.Type().Field(i)
+		if fieldType.Name != "CreationDate" {
+			values = append(values, v.Field(i).Interface())
+		}
+
+	}
+	return values
 }

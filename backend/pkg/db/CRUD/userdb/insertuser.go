@@ -3,7 +3,6 @@ package userdb
 import (
 	"database/sql"
 	"fmt"
-	"socialnetwork/pkg/models/dbmodels"
 )
 
 /*
@@ -26,7 +25,7 @@ Errors:
 Example:
   - InsertUser is called when a new user is created on the application, to insert the new user's data into the database.
 */
-func InsertUser(db *sql.DB, user *dbmodels.User) error {
+func InsertUser(db *sql.DB, values []interface{}) error {
 	statement, err := db.Prepare(`
 	INSERT INTO Users (
 		user_id,
@@ -43,22 +42,22 @@ func InsertUser(db *sql.DB, user *dbmodels.User) error {
 		?, ?, ?, ?, ?, ?, ?, ?, ?, ?
 	)`)
 	if err != nil {
-		return fmt.Errorf("failed to prepare insert user statement: %w", err)
+		return fmt.Errorf("failed to prepare insert user statement: %s", err)
 	}
 	defer statement.Close()
-
-	result, err := statement.Exec(user.UserId, user.IsLoggedIn, user.Email, user.HashedPassword, user.FirstName, user.LastName, user.DOB, user.AvatarPath, user.DisplayName, user.AboutMe)
+	//[user.UserId, user.IsLoggedIn, user.Email, user.HashedPassword, user.FirstName, user.LastName, user.DOB, user.AvatarPath, user.DisplayName, user.AboutMe]
+	result, err := statement.Exec(values...)
 	if err != nil {
-		return fmt.Errorf("failed to execute insert user statement: %w", err)
+		return fmt.Errorf("failed to execute insert user statement: %s", err)
 	}
 
 	rowsAffected, err := result.RowsAffected()
 	if err != nil {
-		return fmt.Errorf("failed to retrieve affected rows: %w", err)
+		return fmt.Errorf("failed to retrieve affected rows: %s", err)
 	}
 
 	if rowsAffected == 0 {
-		return fmt.Errorf("no rows affected when inserting user: %w", err)
+		return fmt.Errorf("no rows affected when inserting user: %s", err)
 	}
 
 	return nil

@@ -3,7 +3,7 @@ package main
 import (
 	"flag"
 	"log"
-	db "socialnetwork/pkg/db/dbutils"
+	"socialnetwork/pkg/db/dbutils"
 	"socialnetwork/pkg/models/dbmodels"
 	"socialnetwork/pkg/models/helpermodels"
 )
@@ -29,7 +29,7 @@ func main() {
 			FileName:  dbName,
 			Extension: ".db",
 		}
-		err := db.CreateDatabase(dbFilePath)
+		err := dbutils.CreateDatabase(dbFilePath)
 		if err != nil {
 			log.Fatalf("Failed to initialise database: %s", err)
 		}
@@ -45,7 +45,7 @@ func main() {
 		}
 		migrationConstructor := &dbmodels.NativeMigrate{}
 		migrateUpDown := &dbmodels.NativeMigrateUpdates{}
-		err := db.MigrateChangesUp(dbFilePath, MIGRATIONS_FILE_PATH, migrationConstructor, migrateUpDown)
+		err := dbutils.MigrateChangesUp(dbFilePath, MIGRATIONS_FILE_PATH, migrationConstructor, migrateUpDown)
 		if err != nil {
 			log.Fatalf("Failed to migrate changes up: %s", err)
 		}
@@ -60,9 +60,23 @@ func main() {
 		}
 		migrationConstructor := &dbmodels.NativeMigrate{}
 		migrateUpDown := &dbmodels.NativeMigrateUpdates{}
-		err := db.MigrateChangesDown(dbFilePath, MIGRATIONS_FILE_PATH, migrationConstructor, migrateUpDown)
+		err := dbutils.MigrateChangesDown(dbFilePath, MIGRATIONS_FILE_PATH, migrationConstructor, migrateUpDown)
 		if err != nil {
 			log.Fatalf("Failed to migrate changes down: %s", err)
 		}
 	}
+	// db, _ := sql.Open("sqlite3", "./pkg/db/socialNetwork.db")
+	// user := &dbmodels.User{
+	// 	UserId:         "1",
+	// 	IsLoggedIn:     0,
+	// 	Email:          "user@test.com",
+	// 	HashedPassword: "hashed_password",
+	// 	FirstName:      "First",
+	// 	LastName:       "Last",
+	// 	DOB:            time.Now(),
+	// 	AvatarPath:     "path/to/avatar",
+	// 	DisplayName:    "User",
+	// 	AboutMe:        "About me",
+	// }
+	// userDB.InsertUser(db, user)
 }

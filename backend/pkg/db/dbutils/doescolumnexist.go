@@ -33,8 +33,12 @@ func DoesColumnExist(db *sql.DB, tableName, columnName string) (bool, error) {
 	for rows.Next() {
 		var cid int
 		var name string
-		// Other columns returned by PRAGMA table_info are not used here.
-		if err := rows.Scan(&cid, &name, nil, nil, nil, nil, nil); err != nil {
+		var typeVar string
+		var notNull int
+		var dfltValue *string
+		var pk int
+
+		if err := rows.Scan(&cid, &name, &typeVar, &notNull, &dfltValue, &pk); err != nil {
 			return false, err
 		}
 		if name == columnName {

@@ -35,7 +35,6 @@ func MigrateChangesUp(dbFilePath helpermodels.FilePathManager, migrationsPath st
 	dbName := dbFilePath.GetFileName()
 	dbExtension := dbFilePath.GetFileExtension()
 	filePath := path.Join(dbDir, dbName+dbExtension)
-
 	isValidPath, _ := helpers.IsValidPath(filePath)
 	if !isValidPath {
 		return fmt.Errorf("invalid directory path")

@@ -2,6 +2,7 @@ package dbutils
 
 import (
 	"fmt"
+	"log"
 	"path"
 	"socialnetwork/pkg/helpers"
 	"socialnetwork/pkg/models/helpermodels"
@@ -35,6 +36,7 @@ func CreateDatabase(dbFilePath helpermodels.FilePathManager) error {
 	}
 
 	dbFullPath := path.Join(dbFilePath.GetDirectory(), dbFilePath.GetFileName()+dbFilePath.GetFileExtension())
+	log.Println("Create database:", dbFullPath)
 	osFileCreator := &helpermodels.OSFileCreator{}
 
 	err = helpers.FileCreator(dbFullPath, osFileCreator)

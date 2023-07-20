@@ -1,4 +1,4 @@
-package db
+package userdb
 
 import (
 	"database/sql"
@@ -38,7 +38,7 @@ func InsertUser(db *sql.DB, user *dbmodels.User) error {
 		date_of_birth,
 		avatar_path,
 		display_name,
-		about_me,
+		about_me
 	) VALUES (
 		?, ?, ?, ?, ?, ?, ?, ?, ?, ?
 	)`)

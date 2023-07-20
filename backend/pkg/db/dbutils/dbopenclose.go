@@ -1,0 +1,56 @@
+package dbutils
+
+import (
+	"database/sql"
+	"fmt"
+	"socialnetwork/pkg/helpers"
+	"socialnetwork/pkg/models/helpermodels"
+)
+
+var DB *sql.DB
+
+/*
+OpenDatabase takes a specific file path to a database and opens it.
+
+The function will first check if the faile path to a database is
+valid. If it is, it will then open a database and keep that connection alive to be used for
+the life of the server.
+
+Parameters:
+  - filepath (*helpermodels.FilePathComponents): a pointer to a struct of file path components
+
+Returns:
+  - error: An error is returned if the database fails to open
+
+Example:
+  - The database will open when dbinit is called in the terminal with the name of the database.
+*/
+func OpenDatabase(filepath *helpermodels.FilePathComponents) error {
+	var err error
+
+	isValidDB, err := helpers.CheckValidPath(filepath)
+	if err != nil {
+		return fmt.Errorf("invalid database file path: %s", err)
+	}
+
+	if isValidDB {
+		DB, err = sql.Open("sqlite3", filepath.Directory+"/"+filepath.FileName+filepath.Extension)
+		if err != nil {
+			return fmt.Errorf("failed to open %s database: %s", filepath.FileName, err)
+		}
+	}
+
+	return nil
+}
+
+/*
+CloseDatabase closes an open database.
+
+The function will take an existing open database and close it.
+
+Example:
+  - The closing of the open database will be defered until the server closes.
+*/
+func CloseDatabase() {
+	DB.Close()
+}

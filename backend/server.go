@@ -7,6 +7,7 @@ import (
 	"log"
 	"reflect"
 	"socialnetwork/pkg/db/CRUD/userdb"
+	"socialnetwork/pkg/db/dbstatements"
 	"socialnetwork/pkg/db/dbutils"
 	"socialnetwork/pkg/models/dbmodels"
 	"socialnetwork/pkg/models/helpermodels"
@@ -19,6 +20,7 @@ const MIGRATIONS_FILE_PATH = "./pkg/db/migrations"
 func main() {
 	/*FLAGS*/
 	dbinit := flag.Bool("dbinit", false, "Initialises a database")
+	dbopen := flag.Bool("dbopen", false, "Opens a database and prepares database statements")
 	dbup := flag.Bool("dbup", false, "Migrate database changes up")
 	dbdown := flag.Bool("dbdown", false, "Migrate database changes down")
 
@@ -29,18 +31,44 @@ func main() {
 		if len(dbName) < 1 {
 			log.Fatalf("Missing database name")
 		}
+
 		dbFilePath := &helpermodels.FilePathComponents{
 			Directory: DATABASE_FILE_PATH,
 			FileName:  dbName,
 			Extension: ".db",
 		}
+
 		err := dbutils.CreateDatabase(dbFilePath)
 		if err != nil {
-			log.Fatalf("Failed to initialise database: %s", err)
+			log.Fatalf("Failed to create database: %s", err)
 		}
-
 	}
 
+	if *dbopen {
+		dbName := flag.Arg(0)
+		if len(dbName) < 1 {
+			log.Fatalf("Missing database name")
+		}
+
+		dbFilePath := &helpermodels.FilePathComponents{
+			Directory: DATABASE_FILE_PATH,
+			FileName:  dbName,
+			Extension: ".db",
+		}
+
+		err := dbutils.OpenDatabase(dbFilePath)
+		if err != nil {
+			log.Fatalf("Fail open database: %s", err)
+		}
+		defer dbutils.CloseDatabase()
+
+		err = dbstatements.InitDBStatements(dbutils.DB)
+		if err != nil {
+			log.Fatalf("Fail to prepare database statements: %s", err)
+		}
+
+		defer dbstatements.CloseDBStatements()
+	}
 	if *dbup {
 		dbName := flag.Arg(0)
 		dbFilePath := &helpermodels.FilePathComponents{
@@ -86,7 +114,7 @@ func main() {
 		DisplayName:    "User2",
 		AboutMe:        "About me2",
 	}
-	addressOfValues := StructFieldAddresses(user)
+	addressOfValues := StructFieldValues(user)
 	for i, v := range addressOfValues {
 		fmt.Println(i, v)
 	}
@@ -97,7 +125,7 @@ func main() {
 	}
 }
 
-func StructFieldAddresses(s interface{}) []interface{} {
+func StructFieldValues(s interface{}) []interface{} {
 	v := reflect.ValueOf(s)
 	if v.Kind() != reflect.Ptr || v.Elem().Kind() != reflect.Struct {
 		panic("input must be a pointer to a struct")

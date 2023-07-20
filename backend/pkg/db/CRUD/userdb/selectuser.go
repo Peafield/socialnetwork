@@ -3,7 +3,7 @@ package userdb
 import (
 	"database/sql"
 	"fmt"
-	"socialnetwork/pkg/db/dbutils"
+	"reflect"
 	"socialnetwork/pkg/models/dbmodels"
 )
 
@@ -31,34 +31,39 @@ Errors:
 Examples:
 - Used when selecting a user, maybe to retrieve certain details or verify credentials.
 */
-func SelectUser(db *sql.DB, columnName, searchValue string) (dbmodels.User, error) {
+func SelectUser(db *sql.DB, table string, conditionStatement string) (interface{}, error) {
 	var user dbmodels.User
 
-	doesColumnExist, err := dbutils.DoesColumnExist(db, "Users", columnName)
-	if !doesColumnExist {
-		return user, fmt.Errorf("search column doesn't exist when selecting user: %w", err)
-	}
+	stm := "SELECT * FROM Users " + conditionStatement
 
-	stm, err := db.Prepare("SELECT * FROM Users WHERE " + columnName + " = ?")
+	result, err := db.Query(stm)
 	if err != nil {
-		return user, fmt.Errorf("statement preparation failure when selecting user: %w", err)
+		return user, fmt.Errorf("statement query failed when selecting: %w", err)
 	}
 
-	err = stm.QueryRow(searchValue).Scan(
-		&user.UserId,
-		&user.IsLoggedIn,
-		&user.Email,
-		&user.HashedPassword,
-		&user.FirstName,
-		&user.LastName,
-		&user.DOB,
-		&user.AvatarPath,
-		&user.DisplayName,
-		&user.AboutMe,
-		&user.CreationDate,
-	)
+	for result.Next() {
+		result.Scan(StructFieldAddress(user)...)
+	}
 	if err != nil {
 		return user, fmt.Errorf("query row failure when selecting user: %w", err)
 	}
 	return user, err
+}
+
+func StructFieldAddress(s interface{}) []interface{} {
+	v := reflect.ValueOf(s)
+	if v.Kind() != reflect.Ptr || v.Elem().Kind() != reflect.Struct {
+		panic("input must be a pointer to a struct")
+	}
+
+	v = v.Elem() // de-reference the pointer to get the underlying struct
+	var addresses []interface{}
+	for i := 0; i < v.NumField(); i++ {
+		fieldType := v.Type().Field(i)
+		if fieldType.Name != "CreationDate" {
+			addresses = append(addresses, v.Field(i).Addr().Interface())
+		}
+
+	}
+	return addresses
 }

@@ -1,4 +1,4 @@
-package userdb
+package postdb
 
 import (
 	"database/sql"
@@ -6,11 +6,13 @@ import (
 )
 
 /*
-InsertUser creates a new user record in the database.
+InsertPost creates a new post record in the database.
 
 It takes as input an object that implements the DBOpener interface and a User object. The DBOpener interface
 should provide methods to retrieve the driver name and the data source name required for establishing a connection
 with the database. The User object contains all necessary data for a new user record.
+
+# It takes an
 
 Upon a successful operation, the function returns the User object that was passed as an input.
 
@@ -25,39 +27,36 @@ Errors:
 Example:
   - InsertUser is called when a new user is created on the application, to insert the new user's data into the database.
 */
-func InsertUser(db *sql.DB, values []interface{}) error {
+func InsertPost(db *sql.DB, values []interface{}) error {
 	statement, err := db.Prepare(`
-	INSERT INTO Users (
-		user_id,
-		isLoggedIn,
-		email,
-		hashed_password,
-		first_name,
-		last_name, 
-		date_of_birth,
-		avatar_path,
-		display_name,
-		about_me
-	) VALUES (
-		?, ?, ?, ?, ?, ?, ?, ?, ?, ?
+	INSERT INTO Posts (
+		post_id,
+		grou_id,
+		creator_id,
+		title,
+		image_path,
+		content, 
+		privacy_level,
+		allowed_followers,
+		likes,
+		dislikes
 	)`)
 	if err != nil {
-		return fmt.Errorf("failed to prepare insert user statement: %s", err)
+		return fmt.Errorf("failed to prepare insert post statement: %s", err)
 	}
 	defer statement.Close()
+
 	result, err := statement.Exec(values...)
 	if err != nil {
-		return fmt.Errorf("failed to execute insert user statement: %s", err)
+		return fmt.Errorf("failed to execute insert post statement: %s", err)
 	}
 
 	rowsAffected, err := result.RowsAffected()
 	if err != nil {
 		return fmt.Errorf("failed to retrieve affected rows: %s", err)
 	}
-
 	if rowsAffected == 0 {
-		return fmt.Errorf("no rows affected when inserting user: %s", err)
+		return fmt.Errorf("no rows affected when inserting post: %s", err)
 	}
-
 	return nil
 }

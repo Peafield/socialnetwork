@@ -3,7 +3,6 @@ package dbutils
 import (
 	"database/sql"
 	"fmt"
-	"socialnetwork/pkg/helpers"
 	"socialnetwork/pkg/models/helpermodels"
 )
 
@@ -28,16 +27,9 @@ Example:
 func OpenDatabase(filepath *helpermodels.FilePathComponents) error {
 	var err error
 
-	isValidDB, err := helpers.CheckValidPath(filepath)
+	DB, err = sql.Open("sqlite3", filepath.Directory+"/"+filepath.FileName+filepath.Extension)
 	if err != nil {
-		return fmt.Errorf("invalid database file path: %s", err)
-	}
-
-	if isValidDB {
-		DB, err = sql.Open("sqlite3", filepath.Directory+"/"+filepath.FileName+filepath.Extension)
-		if err != nil {
-			return fmt.Errorf("failed to open %s database: %s", filepath.FileName, err)
-		}
+		return fmt.Errorf("failed to open %s database: %s", filepath.FileName, err)
 	}
 
 	return nil

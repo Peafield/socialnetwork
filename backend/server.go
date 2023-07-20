@@ -5,13 +5,11 @@ import (
 	"flag"
 	"fmt"
 	"log"
-	"reflect"
-	"socialnetwork/pkg/db/CRUD/userdb"
+	crud "socialnetwork/pkg/db/CRUD"
 	"socialnetwork/pkg/db/dbstatements"
 	"socialnetwork/pkg/db/dbutils"
 	"socialnetwork/pkg/models/dbmodels"
 	"socialnetwork/pkg/models/helpermodels"
-	"time"
 )
 
 const DATABASE_FILE_PATH = "./pkg/db/"
@@ -102,43 +100,30 @@ func main() {
 	if err != nil {
 		log.Fatalf("err %s", err)
 	}
-	user := &dbmodels.User{
-		UserId:         "2",
-		IsLoggedIn:     1,
-		Email:          "user@test.com2",
-		HashedPassword: "hashed_password2",
-		FirstName:      "First2",
-		LastName:       "Last2",
-		DOB:            time.Now(),
-		AvatarPath:     "path/to/avatar2",
-		DisplayName:    "User2",
-		AboutMe:        "About me2",
-	}
-	addressOfValues := StructFieldValues(user)
-	for i, v := range addressOfValues {
-		fmt.Println(i, v)
-	}
-	log.Println(len(addressOfValues))
-	err = userdb.InsertUser(db, addressOfValues)
+	// user := &dbmodels.User{
+	// 	UserId:         "2",
+	// 	IsLoggedIn:     1,
+	// 	Email:          "user@test.com2",
+	// 	HashedPassword: "hashed_password2",
+	// 	FirstName:      "First2",
+	// 	LastName:       "Last2",
+	// 	DOB:            time.Now(),
+	// 	AvatarPath:     "path/to/avatar2",
+	// 	DisplayName:    "User2",
+	// 	AboutMe:        "About me2",
+	// }
+	// addressOfValues := StructFieldValues(user)
+	// for i, v := range addressOfValues {
+	// 	fmt.Println(i, v)
+	// }
+	// log.Println(len(addressOfValues))
+	// err = userdb.InsertUser(db, addressOfValues)
+	// if err != nil {
+	// 	log.Fatalf("err: %s", err)
+	// }
+	user, err := crud.SelectFromDatabase(db, "Users", "WHERE user_id = 2")
 	if err != nil {
-		log.Fatalf("err: %s", err)
+		log.Println(err)
 	}
-}
-
-func StructFieldValues(s interface{}) []interface{} {
-	v := reflect.ValueOf(s)
-	if v.Kind() != reflect.Ptr || v.Elem().Kind() != reflect.Struct {
-		panic("input must be a pointer to a struct")
-	}
-
-	v = v.Elem() // de-reference the pointer to get the underlying struct
-	var values []interface{}
-	for i := 0; i < v.NumField(); i++ {
-		fieldType := v.Type().Field(i)
-		if fieldType.Name != "CreationDate" {
-			values = append(values, v.Field(i).Interface())
-		}
-
-	}
-	return values
+	fmt.Println(user)
 }

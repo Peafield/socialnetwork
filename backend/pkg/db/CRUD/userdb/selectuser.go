@@ -3,7 +3,7 @@ package userdb
 import (
 	"database/sql"
 	"fmt"
-	"reflect"
+	"socialnetwork/pkg/helpers"
 	"socialnetwork/pkg/models/dbmodels"
 )
 
@@ -32,38 +32,28 @@ Examples:
 - Used when selecting a user, maybe to retrieve certain details or verify credentials.
 */
 func SelectUser(db *sql.DB, table string, conditionStatement string) (interface{}, error) {
-	var user dbmodels.User
+	var object dbmodels.User
 
-	stm := "SELECT * FROM Users " + conditionStatement
+	stm := "SELECT * FROM " + table + " " + conditionStatement
 
-	result, err := db.Query(stm)
+	// Use a prepared statement to prevent SQL injection.
+	stmt, err := db.Prepare(stm)
 	if err != nil {
-		return user, fmt.Errorf("statement query failed when selecting: %w", err)
+		return object, fmt.Errorf("statement preparation failed when selecting: %w", err)
 	}
+	defer stmt.Close()
+
+	result, err := stmt.Query()
+	if err != nil {
+		return object, fmt.Errorf("query execution failed when selecting: %w", err)
+	}
+	defer result.Close()
 
 	for result.Next() {
-		result.Scan(StructFieldAddress(user)...)
-	}
-	if err != nil {
-		return user, fmt.Errorf("query row failure when selecting user: %w", err)
-	}
-	return user, err
-}
-
-func StructFieldAddress(s interface{}) []interface{} {
-	v := reflect.ValueOf(s)
-	if v.Kind() != reflect.Ptr || v.Elem().Kind() != reflect.Struct {
-		panic("input must be a pointer to a struct")
-	}
-
-	v = v.Elem() // de-reference the pointer to get the underlying struct
-	var addresses []interface{}
-	for i := 0; i < v.NumField(); i++ {
-		fieldType := v.Type().Field(i)
-		if fieldType.Name != "CreationDate" {
-			addresses = append(addresses, v.Field(i).Addr().Interface())
+		err := result.Scan(helpers.StructFieldAddress(&object)...)
+		if err != nil {
+			return object, fmt.Errorf("failed to scan user data: %w", err)
 		}
-
 	}
-	return addresses
+	return object, err
 }

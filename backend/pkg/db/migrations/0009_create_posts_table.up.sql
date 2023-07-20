@@ -9,7 +9,7 @@ CREATE TABLE Posts (
   allowed_followers TEXT,
   likes INTEGER DEFAULT 0,
   dislikes INTEGER DEFAULT 0,
-  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  creation_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   FOREIGN KEY(creator_id) REFERENCES Users(user_id),
   FOREIGN KEY(group_id) REFERENCES Groups(group_id)
 );

@@ -3,5 +3,6 @@ CREATE TABLE Groups (
   title TEXT NOT NULL,
   description TEXT,
   creator_id TEXT NOT NULL,
+  creation_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   FOREIGN KEY(creator_id) REFERENCES Users(user_id)
 );

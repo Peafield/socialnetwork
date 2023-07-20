@@ -3,7 +3,8 @@ CREATE TABLE Chats_Messages (
   chat_id TEXT NOT NULL,
   sender_id TEXT NOT NULL,
   message TEXT NOT NULL,
-  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  creation_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   FOREIGN KEY(chat_id) REFERENCES Chats(chat_id),
   FOREIGN KEY(sender_id) REFERENCES Users(user_id)
 );

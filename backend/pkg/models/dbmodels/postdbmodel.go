@@ -2,6 +2,7 @@ package dbmodels
 
 import "time"
 
+// Post is a struct that holds post data.
 type Post struct {
 	PostId       string
 	GroupId      string
@@ -17,6 +18,7 @@ type Post struct {
 	CreationDate     time.Time
 }
 
+// Posts is slice of Post.
 type Posts struct {
 	Posts []Post
 }

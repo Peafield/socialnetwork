@@ -14,13 +14,13 @@ func SelectFromDatabase(db *sql.DB, table string, conditionStatement string) (in
 	// Use a prepared statement to prevent SQL injection.
 	stmt, err := db.Prepare(stm)
 	if err != nil {
-		return object, fmt.Errorf("statement preparation failed when selecting: %w", err)
+		return object, fmt.Errorf("failed to prepare select statement: %w", err)
 	}
 	defer stmt.Close()
 
 	result, err := stmt.Query()
 	if err != nil {
-		return object, fmt.Errorf("query execution failed when selecting: %w", err)
+		return object, fmt.Errorf("failed to execute select query: %w", err)
 	}
 	defer result.Close()
 

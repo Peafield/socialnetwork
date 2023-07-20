@@ -1,18 +1,17 @@
 package main
 
 import (
-	"database/sql"
 	"flag"
-	"fmt"
 	"log"
 	"reflect"
-	"socialnetwork/pkg/db/CRUD/userdb"
+	crud "socialnetwork/pkg/db/CRUD"
 	"socialnetwork/pkg/db/dbstatements"
 	"socialnetwork/pkg/db/dbutils"
 	"socialnetwork/pkg/models/dbmodels"
 	"socialnetwork/pkg/models/helpermodels"
-	"time"
 )
+
+// YOU MUST CALLED --dbopen WHEN STARTING THE SERVER TO OPEN THE DATABASE
 
 const DATABASE_FILE_PATH = "./pkg/db/"
 const MIGRATIONS_FILE_PATH = "./pkg/db/migrations"
@@ -47,7 +46,7 @@ func main() {
 	if *dbopen {
 		dbName := flag.Arg(0)
 		if len(dbName) < 1 {
-			log.Fatalf("Missing database name")
+			log.Println("Missing database name")
 		}
 
 		dbFilePath := &helpermodels.FilePathComponents{
@@ -58,17 +57,20 @@ func main() {
 
 		err := dbutils.OpenDatabase(dbFilePath)
 		if err != nil {
-			log.Fatalf("Fail open database: %s", err)
+			log.Printf("Failed open database: %s", err)
+		} else {
+			defer dbutils.CloseDatabase()
 		}
-		defer dbutils.CloseDatabase()
 
 		err = dbstatements.InitDBStatements(dbutils.DB)
 		if err != nil {
-			log.Fatalf("Fail to prepare database statements: %s", err)
+			log.Printf("Failed to prepare database statements: %s", err)
+		} else {
+			defer dbstatements.CloseDBStatements()
 		}
 
-		defer dbstatements.CloseDBStatements()
 	}
+
 	if *dbup {
 		dbName := flag.Arg(0)
 		dbFilePath := &helpermodels.FilePathComponents{
@@ -98,31 +100,43 @@ func main() {
 			log.Fatalf("Failed to migrate changes down: %s", err)
 		}
 	}
-	db, err := sql.Open("sqlite3", "./pkg/db/socialNetwork.db")
+
+	// FOR TESTING PURPOSES MUST DELETE
+	// user := &dbmodels.User{
+	// 	UserId:         "4",
+	// 	IsLoggedIn:     1,
+	// 	Email:          "user@test.com4",
+	// 	HashedPassword: "hashed_password4",
+	// 	FirstName:      "First4",
+	// 	LastName:       "Last4",
+	// 	DOB:            time.Now(),
+	// 	AvatarPath:     "path/to/avatar4",
+	// 	DisplayName:    "User4",
+	// 	AboutMe:        "About me4",
+	// }
+	// values := StructFieldValues(user)
+	// err := crud.InsertIntoDatabase(dbutils.DB, dbstatements.InsertUserStmt, values)
+	// if err != nil {
+	// 	log.Fatalf("failed to insert user data into db: %s", err)
+	// }
+	user := &dbmodels.Post{
+		PostId:           "1",
+		GroupId:          "1",
+		CreatorId:        "1",
+		Title:            "TEST1",
+		ImagePath:        "path/to/image",
+		Content:          "A whole bunch of nonsense",
+		PrivacyLevel:     0,
+		AllowedFollowers: "ted, jill, andrew",
+		Likes:            100,
+		Dislikes:         100000,
+	}
+	values := StructFieldValues(user)
+	err := crud.InsertIntoDatabase(dbutils.DB, dbstatements.InsertPostStmt, values)
 	if err != nil {
-		log.Fatalf("err %s", err)
+		log.Fatalf("failed to insert user data into db: %s", err)
 	}
-	user := &dbmodels.User{
-		UserId:         "2",
-		IsLoggedIn:     1,
-		Email:          "user@test.com2",
-		HashedPassword: "hashed_password2",
-		FirstName:      "First2",
-		LastName:       "Last2",
-		DOB:            time.Now(),
-		AvatarPath:     "path/to/avatar2",
-		DisplayName:    "User2",
-		AboutMe:        "About me2",
-	}
-	addressOfValues := StructFieldValues(user)
-	for i, v := range addressOfValues {
-		fmt.Println(i, v)
-	}
-	log.Println(len(addressOfValues))
-	err = userdb.InsertUser(db, addressOfValues)
-	if err != nil {
-		log.Fatalf("err: %s", err)
-	}
+
 }
 
 func StructFieldValues(s interface{}) []interface{} {

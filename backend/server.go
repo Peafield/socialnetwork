@@ -6,7 +6,6 @@ import (
 	crud "socialnetwork/pkg/db/CRUD"
 	"socialnetwork/pkg/db/dbstatements"
 	"socialnetwork/pkg/db/dbutils"
-	"socialnetwork/pkg/helpers"
 	"socialnetwork/pkg/models/dbmodels"
 	"socialnetwork/pkg/models/helpermodels"
 )
@@ -119,21 +118,25 @@ func main() {
 	// if err != nil {
 	// 	log.Fatalf("failed to insert user data into db: %s", err)
 	// }
-	user := &dbmodels.Post{
-		PostId:           "1",
-		GroupId:          "1",
-		CreatorId:        "1",
-		Title:            "TEST1",
-		ImagePath:        "path/to/image",
-		Content:          "A whole bunch of nonsense",
-		PrivacyLevel:     0,
-		AllowedFollowers: "ted, jill, andrew",
-		Likes:            100,
-		Dislikes:         100000,
-	}
-	values := helpers.StructFieldValues(user)
-	err := crud.InsertIntoDatabase(dbutils.DB, dbstatements.InsertPostStmt, values)
+	// user := &dbmodels.Post{
+	// 	PostId:           "1",
+	// 	GroupId:          "1",
+	// 	CreatorId:        "1",
+	// 	Title:            "TEST1",
+	// 	ImagePath:        "path/to/image",
+	// 	Content:          "A whole bunch of nonsense",
+	// 	PrivacyLevel:     0,
+	// 	AllowedFollowers: "ted, jill, andrew",
+	// 	Likes:            100,
+	// 	Dislikes:         100000,
+	// }
+	// values := helpers.StructFieldValues(user)
+	// err := crud.InsertIntoDatabase(dbutils.DB, dbstatements.InsertPostStmt, values)
+	// if err != nil {
+	// 	log.Fatalf("err %s", err)
+	// }
+	err := crud.DeleteFromDatabase(dbutils.DB, "Posts", "post_id", "1")
 	if err != nil {
-		log.Fatalf("err %s", err)
+		log.Fatalf("delete failed: %s", err)
 	}
 }

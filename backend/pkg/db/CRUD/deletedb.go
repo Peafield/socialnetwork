@@ -24,9 +24,9 @@ Returns:
 Example:
   - A user could be deleted from a the Users table by inserting the user's id as the value.
 */
-func DeleteFromDatabase(db *sql.DB, table string, value string) error {
+func DeleteFromDatabase(db *sql.DB, table string, column string, value string) error {
 
-	stmtToPrepare := "DELETE FROM " + table + " WHERE " + value + " = ?"
+	stmtToPrepare := "DELETE FROM " + table + " WHERE " + column + " = ?"
 
 	stmt, err := db.Prepare(stmtToPrepare)
 	if err != nil {

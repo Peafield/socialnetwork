@@ -3,6 +3,8 @@ package dbutils
 import (
 	"database/sql"
 	"fmt"
+	"path"
+	"socialnetwork/pkg/helpers"
 	"socialnetwork/pkg/models/helpermodels"
 
 	_ "github.com/mattn/go-sqlite3"
@@ -28,8 +30,14 @@ Example:
 */
 func OpenDatabase(filepath *helpermodels.FilePathComponents) error {
 	var err error
+	dbFilePath := path.Join(filepath.Directory, filepath.FileName+filepath.Extension)
 
-	DB, err = sql.Open("sqlite3", filepath.Directory+"/"+filepath.FileName+filepath.Extension)
+	isValidPath, err := helpers.IsValidPath(dbFilePath)
+	if !isValidPath {
+		return fmt.Errorf("path to database not valid: %s", err)
+	}
+
+	DB, err = sql.Open("sqlite3", dbFilePath)
 	if err != nil {
 		return fmt.Errorf("failed to open %s database: %s", filepath.FileName, err)
 	}

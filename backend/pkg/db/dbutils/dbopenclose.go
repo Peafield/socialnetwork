@@ -4,6 +4,8 @@ import (
 	"database/sql"
 	"fmt"
 	"socialnetwork/pkg/models/helpermodels"
+
+	_ "github.com/mattn/go-sqlite3"
 )
 
 var DB *sql.DB

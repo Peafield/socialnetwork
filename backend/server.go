@@ -3,14 +3,13 @@ package main
 import (
 	"flag"
 	"log"
-	crud "socialnetwork/pkg/db/CRUD"
 	"socialnetwork/pkg/db/dbstatements"
 	"socialnetwork/pkg/db/dbutils"
 	"socialnetwork/pkg/models/dbmodels"
 	"socialnetwork/pkg/models/helpermodels"
 )
 
-// YOU MUST CALLED --dbopen WHEN STARTING THE SERVER TO OPEN THE DATABASE
+// YOU MUST CALL --dbopen WHEN STARTING THE SERVER TO OPEN THE DATABASE
 
 const DATABASE_FILE_PATH = "./pkg/db/"
 const MIGRATIONS_FILE_PATH = "./pkg/db/migrations"
@@ -98,45 +97,5 @@ func main() {
 		if err != nil {
 			log.Fatalf("Failed to migrate changes down: %s", err)
 		}
-	}
-
-	// FOR TESTING PURPOSES MUST DELETE
-	// user := &dbmodels.User{
-	// 	UserId:         "4",
-	// 	IsLoggedIn:     1,
-	// 	Email:          "user@test.com4",
-	// 	HashedPassword: "hashed_password4",
-	// 	FirstName:      "First4",
-	// 	LastName:       "Last4",
-	// 	DOB:            time.Now(),
-	// 	AvatarPath:     "path/to/avatar4",
-	// 	DisplayName:    "User4",
-	// 	AboutMe:        "About me4",
-	// }
-	// values := StructFieldValues(user)
-	// err := crud.InsertIntoDatabase(dbutils.DB, dbstatements.InsertUserStmt, values)
-	// if err != nil {
-	// 	log.Fatalf("failed to insert user data into db: %s", err)
-	// }
-	// user := &dbmodels.Post{
-	// 	PostId:           "1",
-	// 	GroupId:          "1",
-	// 	CreatorId:        "1",
-	// 	Title:            "TEST1",
-	// 	ImagePath:        "path/to/image",
-	// 	Content:          "A whole bunch of nonsense",
-	// 	PrivacyLevel:     0,
-	// 	AllowedFollowers: "ted, jill, andrew",
-	// 	Likes:            100,
-	// 	Dislikes:         100000,
-	// }
-	// values := helpers.StructFieldValues(user)
-	// err := crud.InsertIntoDatabase(dbutils.DB, dbstatements.InsertPostStmt, values)
-	// if err != nil {
-	// 	log.Fatalf("err %s", err)
-	// }
-	err := crud.DeleteFromDatabase(dbutils.DB, "Posts", "post_id", "1")
-	if err != nil {
-		log.Fatalf("delete failed: %s", err)
 	}
 }

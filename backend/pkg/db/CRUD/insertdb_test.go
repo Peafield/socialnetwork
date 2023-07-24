@@ -2,10 +2,13 @@ package crud_test
 
 import (
 	"database/sql"
+	"fmt"
+	"math/rand"
 	crud "socialnetwork/pkg/db/CRUD"
 	"socialnetwork/pkg/db/dbstatements"
 	"socialnetwork/pkg/helpers"
 	"socialnetwork/pkg/models/dbmodels"
+	"strconv"
 	"testing"
 	"time"
 
@@ -15,19 +18,19 @@ import (
 // TO DO: NEED RANDOM INFO GENERATOR
 var (
 	user = &dbmodels.User{
-		UserId:         "821",
+		UserId:         strconv.Itoa(rand.Intn(time.Now().Nanosecond())),
 		IsLoggedIn:     1,
-		Email:          "user@test.com821",
+		Email:          "user" + strconv.Itoa(rand.Intn(time.Now().Nanosecond())) + "@test.com",
 		HashedPassword: "hashed_password821",
 		FirstName:      "First821",
 		LastName:       "Last821",
 		DOB:            time.Now(),
 		AvatarPath:     "path/to/avatar821",
-		DisplayName:    "User821",
+		DisplayName:    "User" + strconv.Itoa(rand.Intn(time.Now().Nanosecond())),
 		AboutMe:        "About me821",
 	}
 
-	userValues = helpers.StructFieldValues(user)
+	userValues, _ = helpers.StructFieldValues(user)
 
 	post = &dbmodels.Post{
 		PostId:           "1",
@@ -41,7 +44,16 @@ var (
 		Likes:            100,
 		Dislikes:         100000,
 	}
-	postValues = helpers.StructFieldValues(post)
+	postValues, _ = helpers.StructFieldValues(post)
+
+	chat = &dbmodels.Chat{
+		ChatId:       "ragrg4r4524",
+		SenderId:     "gewtygibo5",
+		ReceiverId:   "usnb08t79bwv75v",
+		CreationDate: time.Now(),
+	}
+
+	chatValues, _ = helpers.StructFieldValues(chat)
 )
 
 /*TestInsertIntoDatabase tests insertion of data into the database*/
@@ -94,6 +106,7 @@ func TestInsertIntoDatabase(t *testing.T) {
 	for _, tc := range testCases {
 		t.Run(tc.Name, func(t *testing.T) {
 			err := crud.InsertIntoDatabase(db, tc.Statement, tc.Values)
+			fmt.Println(tc.Values)
 			if tc.ExpectedError {
 				if err == nil {
 					t.Errorf("expected and error but did not get one")

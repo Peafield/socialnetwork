@@ -39,7 +39,7 @@ type GroupEvent struct {
 	EventStartTime time.Time `json:"event_start_time"`
 	TotalGoing     int       `json:"total_going"`
 	TotalNotGoing  int       `json:"total_not_going"`
-	CreationDate   string    `json:"group_id"`
+	CreationDate   string    `json:"creation_date"`
 }
 
 // GroupEvents is a slice of GroupEvent.
@@ -49,11 +49,11 @@ type GroupEvents struct {
 
 // GroupEventAttendee is a struct that holds group event attendee data.
 type GroupEventAttendee struct {
-	EventId         string
-	AttendeeId      string
-	AttendingStatus string
-	EventStatus     int
-	CreationDate    time.Time
+	EventId         string    `json:"event_id"`
+	AttendeeId      string    `json:"attendee_id"`
+	AttendingStatus string    `json:"attending_status"`
+	EventStatus     int       `json:"event_status"`
+	CreationDate    time.Time `json:"creation_date"`
 }
 
 // GroupEventAttendees is a slice of GroupEventAttendee.

@@ -3,12 +3,13 @@ package routehandlers
 import (
 	"encoding/json"
 	"net/http"
+	"socialnetwork/pkg/controllers"
 	"socialnetwork/pkg/middleware"
 	"socialnetwork/pkg/models/readwritemodels"
 )
 
 func SignUpHandler(w http.ResponseWriter, r *http.Request) {
-	formData, ok := r.Context().Value(middleware.DataKey).(*readwritemodels.ReadData)
+	formData, ok := r.Context().Value(middleware.DataKey).(readwritemodels.ReadData)
 	if !ok {
 		http.Error(w, "failed to read form data from context", http.StatusInternalServerError)
 		return

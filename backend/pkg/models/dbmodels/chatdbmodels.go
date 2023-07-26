@@ -21,7 +21,6 @@ type ChatMessage struct {
 	ChatId       string
 	SenderId     string
 	Message      string
-	Timestamp    time.Time
 	CreationDate time.Time
 }
 

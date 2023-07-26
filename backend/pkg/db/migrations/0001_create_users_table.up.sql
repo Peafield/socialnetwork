@@ -9,5 +9,5 @@ CREATE TABLE Users (
   avatar_path TEXT NOT NULL,
   display_name TEXT UNIQUE,
   about_me TEXT,
-  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+  creation_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );

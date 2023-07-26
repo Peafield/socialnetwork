@@ -82,9 +82,8 @@ func InitDBStatements(db *sql.DB) error {
 		image_path,
 		likes,
 		dislikes,
-		timestamp
 	) VALUES (
-		?, ?, ?, ?, ?, ?, ?, ?
+		?, ?, ?, ?, ?, ?, ?
 	)`)
 	if err != nil {
 		return fmt.Errorf("failed to prepare insert comments statement: %s", err)
@@ -108,9 +107,8 @@ func InitDBStatements(db *sql.DB) error {
 		chat_id,
 		sender_id,
 		receiver_id,
-		created_at
 	) VALUES (
-		?, ?, ?, ?
+		?, ?, ?
 	)`)
 	if err != nil {
 		return fmt.Errorf("failed to prepare insert chats statement: %s", err)
@@ -122,9 +120,8 @@ func InitDBStatements(db *sql.DB) error {
 		chat_id,
 		sender_id,
 		message,
-		created_at
 	) VALUES (
-		?, ?, ?, ?, ?
+		?, ?, ?, ?
 	)`)
 	if err != nil {
 		return fmt.Errorf("failed to prepare insert chats messages statement: %s", err)

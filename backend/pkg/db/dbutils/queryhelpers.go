@@ -32,12 +32,6 @@ func UpdateSetConstructor(MutableValues map[string]interface{}) string {
 	var Temp []string
 
 	for k, v := range MutableValues {
-		// switch fmt.Sprintf("%v", reflect.TypeOf(v)) {
-		// case "string":
-		// 	Temp = append(Temp, fmt.Sprintf(`%s = "%v"`, k, v))
-		// default:
-		// 	Temp = append(Temp, fmt.Sprintf(`%s = %v`, k, v))
-		// }
 		Temp = append(Temp, fmt.Sprintf("%s = '%v'", k, v))
 
 	}

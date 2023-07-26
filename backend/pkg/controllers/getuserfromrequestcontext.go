@@ -30,14 +30,14 @@ Errors:
 - if the interface{} value returned from the database is not a User type.
 */
 func GetUserFromRequestContext(r *http.Request) (*dbmodels.User, error) {
-	payloadData, ok := r.Context().Value(middleware.PayloadKey).(readwritemodels.Payload)
+	payloadData, ok := r.Context().Value(middleware.UserDataKey).(readwritemodels.Payload)
 	if !ok {
 		return nil, fmt.Errorf("failed to read user ID from context")
 	}
 
 	conditions := make(map[string]interface{})
 	conditions["user_id"] = payloadData.UserId
-	conditionStatement := dbutils.UpdateConditionConstructor(conditions)
+	conditionStatement := dbutils.ConditionStatementConstructor(conditions)
 
 	userData, err := crud.SelectFromDatabase(dbutils.DB, "Users", conditionStatement)
 	if err != nil {

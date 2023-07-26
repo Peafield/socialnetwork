@@ -6,7 +6,7 @@ import (
 )
 
 /**/
-func UpdateConditionConstructor(Conditions map[string]interface{}) string {
+func ConditionStatementConstructor(Conditions map[string]interface{}) string {
 	if len(Conditions) == 0 {
 		return ""
 	}

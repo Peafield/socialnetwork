@@ -23,7 +23,7 @@ func UpdateDatabaseRow(db *sql.DB, tableName string, Conditions map[string]inter
 	//maybe check the fields first before accessing them
 
 	var UpdatedValues string = dbutils.UpdateSetConstructor(AffectedColumns)
-	var UpdatedConditions string = dbutils.UpdateConditionConstructor(Conditions)
+	var UpdatedConditions string = dbutils.ConditionStatementConstructor(Conditions)
 
 	Query := fmt.Sprintf(`UPDATE %s %s %s;`, tableName, UpdatedValues, UpdatedConditions)
 	fmt.Println(Query)

@@ -4,10 +4,10 @@ import "time"
 
 // Chat is a struct that holds chat data.
 type Chat struct {
-	ChatId       string
-	SenderId     string
-	ReceiverId   string
-	CreationDate time.Time
+	ChatId       string    `json:"chat_id"`
+	SenderId     string    `json:"sender_id"`
+	ReceiverId   string    `json:"receiever_id"`
+	CreationDate time.Time `json:"creation_date"`
 }
 
 // Chats is a slice of Chat.
@@ -17,11 +17,11 @@ type Chats struct {
 
 // ChatMessage is a struct that holds chat message data.
 type ChatMessage struct {
-	MessageId    string
-	ChatId       string
-	SenderId     string
-	Message      string
-	CreationDate time.Time
+	MessageId    string    `json:"message_id"`
+	ChatId       string    `json:"chat_id"`
+	SenderId     string    `json:"sender_id"`
+	Message      string    `json:"message"`
+	CreationDate time.Time `json:"creation_date"`
 }
 
 // ChatMessages is a slice of ChatMessage.

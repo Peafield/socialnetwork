@@ -12,9 +12,7 @@ import (
 	"strings"
 )
 
-type key int
-
-const PayloadKey key = iota
+const UserDataKey readwritemodels.ContextKey = iota
 
 /*
 ValidateTokenMiddleware is a middleware function that validates a webtoken included in the Authorization header of a http request.
@@ -67,7 +65,7 @@ func ValidateTokenMiddleware(next http.Handler) http.Handler {
 			return
 		}
 
-		ctx := context.WithValue(r.Context(), PayloadKey, RecievedPayload)
+		ctx := context.WithValue(r.Context(), UserDataKey, RecievedPayload)
 		next.ServeHTTP(w, r.WithContext(ctx))
 	})
 }

@@ -2,7 +2,7 @@ package readwritemodels
 
 import "time"
 
-type ContextKey string
+type ContextKey int
 
 type Header struct {
 	Alg string

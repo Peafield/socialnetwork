@@ -200,7 +200,7 @@ func TestSelectFromDatabase(t *testing.T) {
 				fmt.Println(err)
 			}
 
-			conditionStatement := dbutils.UpdateConditionConstructor(tc.Conditions)
+			conditionStatement := dbutils.ConditionStatementConstructor(tc.Conditions)
 			obj, err := crud.SelectFromDatabase(db, tc.Table, conditionStatement)
 			fmt.Println(err)
 

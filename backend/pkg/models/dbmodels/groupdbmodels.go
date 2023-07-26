@@ -4,11 +4,11 @@ import "time"
 
 // Group is a struct that holds group data.
 type Group struct {
-	GroupId      string
-	Title        string
-	Description  string
-	CreatorId    string
-	CreationDate time.Time
+	GroupId      string    `json:"group_id"`
+	Title        string    `json:"title"`
+	Description  string    `json:"description"`
+	CreatorId    string    `json:"creator_id"`
+	CreationDate time.Time `json:"creation_date"`
 }
 
 // Groups is a slice of Group.
@@ -18,10 +18,10 @@ type Groups struct {
 
 // GroupMember is a struct that holds group member data.
 type GroupMember struct {
-	GroupId        string
-	MemberId       string
-	RequestPending int
-	CreationDate   time.Time
+	GroupId        string    `json:"group_id"`
+	MemberId       string    `json:"member_id"`
+	RequestPending int       `json:"request_pending"`
+	CreationDate   time.Time `json:"creation_date"`
 }
 
 // GroupMembers is a slice of GroupMember.
@@ -31,15 +31,15 @@ type GroupMembers struct {
 
 // GroupEvent is a struct that holds group event data.
 type GroupEvent struct {
-	EventId        string
-	GroupId        string
-	CreatorId      string
-	Title          string
-	Description    string
-	EventStartTime time.Time
-	TotalGoing     int
-	TotalNotGoing  int
-	CreationDate   string
+	EventId        string    `json:"event_id"`
+	GroupId        string    `json:"group_id"`
+	CreatorId      string    `json:"creator_id"`
+	Title          string    `json:"title"`
+	Description    string    `json:"description"`
+	EventStartTime time.Time `json:"event_start_time"`
+	TotalGoing     int       `json:"total_going"`
+	TotalNotGoing  int       `json:"total_not_going"`
+	CreationDate   string    `json:"group_id"`
 }
 
 // GroupEvents is a slice of GroupEvent.

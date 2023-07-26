@@ -37,7 +37,7 @@ func TestUpdateConditionStatement(t *testing.T) {
 
 	for _, tc := range testcases {
 		t.Run(tc.CaseName, func(t *testing.T) {
-			result := dbutils.UpdateConditionConstructor(tc.Conditions)
+			result := dbutils.ConditionStatementConstructor(tc.Conditions)
 			sep := "AND"
 
 			//we split the expected output and the result by "AND"

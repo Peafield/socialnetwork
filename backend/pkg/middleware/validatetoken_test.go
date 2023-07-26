@@ -73,8 +73,8 @@ func TestVerifyToken(t *testing.T) {
 		FirstName: "Test",
 		LastName:  "Tests",
 		Role:      1,
-		Exp:       time.Now(),
-		Iat:       time.Now(),
+		Exp:       time.Now().Unix(),
+		Iat:       time.Now().Unix(),
 	}
 
 	validtoken, err := helpers.GenerateWebToken(header, payload)

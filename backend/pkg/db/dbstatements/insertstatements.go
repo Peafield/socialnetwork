@@ -81,7 +81,7 @@ func InitDBStatements(db *sql.DB) error {
 		content,
 		image_path,
 		likes,
-		dislikes,
+		dislikes
 	) VALUES (
 		?, ?, ?, ?, ?, ?, ?
 	)`)
@@ -106,7 +106,7 @@ func InitDBStatements(db *sql.DB) error {
 	INSERT INTO Chats (
 		chat_id,
 		sender_id,
-		receiver_id,
+		receiver_id
 	) VALUES (
 		?, ?, ?
 	)`)
@@ -119,7 +119,7 @@ func InitDBStatements(db *sql.DB) error {
 		message_id,
 		chat_id,
 		sender_id,
-		message,
+		message
 	) VALUES (
 		?, ?, ?, ?
 	)`)

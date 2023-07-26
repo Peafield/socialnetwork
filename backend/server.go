@@ -2,9 +2,11 @@ package main
 
 import (
 	"flag"
+	"fmt"
 	"log"
 	"socialnetwork/pkg/db/dbstatements"
 	"socialnetwork/pkg/db/dbutils"
+	"socialnetwork/pkg/helpers"
 	"socialnetwork/pkg/models/dbmodels"
 	"socialnetwork/pkg/models/helpermodels"
 )
@@ -98,4 +100,7 @@ func main() {
 			log.Fatalf("Failed to migrate changes down: %s", err)
 		}
 	}
+
+	password := ""
+	fmt.Println(helpers.HashPassword(password))
 }

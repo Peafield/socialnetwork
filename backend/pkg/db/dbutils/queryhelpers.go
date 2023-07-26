@@ -5,20 +5,43 @@ import (
 	"strings"
 )
 
+/**/
 func UpdateConditionConstructor(Conditions map[string]interface{}) string {
+	if len(Conditions) == 0 {
+		return ""
+	}
 	var conditionStatement string = "WHERE "
 	var temp []string
 	// conditionValues := make([]interface{}, 0)
 
 	for k, v := range Conditions {
-		if fmt.Sprintf("%T", v) == "string" {
-			temp = append(temp, fmt.Sprintf(`%s = "%v"`, k, v))
-		} else {
-			temp = append(temp, fmt.Sprintf("%s = %v", k, v))
-		}
-
+		temp = append(temp, fmt.Sprintf(`%s = %v`, k, v))
 	}
 
 	conditionStatement += strings.Join(temp, " AND ")
 	return conditionStatement
+}
+
+/**/
+func UpdateSetConstructor(MutableValues map[string]interface{}) string {
+	if len(MutableValues) == 0 {
+		return ""
+	}
+
+	var setStatement string = "SET "
+	var Temp []string
+
+	for k, v := range MutableValues {
+		// switch fmt.Sprintf("%v", reflect.TypeOf(v)) {
+		// case "string":
+		// 	Temp = append(Temp, fmt.Sprintf(`%s = "%v"`, k, v))
+		// default:
+		// 	Temp = append(Temp, fmt.Sprintf(`%s = %v`, k, v))
+		// }
+		Temp = append(Temp, fmt.Sprintf("%s = '%v'", k, v))
+
+	}
+	setStatement += strings.Join(Temp, ", ")
+
+	return setStatement
 }

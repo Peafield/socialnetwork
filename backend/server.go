@@ -98,5 +98,4 @@ func main() {
 			log.Fatalf("Failed to migrate changes down: %s", err)
 		}
 	}
-
 }

@@ -14,5 +14,5 @@ type Payload struct {
 	LastName  string    `json:"last_name"`
 	Role      int       `json:"role"`
 	Exp       time.Time `json:"exp"`
-	Iat       time.Time `json:"Iat"`
+	Iat       time.Time `json:"iat"`
 }

@@ -6,7 +6,6 @@ CREATE TABLE Comments (
     image_path TEXT,
     likes INTEGER DEFAULT 0,
     dislikes INTEGER DEFAULT 0,
-    timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     creation_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (post_id) REFERENCES Posts(post_id),
     FOREIGN KEY (user_id) REFERENCES Users(user_id)

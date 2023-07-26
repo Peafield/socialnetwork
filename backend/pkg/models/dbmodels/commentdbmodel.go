@@ -11,7 +11,6 @@ type Comment struct {
 	ImagePath    string
 	Likes        int
 	Dislikes     int
-	Timestamp    time.Time
 	CreationDate time.Time
 }
 

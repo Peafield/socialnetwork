@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"database/sql"
 	"fmt"
 	crud "socialnetwork/pkg/db/CRUD"
 	"socialnetwork/pkg/db/dbutils"
@@ -11,7 +12,7 @@ import (
 
 /*
  */
-func ValidateCredentials(formData map[string]interface{}) (*dbmodels.User, error) {
+func ValidateCredentials(formData map[string]interface{}, db *sql.DB) (*dbmodels.User, error) {
 	// Email
 	username_email, ok := formData["username_email"].(string)
 	if !ok {
@@ -35,7 +36,7 @@ func ValidateCredentials(formData map[string]interface{}) (*dbmodels.User, error
 	conditionStatement := dbutils.ConditionStatementConstructor(conditions)
 
 	//get user data as interface
-	userData, err := crud.SelectFromDatabase(dbutils.DB, "Users", conditionStatement)
+	userData, err := crud.SelectFromDatabase(db, "Users", conditionStatement)
 	if err != nil {
 		return nil, fmt.Errorf("error selecting user from database: %s", err)
 	}

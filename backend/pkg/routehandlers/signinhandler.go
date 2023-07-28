@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"net/http"
 	"socialnetwork/pkg/controllers"
+	"socialnetwork/pkg/db/dbutils"
 	"socialnetwork/pkg/middleware"
 	"socialnetwork/pkg/models/readwritemodels"
 )
@@ -19,7 +20,7 @@ func SignInHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	//validate credentials
-	user, err := controllers.ValidateCredentials(formData.Data)
+	user, err := controllers.ValidateCredentials(formData.Data, dbutils.DB)
 	if err != nil {
 		http.Error(w, "failed to validate credentials", http.StatusUnauthorized)
 		return

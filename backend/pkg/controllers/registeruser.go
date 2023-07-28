@@ -1,9 +1,9 @@
 package controllers
 
 import (
+	"database/sql"
 	"fmt"
 	crud "socialnetwork/pkg/db/CRUD"
-	"socialnetwork/pkg/db/dbstatements"
 	"socialnetwork/pkg/db/dbutils"
 	"socialnetwork/pkg/helpers"
 	"socialnetwork/pkg/models/dbmodels"
@@ -43,7 +43,7 @@ Errors:
   - Returns an error if there is an issue extracting the User struct fields
   - Returns an error if there is an issue inserting the User struct into the database
 */
-func RegisterUser(formData map[string]interface{}) (*dbmodels.User, error) {
+func RegisterUser(formData map[string]interface{}, db *sql.DB, statement *sql.Stmt) (*dbmodels.User, error) {
 	var user dbmodels.User
 
 	// Email
@@ -71,7 +71,7 @@ func RegisterUser(formData map[string]interface{}) (*dbmodels.User, error) {
 	conditionStatement := dbutils.ConditionStatementConstructor(conditions)
 
 	//get user data as interface
-	_, err := crud.SelectFromDatabase(dbutils.DB, "Users", conditionStatement)
+	_, err := crud.SelectFromDatabase(db, "Users", conditionStatement)
 	if err == nil {
 		return nil, fmt.Errorf("user display name or email already in use")
 	}
@@ -132,7 +132,7 @@ func RegisterUser(formData map[string]interface{}) (*dbmodels.User, error) {
 	if err != nil {
 		return nil, fmt.Errorf("failed to get user struct values: %s", err)
 	}
-	err = crud.InsertIntoDatabase(dbutils.DB, dbstatements.InsertUserStmt, userValues)
+	err = crud.InsertIntoDatabase(db, statement, userValues)
 	if err != nil {
 		return nil, fmt.Errorf("failed to insert user into database: %s", err)
 	}

@@ -3,13 +3,10 @@ package main
 import (
 	"flag"
 	"log"
-	"socialnetwork/pkg/controllers"
 	"socialnetwork/pkg/db/dbstatements"
 	"socialnetwork/pkg/db/dbutils"
 	"socialnetwork/pkg/models/dbmodels"
 	"socialnetwork/pkg/models/helpermodels"
-	"socialnetwork/pkg/models/readwritemodels"
-	"time"
 )
 
 // YOU MUST CALL --dbopen WHEN STARTING THE SERVER TO OPEN THE DATABASE
@@ -100,23 +97,5 @@ func main() {
 		if err != nil {
 			log.Fatalf("Failed to migrate changes down: %s", err)
 		}
-	}
-
-	test := readwritemodels.ReadData{
-		Status: "success",
-		Data: map[string]interface{}{
-			"email":        "test@email",
-			"password":     "password",
-			"first_name":   "Harry",
-			"last_name":    "Antonio",
-			"dob":          time.Now(),
-			"display_name": "TopG",
-			"about_me":     "dfkjhsdkjfhksdj sdfjhsdkjfh fsdkjfhksdjhfkjsd sdfkjsdhfkjsdhf fdkjshdfkjhsdkj.",
-		},
-	}
-
-	_, err := controllers.RegisterUser(test.Data)
-	if err != nil {
-		log.Println(err)
 	}
 }

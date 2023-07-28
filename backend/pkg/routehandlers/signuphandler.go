@@ -2,11 +2,14 @@ package routehandlers
 
 import (
 	"encoding/json"
+	"errors"
 	"net/http"
 	"socialnetwork/pkg/controllers"
 	"socialnetwork/pkg/middleware"
 	"socialnetwork/pkg/models/readwritemodels"
 )
+
+var ErrUserExists = errors.New("user display name or email already in use")
 
 /*
 SignUpHandler is a HTTP handler function that processes sign up requests.
@@ -70,7 +73,11 @@ func SignUpHandler(w http.ResponseWriter, r *http.Request) {
 
 	user, err := controllers.RegisterUser(formData.Data)
 	if err != nil {
-		http.Error(w, "failed to reigster user", http.StatusInternalServerError)
+		if errors.Is(err, ErrUserExists) {
+			http.Error(w, "user display name or email already in use", http.StatusBadRequest)
+		} else {
+			http.Error(w, "failed to reigster user", http.StatusInternalServerError)
+		}
 		return
 	}
 

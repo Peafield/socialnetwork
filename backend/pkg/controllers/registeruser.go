@@ -7,6 +7,7 @@ import (
 	"socialnetwork/pkg/db/dbutils"
 	"socialnetwork/pkg/helpers"
 	"socialnetwork/pkg/models/dbmodels"
+	"strings"
 	"time"
 )
 
@@ -45,6 +46,36 @@ Errors:
 func RegisterUser(formData map[string]interface{}) (*dbmodels.User, error) {
 	var user dbmodels.User
 
+	// Email
+	email, ok := formData["email"].(string)
+	if !ok {
+		return nil, fmt.Errorf("email is not a string")
+	}
+	user.Email = email
+
+	// Display Name
+	displayName, ok := formData["display_name"].(string)
+	if !ok {
+		return nil, fmt.Errorf("display name is not a string")
+	}
+	user.DisplayName = displayName
+
+	//set conditions
+	conditions := make(map[string]interface{})
+	if strings.Contains(user.Email, "@") {
+		conditions["email"] = user.Email
+	} else {
+		conditions["display_name"] = user.DisplayName
+	}
+
+	conditionStatement := dbutils.ConditionStatementConstructor(conditions)
+
+	//get user data as interface
+	_, err := crud.SelectFromDatabase(dbutils.DB, "Users", conditionStatement)
+	if err == nil {
+		return nil, fmt.Errorf("user display name or email already in use")
+	}
+
 	// UUID
 	userId, err := helpers.CreateUUID()
 	if err != nil {
@@ -54,13 +85,6 @@ func RegisterUser(formData map[string]interface{}) (*dbmodels.User, error) {
 
 	// IsLoggedIn
 	user.IsLoggedIn = 1
-
-	// Email
-	email, ok := formData["email"].(string)
-	if !ok {
-		return nil, fmt.Errorf("email is not a string")
-	}
-	user.Email = email
 
 	// Password
 	password, ok := formData["password"].(string)
@@ -96,13 +120,6 @@ func RegisterUser(formData map[string]interface{}) (*dbmodels.User, error) {
 
 	// Avatar Path TO DO
 	user.AvatarPath = "path/to/image"
-
-	// Display Name
-	displayName, ok := formData["display_name"].(string)
-	if !ok {
-		return nil, fmt.Errorf("display name is not a string")
-	}
-	user.DisplayName = displayName
 
 	// About Me
 	aboutMe, ok := formData["about_me"].(string)

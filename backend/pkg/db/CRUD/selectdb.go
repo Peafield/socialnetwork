@@ -53,6 +53,7 @@ func SelectFromDatabase(db *sql.DB, table string, conditionStatement string) (in
 	}
 	defer result.Close()
 
+	found := false
 	for result.Next() {
 		objAddresses, oErr := helpers.StructFieldAddress(object)
 		if oErr != nil {
@@ -62,6 +63,10 @@ func SelectFromDatabase(db *sql.DB, table string, conditionStatement string) (in
 		if err != nil {
 			return object, fmt.Errorf("failed to scan data: %w", err)
 		}
+		found = true
+	}
+	if !found {
+		err = fmt.Errorf("no results found")
 	}
 	return object, err
 }

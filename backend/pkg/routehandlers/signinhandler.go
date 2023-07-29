@@ -10,7 +10,52 @@ import (
 )
 
 /*
- */
+SignInHandler is a HTTP handler function that processes sign in requests.
+
+It expects the request context to contain a middleware.DataKey key that holds
+a value of type readwritemodels.ReadData, which is extracted from the request
+body by the ParseAndValidateData middleware.
+
+The readwritemodels.ReadData struct should include a data field with the user
+sign in details.
+
+The handler does the following:
+
+ 1. Extracts form data from the context. If this operation fails, it returns an
+    HTTP 500 (Internal Server Error) response.
+
+ 2. Calls controllers.ValidateCredentials function to validate the users credentials. If an error
+    occurs, it returns an HTTP 401 Unauthorized response.
+
+ 3. Calls controllers.CreateWebToken function to create a JWT token for the newly
+    signed in user. If the JWT creation fails, it returns an HTTP 500 response.
+
+ 4. If the previous steps succeed, the handler sends a success response containing
+    the JWT token for the new user. This response is a JSON object of type
+    readwritemodels.WriteData, with a "Status" field set to "success" and a "Data"
+    field containing the JWT token.
+
+HTTP Request Method: POST
+
+Path: /signin
+
+Example request body:
+
+	{
+		"status": "success",
+		"data": {
+			"username_email": "me@example.com",
+			"password": "someHashedPassword",
+		}
+	}
+
+Example response body on success:
+
+	{
+		"Status": "success",
+		"Data": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c"
+	}
+*/
 func SignInHandler(w http.ResponseWriter, r *http.Request) {
 	//retrieve sign in form data
 	formData, ok := r.Context().Value(middleware.DataKey).(readwritemodels.ReadData)

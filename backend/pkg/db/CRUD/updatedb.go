@@ -26,7 +26,6 @@ func UpdateDatabaseRow(db *sql.DB, tableName string, Conditions map[string]inter
 	var UpdatedConditions string = dbutils.ConditionStatementConstructor(Conditions)
 
 	Query := fmt.Sprintf(`UPDATE %s %s %s;`, tableName, UpdatedValues, UpdatedConditions)
-	fmt.Println(Query)
 
 	statement, err := db.Prepare(Query)
 
@@ -46,8 +45,7 @@ func UpdateDatabaseRow(db *sql.DB, tableName string, Conditions map[string]inter
 	if err != nil {
 		return fmt.Errorf("failed to retrieve affected rows in UpdateUserInfo: %s", err)
 	}
-	fmt.Println(rowsAffected)
-	// fmt.Println(AffectedColumns)
+
 	if rowsAffected == 0 {
 		return fmt.Errorf("no rows affected in UpdateUserInfo: %s", err)
 	}

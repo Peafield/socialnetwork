@@ -61,8 +61,12 @@ func ValidateCredentials(formData map[string]interface{}, db *sql.DB) (*dbmodels
 		return nil, fmt.Errorf("error selecting user from database: %s", err)
 	}
 
+	if len(userData) > 1 {
+		return nil, fmt.Errorf("found multiple users with same credentials, ???")
+	}
+
 	//assert dbmodels.User type
-	user, ok := userData.(*dbmodels.User)
+	user, ok := userData[0].(*dbmodels.User)
 	if !ok {
 		return nil, fmt.Errorf("returned database value is not a User struct: %s", err)
 	}

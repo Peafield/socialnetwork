@@ -204,7 +204,12 @@ func TestSelectFromDatabase(t *testing.T) {
 			obj, err := crud.SelectFromDatabase(db, tc.Table, conditionStatement)
 			fmt.Println(err)
 
-			objValues, _ := helpers.StructFieldValues(obj)
+			var objValues []interface{}
+
+			if len(obj) > 0 {
+				objValues, _ = helpers.StructFieldValues(obj[0])
+			}
+
 			tcValues, _ := helpers.StructFieldValues(tc.Value)
 
 			if tc.IsSame && !reflect.DeepEqual(objValues, tcValues) {

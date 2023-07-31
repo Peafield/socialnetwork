@@ -44,7 +44,11 @@ func GetUserFromRequestContext(r *http.Request) (*dbmodels.User, error) {
 		return nil, fmt.Errorf("error selecting user from database: %s", err)
 	}
 
-	user, ok := userData.(*dbmodels.User)
+	if len(userData) > 1 {
+		return nil, fmt.Errorf("found multiple users with same credentials, ???")
+	}
+
+	user, ok := userData[0].(*dbmodels.User)
 	if !ok {
 		return nil, fmt.Errorf("returned database value is not a User struct: %s", err)
 	}

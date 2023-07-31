@@ -5,6 +5,8 @@ import (
 	"fmt"
 )
 
+const ()
+
 // Prepared insert statements
 var (
 	InsertUserStmt              *sql.Stmt

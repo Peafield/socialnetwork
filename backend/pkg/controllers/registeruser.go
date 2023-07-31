@@ -71,8 +71,8 @@ func RegisterUser(formData map[string]interface{}, db *sql.DB, statement *sql.St
 	conditionStatement := dbutils.ConditionStatementConstructor(conditions)
 
 	//get user data as interface
-	_, err := crud.SelectFromDatabase(db, "Users", conditionStatement)
-	if err == nil {
+	users, err := crud.SelectFromDatabase(db, "Users", conditionStatement)
+	if err == nil && len(users) > 0 {
 		return nil, fmt.Errorf("user display name or email already in use")
 	}
 

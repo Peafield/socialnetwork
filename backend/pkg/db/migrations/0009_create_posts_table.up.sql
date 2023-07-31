@@ -6,7 +6,6 @@ CREATE TABLE Posts (
   image_path TEXT,
   content TEXT NOT NULL,
   privacy_level INTEGER DEFAULT 0,
-  allowed_followers TEXT,
   likes INTEGER DEFAULT 0,
   dislikes INTEGER DEFAULT 0,
   creation_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,

@@ -9,19 +9,20 @@ const ()
 
 // Prepared insert statements
 var (
-	InsertUserStmt              *sql.Stmt
-	InsertSessionsStmt          *sql.Stmt
-	InsertPostStmt              *sql.Stmt
-	InsertCommentsStmt          *sql.Stmt
-	InsertReactionsStmt         *sql.Stmt
-	InsertChatsStmt             *sql.Stmt
-	InsertChatsMessagesStmt     *sql.Stmt
-	InsertFollowersStmt         *sql.Stmt
-	InsertGroupsStmt            *sql.Stmt
-	InsertGroupsMembersStmt     *sql.Stmt
-	InsertGroupsEventsStmt      *sql.Stmt
-	InsertGroupsEventsAttendees *sql.Stmt
-	InsertNotificationsStmt     *sql.Stmt
+	InsertUserStmt                  *sql.Stmt
+	InsertSessionsStmt              *sql.Stmt
+	InsertPostStmt                  *sql.Stmt
+	InsertPostsSelectedFollowerStmt *sql.Stmt
+	InsertCommentsStmt              *sql.Stmt
+	InsertReactionsStmt             *sql.Stmt
+	InsertChatsStmt                 *sql.Stmt
+	InsertChatsMessagesStmt         *sql.Stmt
+	InsertFollowersStmt             *sql.Stmt
+	InsertGroupsStmt                *sql.Stmt
+	InsertGroupsMembersStmt         *sql.Stmt
+	InsertGroupsEventsStmt          *sql.Stmt
+	InsertGroupsEventsAttendees     *sql.Stmt
+	InsertNotificationsStmt         *sql.Stmt
 )
 
 func InitDBStatements(db *sql.DB) error {
@@ -65,7 +66,6 @@ func InitDBStatements(db *sql.DB) error {
 		image_path,
 		content,
 		privacy_level,
-		allowed_followers,
 		likes,
 		dislikes
 	) VALUES (
@@ -73,6 +73,17 @@ func InitDBStatements(db *sql.DB) error {
 	)`)
 	if err != nil {
 		return fmt.Errorf("failed to prepare insert posts statement: %s", err)
+	}
+
+	InsertPostsSelectedFollowerStmt, err = db.Prepare(`
+	INSERT INTO Posts_Selected_Followers  (
+		post_id,
+		user_id
+	) VALUES (
+		?, ?
+	)`)
+	if err != nil {
+		return fmt.Errorf("failed to prepare insert post follower statement: %s", err)
 	}
 
 	InsertCommentsStmt, err = db.Prepare(`
@@ -222,6 +233,7 @@ func CloseDBStatements() {
 	InsertUserStmt.Close()
 	InsertSessionsStmt.Close()
 	InsertPostStmt.Close()
+	InsertPostsSelectedFollowerStmt.Close()
 	InsertCommentsStmt.Close()
 	InsertReactionsStmt.Close()
 	InsertChatsStmt.Close()

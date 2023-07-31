@@ -10,7 +10,7 @@ CREATE TABLE Notifications (
   chat_id TEXT,
   reaction_type TEXT,
   read_status INTEGER NOT NULL DEFAULT 0,
-  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  creation_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   FOREIGN KEY(sender_id) REFERENCES Users(user_id),
   FOREIGN KEY(receiver_id) REFERENCES Users(user_id),
   FOREIGN KEY(group_id) REFERENCES Groups(group_id),

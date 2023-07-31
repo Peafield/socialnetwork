@@ -59,7 +59,6 @@ func TestFileCreator(t *testing.T) {
 			filepath := tc.fullPath
 
 			err := helpers.FileCreator(filepath, tc.fileCreator)
-
 			if tc.expectError && err == nil {
 				t.Error("Expected an error, but got nil")
 			} else if !tc.expectError && err != nil {

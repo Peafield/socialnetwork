@@ -7,6 +7,7 @@ CREATE TABLE Groups_Events (
   event_start_time TIMESTAMP,
   total_going INTEGER DEFAULT 0,
   total_not_going INTEGER DEFAULT 0,
+  creation_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   FOREIGN KEY(group_id) REFERENCES Groups(group_id),
   FOREIGN KEY(creator_id) REFERENCES Users(user_id)
 );

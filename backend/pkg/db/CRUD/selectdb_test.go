@@ -6,7 +6,6 @@ import (
 	"reflect"
 	crud "socialnetwork/pkg/db/CRUD"
 	"socialnetwork/pkg/db/dbstatements"
-	"socialnetwork/pkg/db/dbutils"
 	"socialnetwork/pkg/helpers"
 	"socialnetwork/pkg/models/dbmodels"
 	"testing"
@@ -104,8 +103,9 @@ func TestSelectFromDatabase(t *testing.T) {
 		Name            string
 		Table           string
 		Insert          bool
-		Conditions      map[string]interface{}
 		Value           interface{}
+		QueryStatement  string
+		QueryValues     []interface{}
 		InsertStatement *sql.Stmt
 		InsertValues    []interface{}
 		IsSame          bool
@@ -115,10 +115,12 @@ func TestSelectFromDatabase(t *testing.T) {
 			Name:   "Found User Correctly Single Condition",
 			Table:  "Users",
 			Insert: true,
-			Conditions: map[string]interface{}{
-				"user_id": user1.UserId,
-			},
-			Value:           user1,
+			Value:  user1,
+			QueryStatement: `
+			SELECT * FROM Users
+			WHERE user_id = ?
+			`,
+			QueryValues:     []interface{}{user1.UserId},
 			InsertStatement: dbstatements.InsertUserStmt,
 			InsertValues:    user1Values,
 			IsSame:          true,
@@ -128,11 +130,13 @@ func TestSelectFromDatabase(t *testing.T) {
 			Name:   "Found User Correctly Multiple Conditions",
 			Table:  "Users",
 			Insert: true,
-			Conditions: map[string]interface{}{
-				"email":           user2.Email,
-				"hashed_password": user2.HashedPassword,
-			},
-			Value:           user2,
+			Value:  user2,
+			QueryStatement: `
+			SELECT * FROM Users
+			WHERE email = ?
+			AND hashed_password = ?
+			`,
+			QueryValues:     []interface{}{user2.Email, user2.HashedPassword},
 			InsertStatement: dbstatements.InsertUserStmt,
 			InsertValues:    user2Values,
 			IsSame:          true,
@@ -142,10 +146,12 @@ func TestSelectFromDatabase(t *testing.T) {
 			Name:   "Found Post Correctly Single Condition",
 			Table:  "Posts",
 			Insert: true,
-			Conditions: map[string]interface{}{
-				"post_id": post1.PostId,
-			},
-			Value:           post1,
+			Value:  post1,
+			QueryStatement: `
+			SELECT * FROM Posts
+			WHERE post_id = ?
+			`,
+			QueryValues:     []interface{}{post1.PostId},
 			InsertStatement: dbstatements.InsertPostStmt,
 			InsertValues:    post1Values,
 			IsSame:          true,
@@ -155,11 +161,13 @@ func TestSelectFromDatabase(t *testing.T) {
 			Name:   "Found Post Correctly Multiple Conditions",
 			Table:  "Posts",
 			Insert: true,
-			Conditions: map[string]interface{}{
-				"group_id":   post2.GroupId,
-				"creator_id": post2.CreatorId,
-			},
-			Value:           post2,
+			Value:  post2,
+			QueryStatement: `
+			SELECT * FROM Posts
+			WHERE group_id = ?
+			AND creator_id = ?
+			`,
+			QueryValues:     []interface{}{post2.GroupId, post2.CreatorId},
 			InsertStatement: dbstatements.InsertPostStmt,
 			InsertValues:    post2Values,
 			IsSame:          true,
@@ -169,10 +177,12 @@ func TestSelectFromDatabase(t *testing.T) {
 			Name:   "Didn't Find Post Correctly Single Condition",
 			Table:  "Posts",
 			Insert: false,
-			Conditions: map[string]interface{}{
-				"post_id": "xxx",
-			},
-			Value:           post2,
+			Value:  post2,
+			QueryStatement: `
+			SELECT * FROM Posts
+			WHERE post_id = ?
+			`,
+			QueryValues:     []interface{}{"xxx"},
 			InsertStatement: dbstatements.InsertPostStmt,
 			InsertValues:    post2Values,
 			IsSame:          false,
@@ -182,10 +192,12 @@ func TestSelectFromDatabase(t *testing.T) {
 			Name:   "Incorrect Table",
 			Table:  "Chatss",
 			Insert: false,
-			Conditions: map[string]interface{}{
-				"chat_id": "1",
-			},
-			Value:           nil,
+			Value:  nil,
+			QueryStatement: `
+			SELECT * FROM Chatss
+			WHERE chat_id = ?
+			`,
+			QueryValues:     []interface{}{"1"},
 			InsertStatement: dbstatements.InsertChatsStmt,
 			InsertValues:    chat1Values,
 			IsSame:          false,
@@ -200,8 +212,7 @@ func TestSelectFromDatabase(t *testing.T) {
 				fmt.Println(err)
 			}
 
-			conditionStatement := dbutils.ConditionStatementConstructor(tc.Conditions)
-			obj, err := crud.SelectFromDatabase(db, tc.Table, conditionStatement)
+			obj, err := crud.SelectFromDatabase(db, tc.Table, tc.QueryStatement, tc.QueryValues)
 			fmt.Println(err)
 
 			var objValues []interface{}

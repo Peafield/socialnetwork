@@ -4,7 +4,6 @@ import (
 	"database/sql"
 	"fmt"
 	crud "socialnetwork/pkg/db/CRUD"
-	"socialnetwork/pkg/db/dbutils"
 	"socialnetwork/pkg/helpers"
 	"socialnetwork/pkg/models/dbmodels"
 	"strings"
@@ -60,18 +59,25 @@ func RegisterUser(formData map[string]interface{}, db *sql.DB, statement *sql.St
 	}
 	user.DisplayName = displayName
 
-	//set conditions
-	conditions := make(map[string]interface{})
+	//set query statements
+	queryStatement := ""
+	queryValues := make([]interface{}, 0)
 	if strings.Contains(user.Email, "@") {
-		conditions["email"] = user.Email
+		queryStatement = `
+			SELECT * FROM Users 
+			WHERE email = ?
+			`
+		queryValues = append(queryValues, user.Email)
 	} else {
-		conditions["display_name"] = user.DisplayName
+		queryStatement = `
+			SELECT * FROM Users 
+			WHERE display_name = ?
+			`
+		queryValues = append(queryValues, user.DisplayName)
 	}
 
-	conditionStatement := dbutils.ConditionStatementConstructor(conditions)
-
 	//get user data as interface
-	users, err := crud.SelectFromDatabase(db, "Users", conditionStatement)
+	users, err := crud.SelectFromDatabase(db, "Users", queryStatement, queryValues)
 	if err == nil && len(users) > 0 {
 		return nil, fmt.Errorf("user display name or email already in use")
 	}

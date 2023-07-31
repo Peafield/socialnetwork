@@ -6,6 +6,7 @@ import (
 	"crypto/sha256"
 	"encoding/base64"
 	"encoding/json"
+	"log"
 	"net/http"
 	"os"
 	"socialnetwork/pkg/models/readwritemodels"
@@ -47,7 +48,7 @@ func ValidateTokenMiddleware(next http.Handler) http.Handler {
 
 		validToken, err := VerifyToken(bearerToken)
 		if !validToken || err != nil {
-			http.Error(w, "Invalid token", http.StatusUnauthorized)
+			http.Error(w, "Invalid token verification", http.StatusUnauthorized)
 			return
 		}
 
@@ -55,7 +56,7 @@ func ValidateTokenMiddleware(next http.Handler) http.Handler {
 		payloadEncoded := tokenParts[1]
 		payload, err := base64.StdEncoding.DecodeString(payloadEncoded)
 		if err != nil {
-			http.Error(w, "Invalid token", http.StatusUnauthorized)
+			http.Error(w, "failed to decode token", http.StatusUnauthorized)
 			return
 		}
 		var RecievedPayload readwritemodels.Payload
@@ -91,21 +92,14 @@ func VerifyToken(token string) (bool, error) {
 		return false, nil
 	}
 
-	header, err := base64.StdEncoding.DecodeString(splitToken[0])
-	if err != nil {
-		return false, err
-	}
-
-	payload, err := base64.StdEncoding.DecodeString(splitToken[1])
-	if err != nil {
-		return false, err
-	}
-
-	unsignedStr := string(header) + string(payload)
+	unsignedStr := splitToken[0] + "." + splitToken[1]
 	h := hmac.New(sha256.New, []byte(os.Getenv("SECRET_TOKEN_KEY")))
 	h.Write([]byte(unsignedStr))
 
 	signature := base64.StdEncoding.EncodeToString(h.Sum(nil))
+
+	log.Println(signature)
+	log.Println(splitToken[2])
 
 	if signature != splitToken[2] {
 		return false, nil

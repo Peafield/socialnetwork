@@ -114,28 +114,11 @@ func main() {
 		ReadTimeout:  15 * time.Second,
 	}
 
+	/*AUTH ENDPOINTS*/
 	r.Handle("/signup", middleware.ParseAndValidateData(http.HandlerFunc(routehandlers.SignUpHandler))).Methods("POST")
 	r.Handle("/signin", middleware.ParseAndValidateData(http.HandlerFunc(routehandlers.SignInHandler))).Methods("POST")
+	r.Handle("/signout", middleware.ValidateTokenMiddleware(http.HandlerFunc(routehandlers.SignOutHandler))).Methods("POST")
 
 	/*LISTEN AND SERVER*/
 	log.Fatal(srv.ListenAndServe())
-	// pword, _ := helpers.HashPassword("abc123")
-	// user := &dbmodels.User{
-	// 	UserId:         "10",
-	// 	IsLoggedIn:     0,
-	// 	Email:          "test@test101.com",
-	// 	HashedPassword: pword,
-	// 	FirstName:      fmt.Sprintf("F%v", time.Now().Unix()),
-	// 	LastName:       fmt.Sprintf("L%v", time.Now().Unix()),
-	// 	DOB:            time.Now(),
-	// 	AvatarPath:     "/path/to/avatar",
-	// 	DisplayName:    "testDisplayName1",
-	// 	AboutMe:        fmt.Sprintf("Test time: %v", time.Now().Unix()),
-	// }
-	// values, _ := helpers.StructFieldValues(user)
-	// err := crud.InsertIntoDatabase(dbutils.DB, dbstatements.InsertUserStmt, values)
-	// if err != nil {
-	// 	log.Fatal(err)
-	// }
-
 }

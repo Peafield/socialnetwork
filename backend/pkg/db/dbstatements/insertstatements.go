@@ -27,7 +27,7 @@ func InitDBStatements(db *sql.DB) error {
 	InsertUserStmt, err = db.Prepare(`
 	INSERT INTO Users (
 		user_id,
-		isLoggedIn,
+		is_logged_in,
 		email,
 		hashed_password,
 		first_name,

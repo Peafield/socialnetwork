@@ -2,6 +2,7 @@ package routehandlers
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"socialnetwork/pkg/controllers"
 	crud "socialnetwork/pkg/db/CRUD"
@@ -65,10 +66,13 @@ func SignInHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	fmt.Println(formData)
+
 	//validate credentials
 	user, err := controllers.ValidateCredentials(formData.Data, dbutils.DB)
 	if err != nil {
-		http.Error(w, "failed to validate credentials", http.StatusUnauthorized)
+		mi := fmt.Sprintf("failed to validate credentials, error: %s", err)
+		http.Error(w, mi, http.StatusUnauthorized)
 		return
 	}
 

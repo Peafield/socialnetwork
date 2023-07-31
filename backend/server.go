@@ -3,10 +3,16 @@ package main
 import (
 	"flag"
 	"log"
+	"net/http"
 	"socialnetwork/pkg/db/dbstatements"
 	"socialnetwork/pkg/db/dbutils"
+	"socialnetwork/pkg/middleware"
 	"socialnetwork/pkg/models/dbmodels"
 	"socialnetwork/pkg/models/helpermodels"
+	"socialnetwork/pkg/routehandlers"
+	"time"
+
+	"github.com/gorilla/mux"
 )
 
 // YOU MUST CALL --dbopen WHEN STARTING THE SERVER TO OPEN THE DATABASE
@@ -98,4 +104,38 @@ func main() {
 			log.Fatalf("Failed to migrate changes down: %s", err)
 		}
 	}
+
+	/*SERVER SETTINGS*/
+	r := mux.NewRouter()
+	srv := &http.Server{
+		Handler:      r,
+		Addr:         "localhost:8080",
+		WriteTimeout: 15 * time.Second,
+		ReadTimeout:  15 * time.Second,
+	}
+
+	r.Handle("/signup", middleware.ParseAndValidateData(http.HandlerFunc(routehandlers.SignUpHandler))).Methods("POST")
+	r.Handle("/signin", middleware.ParseAndValidateData(http.HandlerFunc(routehandlers.SignInHandler))).Methods("POST")
+
+	/*LISTEN AND SERVER*/
+	log.Fatal(srv.ListenAndServe())
+	// pword, _ := helpers.HashPassword("abc123")
+	// user := &dbmodels.User{
+	// 	UserId:         "10",
+	// 	IsLoggedIn:     0,
+	// 	Email:          "test@test101.com",
+	// 	HashedPassword: pword,
+	// 	FirstName:      fmt.Sprintf("F%v", time.Now().Unix()),
+	// 	LastName:       fmt.Sprintf("L%v", time.Now().Unix()),
+	// 	DOB:            time.Now(),
+	// 	AvatarPath:     "/path/to/avatar",
+	// 	DisplayName:    "testDisplayName1",
+	// 	AboutMe:        fmt.Sprintf("Test time: %v", time.Now().Unix()),
+	// }
+	// values, _ := helpers.StructFieldValues(user)
+	// err := crud.InsertIntoDatabase(dbutils.DB, dbstatements.InsertUserStmt, values)
+	// if err != nil {
+	// 	log.Fatal(err)
+	// }
+
 }

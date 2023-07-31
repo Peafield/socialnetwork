@@ -3,6 +3,7 @@ package middleware
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"socialnetwork/pkg/models/readwritemodels"
 )
@@ -27,10 +28,12 @@ Errors:
 func ParseAndValidateData(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		var data readwritemodels.ReadData
+		fmt.Println(r.Body)
 		err := json.NewDecoder(r.Body).Decode(&data)
 		if err != nil {
 			http.Error(w, "Invalid request payload", http.StatusBadRequest)
 		}
+		fmt.Println("data is equal to:", data)
 		ctx := context.WithValue(r.Context(), DataKey, data)
 		next.ServeHTTP(w, r.WithContext(ctx))
 	})

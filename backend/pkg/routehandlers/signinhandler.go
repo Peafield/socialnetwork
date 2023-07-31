@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"net/http"
 	"socialnetwork/pkg/controllers"
+	crud "socialnetwork/pkg/db/CRUD"
 	"socialnetwork/pkg/db/dbutils"
 	"socialnetwork/pkg/middleware"
 	"socialnetwork/pkg/models/readwritemodels"
@@ -70,6 +71,13 @@ func SignInHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "failed to validate credentials", http.StatusUnauthorized)
 		return
 	}
+
+	//update user logged in status
+	conditions := make(map[string]interface{})
+	affectedColums := make(map[string]interface{})
+	conditions["email"] = user.Email
+	affectedColums["is_logged_in"] = 1
+	crud.UpdateDatabaseRow(dbutils.DB, "Users", conditions, affectedColums)
 
 	//generate web token
 	token, err := controllers.CreateWebToken(user)

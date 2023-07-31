@@ -34,12 +34,26 @@ func TestRegisterUser(t *testing.T) {
 			Name:   "Successfuly insertion",
 			Status: "success",
 			Data: map[string]interface{}{
-				"email":        fmt.Sprintf("test@%v", time.Now().Unix()),
+				"email":        "test@",
 				"password":     fmt.Sprintf("PW%v", time.Now().Unix()),
 				"first_name":   fmt.Sprintf("F%v", time.Now().Unix()),
 				"last_name":    fmt.Sprintf("L%v", time.Now().Unix()),
 				"dob":          time.Now(),
-				"display_name": fmt.Sprintf("DN%v", time.Now().Unix()),
+				"display_name": "DN",
+				"about_me":     fmt.Sprintf("Test time: %v", time.Now().Unix()),
+			},
+			ExpectedError: false,
+		},
+		{
+			Name:   "Successfuly insertion",
+			Status: "success",
+			Data: map[string]interface{}{
+				"email":        "test@",
+				"password":     fmt.Sprintf("PW%v", time.Now().Unix()),
+				"first_name":   fmt.Sprintf("F%v", time.Now().Unix()),
+				"last_name":    fmt.Sprintf("L%v", time.Now().Unix()),
+				"dob":          time.Now(),
+				"display_name": "DN",
 				"about_me":     fmt.Sprintf("Test time: %v", time.Now().Unix()),
 			},
 			ExpectedError: false,
@@ -48,11 +62,11 @@ func TestRegisterUser(t *testing.T) {
 			Name:   "Bad data",
 			Status: "success",
 			Data: map[string]interface{}{
-				"email":        fmt.Sprintf("test@%v", time.Now().Unix()),
+				"email":        1,
 				"password":     fmt.Sprintf("PW%v", time.Now().Unix()),
 				"first_name":   fmt.Sprintf("F%v", time.Now().Unix()),
 				"last_name":    time.Now().Unix(),
-				"dob":          time.Now(),
+				"dob":          "DN",
 				"display_name": fmt.Sprintf("DN%v", time.Now().Unix()),
 				"about_me":     fmt.Sprintf("Test time: %v", time.Now().Unix()),
 			},
@@ -67,7 +81,7 @@ func TestRegisterUser(t *testing.T) {
 				"first_name":   fmt.Sprintf("F%v", time.Now().Unix()),
 				"last_name":    fmt.Sprintf("L%v", time.Now().Unix()),
 				"dob":          time.Now(),
-				"display_name": fmt.Sprintf("DN%v", time.Now().Unix()),
+				"display_name": "DN",
 				"about_me":     fmt.Sprintf("Test time: %v", time.Now().Unix()),
 			},
 			ExpectedError: true,
@@ -76,7 +90,7 @@ func TestRegisterUser(t *testing.T) {
 			Name:   "Non-unqiue display name",
 			Status: "success",
 			Data: map[string]interface{}{
-				"email":        fmt.Sprintf("test@%v", time.Now().Unix()),
+				"email":        "test@",
 				"password":     fmt.Sprintf("PW%v", time.Now().Unix()),
 				"first_name":   fmt.Sprintf("F%v", time.Now().Unix()),
 				"last_name":    fmt.Sprintf("L%v", time.Now().Unix()),
@@ -94,8 +108,14 @@ func TestRegisterUser(t *testing.T) {
 		},
 	}
 
-	for _, tc := range testCases {
+	for i, tc := range testCases {
 		t.Run(tc.Name, func(t *testing.T) {
+			testingTime := time.Now().Add(time.Minute * time.Duration(i*10)).Unix()
+			if tc.Name != "Non-unqiue email" && tc.Name != "Non-unqiue display name" {
+				tc.Data["email"] = fmt.Sprintf("test@%v", testingTime)
+				tc.Data["password"] = fmt.Sprintf("PW%v", testingTime)
+				tc.Data["display_name"] = fmt.Sprintf("DN%v", testingTime)
+			}
 			_, err := controllers.RegisterUser(tc.Data, db, dbstatements.InsertUserStmt)
 			if tc.ExpectedError && err == nil {
 				t.Error("Expected an error, but got nil")

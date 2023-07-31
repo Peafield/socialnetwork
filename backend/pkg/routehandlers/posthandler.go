@@ -1,6 +1,7 @@
 package routehandlers
 
 import (
+	"encoding/json"
 	"net/http"
 	"socialnetwork/pkg/controllers"
 	"socialnetwork/pkg/db/dbutils"
@@ -50,5 +51,23 @@ func UserPosts(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	userPosts, err := controllers.SelectPostsForUser(dbutils.DB, userInfo.UserId)
+	userPosts, err := controllers.SelectUserViewablePosts(dbutils.DB, userInfo.UserId)
+	if err != nil {
+		http.Error(w, "failed to select user viewable posts", http.StatusInternalServerError)
+		return
+	}
+
+	response := readwritemodels.WriteData{
+		Status: "success",
+		Data:   userPosts,
+	}
+	jsonReponse, err := json.Marshal(response)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	w.Write(jsonReponse)
+
 }

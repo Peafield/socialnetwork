@@ -8,8 +8,9 @@ import (
 )
 
 func SelectUserViewablePosts(db *sql.DB, userId string) (*dbmodels.Posts, error) {
-	conditionQuery := `
-	privacy_level = 0
+	query := `
+	SELECT * FROM Posts
+	WHERE privacy_level = 0
 	UNION
 	SELECT * FROM Posts 
 	WHERE creator_id = ?
@@ -28,7 +29,7 @@ func SelectUserViewablePosts(db *sql.DB, userId string) (*dbmodels.Posts, error)
 		userId,
 	}
 
-	postsData, err := crud.SelectFromDatabase(db, "Posts", conditionQuery, values)
+	postsData, err := crud.SelectFromDatabase(db, "Posts", query, values)
 	if err != nil {
 		return nil, fmt.Errorf("failed to select user viewable posts from database: %w", err)
 	}

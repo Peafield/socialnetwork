@@ -30,7 +30,7 @@ func UpdateDatabaseRow(db *sql.DB, tableName string, Conditions map[string]inter
 	statement, err := db.Prepare(Query)
 
 	if err != nil {
-		return fmt.Errorf("failed to prepare UpdateUserInfo's statement: %w", err)
+		return fmt.Errorf("failed to prepare update statement: %w", err)
 	}
 
 	defer statement.Close()
@@ -38,16 +38,16 @@ func UpdateDatabaseRow(db *sql.DB, tableName string, Conditions map[string]inter
 	result, err := statement.Exec()
 
 	if err != nil {
-		return fmt.Errorf("failed to execute UpdateUserInfo's statement: %w", err)
+		return fmt.Errorf("failed to execute update statement: %w", err)
 	}
 
 	rowsAffected, err := result.RowsAffected()
 	if err != nil {
-		return fmt.Errorf("failed to retrieve affected rows in UpdateUserInfo: %s", err)
+		return fmt.Errorf("failed to retrieve affected rows for update: %s", err)
 	}
 
 	if rowsAffected == 0 {
-		return fmt.Errorf("no rows affected in UpdateUserInfo: %s", err)
+		return fmt.Errorf("no rows affected in update: %s", err)
 	}
 
 	return nil

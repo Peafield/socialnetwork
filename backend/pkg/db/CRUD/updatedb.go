@@ -19,15 +19,17 @@ Parameters:
 Example:
   - A user would want to change his personal info (e.g nickname, profile picture ...).
 */
-func UpdateDatabaseRow(db *sql.DB, tableName string, Conditions map[string]interface{}, AffectedColumns map[string]interface{}) error {
+func UpdateDatabaseRow(DB *sql.DB, TableName string, Conditions map[string]interface{}, AffectedColumns map[string]interface{}) error {
 	//maybe check the fields first before accessing them
 
-	var UpdatedValues string = dbutils.UpdateSetConstructor(AffectedColumns)
-	var UpdatedConditions string = dbutils.ConditionStatementConstructor(Conditions)
+	//seperate the keys and the values respectively as a string and an []interface{}
+	setStatement, setValues := dbutils.UpdateSetConstructor(AffectedColumns)
+	updateStatement, updatedValues := dbutils.ConditionStatementConstructor(Conditions)
 
-	Query := fmt.Sprintf(`UPDATE %s %s %s;`, tableName, UpdatedValues, UpdatedConditions)
+	//assemble the final form of the statement
+	finalStatement := fmt.Sprintf(`UPDATE %s %s %s;`, TableName, setStatement, updateStatement)
 
-	statement, err := db.Prepare(Query)
+	statement, err := DB.Prepare(finalStatement)
 
 	if err != nil {
 		return fmt.Errorf("failed to prepare update statement: %w", err)
@@ -35,7 +37,9 @@ func UpdateDatabaseRow(db *sql.DB, tableName string, Conditions map[string]inter
 
 	defer statement.Close()
 
-	result, err := statement.Exec()
+	//combine the values from both maps to pass in the "Exec()" method
+	combinedValues := append(setValues, updatedValues...)
+	result, err := statement.Exec(combinedValues...)
 
 	if err != nil {
 		return fmt.Errorf("failed to execute update statement: %w", err)

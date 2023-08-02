@@ -19,39 +19,41 @@ Parameters:
 Returns:
   - string: a condition statement string.
 */
-func ConditionStatementConstructor(conditions map[string]interface{}) string {
+func ConditionStatementConstructor(conditions map[string]interface{}) (string, []interface{}) {
 	if len(conditions) == 0 {
-		return ""
+		return "", nil
 	}
 	var conditionStatement string = "WHERE "
 	var temp []string
+	var ConditionValues []interface{}
 
 	for k, v := range conditions {
-		if fmt.Sprintf("%T", v) == "string" {
-			temp = append(temp, fmt.Sprintf(`%s = "%v"`, k, v))
-		} else {
-			temp = append(temp, fmt.Sprintf(`%s = %v`, k, v))
-		}
+
+		temp = append(temp, fmt.Sprintf(`%s = ?`, k))
+		ConditionValues = append(ConditionValues, v)
 	}
 
 	conditionStatement += strings.Join(temp, " AND ")
-	return conditionStatement
+	return conditionStatement, ConditionValues
 }
 
 /**/
-func UpdateSetConstructor(MutableValues map[string]interface{}) string {
+func UpdateSetConstructor(MutableValues map[string]interface{}) (string, []interface{}) {
+	//if nothing received, return nothing
 	if len(MutableValues) == 0 {
-		return ""
+		return "", nil
 	}
 
 	var setStatement string = "SET "
 	var Temp []string
+	var ColumnValues []interface{}
 
 	for k, v := range MutableValues {
-		Temp = append(Temp, fmt.Sprintf("%s = '%v'", k, v))
+		Temp = append(Temp, fmt.Sprintf("%s = ?", k))
+		ColumnValues = append(ColumnValues, v)
 
 	}
 	setStatement += strings.Join(Temp, ", ")
 
-	return setStatement
+	return setStatement, ColumnValues
 }

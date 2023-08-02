@@ -13,23 +13,23 @@ the function prepares the query and returns a success or a failure if the row ha
 Parameters:
   - db (*sql.DB): an open connection to a sql database.
   - tableName (string): the database table to be deleted from.
-  - Conditions (map[string]interface{}): maps the conditions to representing the desired row
-  - AffectedColumns (map[string]interface{}): maps the columns to be updated.
+  - conditions (map[string]interface{}): maps the conditions to representing the desired row
+  - affectedColumns (map[string]interface{}): maps the columns to be updated.
 
 Example:
   - A user would want to change his personal info (e.g nickname, profile picture ...).
 */
-func UpdateDatabaseRow(DB *sql.DB, TableName string, Conditions map[string]interface{}, AffectedColumns map[string]interface{}) error {
+func UpdateDatabaseRow(db *sql.DB, tableName string, conditions map[string]interface{}, affectedColumns map[string]interface{}) error {
 	//maybe check the fields first before accessing them
 
 	//seperate the keys and the values respectively as a string and an []interface{}
-	setStatement, setValues := dbutils.UpdateSetConstructor(AffectedColumns)
-	updateStatement, updatedValues := dbutils.ConditionStatementConstructor(Conditions)
+	setStatement, setValues := dbutils.UpdateSetConstructor(affectedColumns)
+	updateStatement, updatedValues := dbutils.ConditionStatementConstructor(conditions)
 
 	//assemble the final form of the statement
-	finalStatement := fmt.Sprintf(`UPDATE %s %s %s;`, TableName, setStatement, updateStatement)
+	finalStatement := fmt.Sprintf(`UPDATE %s %s %s;`, tableName, setStatement, updateStatement)
 
-	statement, err := DB.Prepare(finalStatement)
+	statement, err := db.Prepare(finalStatement)
 
 	if err != nil {
 		return fmt.Errorf("failed to prepare update statement: %w", err)

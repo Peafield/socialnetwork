@@ -155,6 +155,7 @@ func UpdateReaction(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// TO DO
 	err := controllers.UpdateUserReaction(dbutils.DB, userData.UserId, updateReactionData.Data)
 	if err != nil {
 		http.Error(w, "failed to update user reaction", http.StatusInternalServerError)

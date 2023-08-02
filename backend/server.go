@@ -120,9 +120,9 @@ func main() {
 	r.Handle("/signout", middleware.ValidateTokenMiddleware(http.HandlerFunc(routehandlers.SignOutHandler))).Methods("POST")
 
 	/*END POINTS*/
-	r.Handle("/user", middleware.ValidateTokenMiddleware(http.HandlerFunc(routehandlers.UserHandler)))
-	r.Handle("/post", middleware.ValidateTokenMiddleware(http.HandlerFunc(routehandlers.PostHandler)))
-	r.Handle("/comment", middleware.ValidateTokenMiddleware(http.HandlerFunc(routehandlers.CommentHandler)))
+	r.Handle("/user", middleware.ValidateTokenMiddleware(middleware.ParseAndValidateData(http.HandlerFunc(routehandlers.UserHandler))))
+	r.Handle("/post", middleware.ValidateTokenMiddleware(middleware.ParseAndValidateData(http.HandlerFunc(routehandlers.PostHandler))))
+	r.Handle("/comment", middleware.ValidateTokenMiddleware(middleware.ParseAndValidateData(http.HandlerFunc(routehandlers.CommentHandler))))
 
 	/*LISTEN AND SERVER*/
 	log.Fatal(srv.ListenAndServe())

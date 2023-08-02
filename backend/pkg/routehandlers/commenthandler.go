@@ -10,7 +10,7 @@ import (
 )
 
 /*
-CommentHandler function is a general HTTP request handler for actions related to a comments.
+CommentHandler is a general HTTP request handler for actions related to a comments.
 It is designed to process different HTTP methods (GET, POST, PUT, DELETE) and call the corresponding functions for each method.
 
 Based on the HTTP method, it will:
@@ -40,15 +40,15 @@ func CommentHandler(w http.ResponseWriter, r *http.Request) {
 	case http.MethodPost:
 		NewComment(w, r)
 		return
-	// case http.MethodGet:
-	// 	PostComments(w, r)
-	// 	return
+	case http.MethodGet:
+		PostComments(w, r)
+		return
 	// case http.MethodPut:
 	// 	UpdateComment(w, r)
 	// 	return
-	// case http.MethodDelete:
-	// 	DeleteComment(w, r)
-	// 	return
+	case http.MethodDelete:
+		DeleteComment(w, r)
+		return
 	default:
 		http.Error(w, "invalid method", http.StatusBadRequest)
 		return
@@ -56,7 +56,7 @@ func CommentHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 /*
-NewComment function is an HTTP handler for creating a new comment in the web application.
+NewComment is an HTTP handler for creating a new comment in the web application.
 This function extracts user data and comment data from the HTTP request context, then inserts the new comment into the database.
 
 Parameters:
@@ -67,7 +67,7 @@ Specifically, it:
   - Attempts to extract the user data from the context of the request. If it fails, it sends an HTTP 500 (Internal Server Error) status to the client, with an error message indicating that it failed to read the user data from the context.
   - Attempts to extract the comment data from the context of the request. If it fails, it sends an HTTP 500 (Internal Server Error) status to the client, with an error message indicating that it failed to read the post data from the context.
   - Calls controllers.InsertComment to insert the new comment data into the database. If it fails, it sends an HTTP 500 (Internal Server Error) status to the client, with an error message indicating that it failed to insert the post data.
-  - If all of the above steps are successful, it sends an HTTP 200 (OK) status to the client, indicating that the post was successfully inserted.
+  - If all of the above steps are successful, it sends an HTTP 200 (OK) status to the client, indicating that the comment was successfully inserted.
 */
 func NewComment(w http.ResponseWriter, r *http.Request) {
 	userData, ok := r.Context().Value(middleware.UserDataKey).(readwritemodels.Payload)
@@ -90,6 +90,19 @@ func NewComment(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 }
 
+/*
+PostComments is an HTTP handler for selecting all comments for a post from the database.
+This function extracts comment data from the HTTP request context, then selects all comments related to a post from the database
+
+Parameters:
+  - w (http.ResponseWriter): An HTTP ResponseWriter interface that forms the response that will be written to the HTTP connection.
+  - r (*http.Request): A pointer to the HTTP request received from the client.
+
+Specifically, it:
+  - Attempts to extract the comment data from the context of the request. If it fails, it sends an HTTP 500 (Internal Server Error) status to the client, with an error message indicating that it failed to read the user data from the context.
+  - Calls controllers.SelectPostComments to select all comments related to a post. If it fails, it sends an HTTP 500 (Internal Server Error) status to the client, with an error message indicating that it failed to insert the post data.
+  - If all of the above steps are successful, it writes the posts to a response and sends an HTTP 200 (OK) status to the client, indicating that the comment was successfully selected.
+*/
 func PostComments(w http.ResponseWriter, r *http.Request) {
 	postIDData, ok := r.Context().Value(middleware.DataKey).(readwritemodels.ReadData)
 	if !ok {
@@ -116,4 +129,40 @@ func PostComments(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 	w.Write(jsonReponse)
 
+}
+
+/*
+DeleteComment is an HTTP handler for deleting a comment from the database.
+This function extracts user data and delete comment data from the HTTP request context, then deletes a specific comment
+based on that data in the database.
+
+Parameters:
+  - w (http.ResponseWriter): An HTTP ResponseWriter interface that forms the response that will be written to the HTTP connection.
+  - r (*http.Request): A pointer to the HTTP request received from the client.
+
+Specifically, it:
+  - Attempts to extract the user data from the context of the request. If it fails, it sends an HTTP 500 (Internal Server Error) status to the client, with an error message indicating that it failed to read the user data from the context.
+  - Attempts to extract the comment data from the context of the request. If it fails, it sends an HTTP 500 (Internal Server Error) status to the client, with an error message indicating that it failed to read the post data from the context.
+  - Calls controllers.DeleteUserComment to delete a comment. If it fails, it sends an HTTP 500 (Internal Server Error) status to the client, with an error message indicating that it failed to insert the post data.
+  - If all of the above steps are successful, it sends an HTTP 200 (OK) status to the client, indicating that the comment was successfully deleted.
+*/
+func DeleteComment(w http.ResponseWriter, r *http.Request) {
+	userData, ok := r.Context().Value(middleware.UserDataKey).(readwritemodels.Payload)
+	if !ok {
+		http.Error(w, "failed to read user data from context", http.StatusInternalServerError)
+		return
+	}
+
+	deleteCommentData, ok := r.Context().Value(middleware.DataKey).(readwritemodels.ReadData)
+	if !ok {
+		http.Error(w, "failed to read delete comment data from context", http.StatusInternalServerError)
+		return
+	}
+
+	err := controllers.DeleteUserComment(dbutils.DB, userData.UserId, deleteCommentData.Data["comment_id"].(string))
+	if err != nil {
+		http.Error(w, "failed to delete user comment", http.StatusInternalServerError)
+		return
+	}
+	w.WriteHeader(http.StatusOK)
 }

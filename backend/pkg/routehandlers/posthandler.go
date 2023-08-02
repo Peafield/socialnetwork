@@ -101,10 +101,9 @@ Parameters:
   - r (*http.Request): A pointer to the HTTP request received from the client.
 
 Specifically, it:
-
-	Attempts to extract the user data from the context of the request. If it fails, it sends an HTTP 500 (Internal Server Error) status to the client, with an error message indicating that it failed to read the user data from the context.
-	Calls controllers.SelectUserViewablePosts to select all viewable posts. If it fails, it sends an HTTP 500 (Internal Server Error) status to the client, with an error message indicating that it failed to insert the post data.
-	If all of the above steps are successful, it writes the posts to a response and sends an HTTP 200 (OK) status to the client, indicating that the post was successfully inserted.
+  - Attempts to extract the user data from the context of the request. If it fails, it sends an HTTP 500 (Internal Server Error) status to the client, with an error message indicating that it failed to read the user data from the context.
+  - Calls controllers.SelectUserViewablePosts to select all viewable posts. If it fails, it sends an HTTP 500 (Internal Server Error) status to the client, with an error message indicating that it failed to insert the post data.
+  - If all of the above steps are successful, it writes the posts to a response and sends an HTTP 200 (OK) status to the client, indicating that the posts were successfully selected.
 */
 func UserPosts(w http.ResponseWriter, r *http.Request) {
 	userInfo, ok := r.Context().Value(middleware.UserDataKey).(readwritemodels.Payload)
@@ -143,11 +142,10 @@ Parameters:
   - r (*http.Request): A pointer to the HTTP request received from the client.
 
 Specifically, it:
-
-	Attempts to extract the user data from the context of the request. If it fails, it sends an HTTP 500 (Internal Server Error) status to the client, with an error message indicating that it failed to read the user data from the context.
-	Attempts to extract the post data from the context of the request. If it fails, it sends an HTTP 500 (Internal Server Error) status to the client, with an error message indicating that it failed to read the post data from the context.
-	Calls controllers.UpdateUserPost to update a post with new data. If it fails, it sends an HTTP 500 (Internal Server Error) status to the client, with an error message indicating that it failed to insert the post data.
-	If all of the above steps are successful, it sends an HTTP 200 (OK) status to the client, indicating that the post was successfully inserted.
+  - Attempts to extract the user data from the context of the request. If it fails, it sends an HTTP 500 (Internal Server Error) status to the client, with an error message indicating that it failed to read the user data from the context.
+  - Attempts to extract the post data from the context of the request. If it fails, it sends an HTTP 500 (Internal Server Error) status to the client, with an error message indicating that it failed to read the post data from the context.
+  - Calls controllers.UpdateUserPost to update a post with new data. If it fails, it sends an HTTP 500 (Internal Server Error) status to the client, with an error message indicating that it failed to insert the post data.
+  - If all of the above steps are successful, it sends an HTTP 200 (OK) status to the client, indicating that the post was successfully updated.
 */
 func UpdatePost(w http.ResponseWriter, r *http.Request) {
 	userData, ok := r.Context().Value(middleware.UserDataKey).(readwritemodels.Payload)
@@ -180,11 +178,10 @@ Parameters:
   - r (*http.Request): A pointer to the HTTP request received from the client.
 
 Specifically, it:
-
-	Attempts to extract the user data from the context of the request. If it fails, it sends an HTTP 500 (Internal Server Error) status to the client, with an error message indicating that it failed to read the user data from the context.
-	Attempts to extract the delete post data from the context of the request. If it fails, it sends an HTTP 500 (Internal Server Error) status to the client, with an error message indicating that it failed to read the post data from the context.
-	Calls controllers.DeleteUserPost to delete a post with new data. If it fails, it sends an HTTP 500 (Internal Server Error) status to the client, with an error message indicating that it failed to insert the post data.
-	If all of the above steps are successful, it sends an HTTP 200 (OK) status to the client, indicating that the post was successfully inserted.
+  - Attempts to extract the user data from the context of the request. If it fails, it sends an HTTP 500 (Internal Server Error) status to the client, with an error message indicating that it failed to read the user data from the context.
+  - Attempts to extract the delete post data from the context of the request. If it fails, it sends an HTTP 500 (Internal Server Error) status to the client, with an error message indicating that it failed to read the post data from the context.
+  - Calls controllers.DeleteUserPost to delete a post. If it fails, it sends an HTTP 500 (Internal Server Error) status to the client, with an error message indicating that it failed to insert the post data.
+  - If all of the above steps are successful, it sends an HTTP 200 (OK) status to the client, indicating that the post was successfully deleted.
 */
 func DeletePost(w http.ResponseWriter, r *http.Request) {
 	userData, ok := r.Context().Value(middleware.UserDataKey).(readwritemodels.Payload)
@@ -199,7 +196,7 @@ func DeletePost(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err := controllers.DeleteUserPost(dbutils.DB, userData.UserId, deletePostData.Data)
+	err := controllers.DeleteUserPost(dbutils.DB, userData.UserId, deletePostData.Data["post_id"].(string))
 	if err != nil {
 		http.Error(w, "failed to delete user post", http.StatusInternalServerError)
 		return

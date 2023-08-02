@@ -7,6 +7,27 @@ import (
 	"socialnetwork/pkg/models/dbmodels"
 )
 
+/*
+SelectUserViewablePosts selects all user viewable posts.
+
+The function first creates a query to select all user viewable posts match:
+  - where the privacy level is public (0)
+  - where the user is the creator of the post
+  - where the user is a follower of the post's creator
+  - where the user is one of the selected followers of the post
+
+It then creates an interface slice of values to be exectuted along with the query to select the posts
+from the database. It then appends these posts to a slice of posts and returns them along with an error
+if one exists.
+
+Parameters:
+  - db (*sql.DB): a open database
+  - userId (string): a user id
+
+Returns:
+  - posts: a slice of posts
+  - error: if the database fails to return the posts or the post data fails to be asserted.
+*/
 func SelectUserViewablePosts(db *sql.DB, userId string) (*dbmodels.Posts, error) {
 	query := `
 	SELECT * FROM Posts

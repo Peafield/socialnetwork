@@ -1,6 +1,7 @@
 package routehandlers
 
 import (
+	"encoding/json"
 	"net/http"
 	"socialnetwork/pkg/controllers"
 	"socialnetwork/pkg/db/dbutils"
@@ -14,10 +15,10 @@ It is designed to process different HTTP methods (GET, POST, PUT, DELETE) and ca
 
 Based on the HTTP method, it will:
 
-	POST: Create a new post using NewComment(w, r)
-	GET: Retrieve a users posts using UserComments(w, r)
-	PUT: Update an existing post using UpdateComment(w, r)
-	DELETE: Delete a post using DeleteComment(w, r)
+	POST: Create a new comment using NewComment(w, r)
+	GET: Retrieve a posts comments using PostComments(w, r)
+	PUT: Update an existing comment using UpdateComment(w, r)
+	DELETE: Delete a comment using DeleteComment(w, r)
 
 If the request's HTTP method is not one of the above, the function will respond with an HTTP 400 (Bad Request) status,
 indicating that the server cannot or will not process the request due to something perceived to be a client error.
@@ -40,7 +41,7 @@ func CommentHandler(w http.ResponseWriter, r *http.Request) {
 		NewComment(w, r)
 		return
 	// case http.MethodGet:
-	// 	UserComments(w, r)
+	// 	PostComments(w, r)
 	// 	return
 	// case http.MethodPut:
 	// 	UpdateComment(w, r)
@@ -87,4 +88,32 @@ func NewComment(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	w.WriteHeader(http.StatusOK)
+}
+
+func PostComments(w http.ResponseWriter, r *http.Request) {
+	postIDData, ok := r.Context().Value(middleware.DataKey).(readwritemodels.ReadData)
+	if !ok {
+		http.Error(w, "failed to read post id data from context", http.StatusInternalServerError)
+		return
+	}
+
+	postComments, err := controllers.SelectPostComments(dbutils.DB, postIDData.Data["post_id"].(string))
+	if err != nil {
+		http.Error(w, "failed to select post's comments", http.StatusInternalServerError)
+		return
+	}
+
+	response := readwritemodels.WriteData{
+		Status: "success",
+		Data:   postComments,
+	}
+	jsonReponse, err := json.Marshal(response)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	w.Write(jsonReponse)
+
 }

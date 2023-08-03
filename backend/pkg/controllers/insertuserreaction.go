@@ -10,7 +10,7 @@ import (
 )
 
 func InsertUserReaction(db *sql.DB, userID string, newReactionData map[string]interface{}) error {
-	var reaction *dbmodels.Reaction
+	reaction := &dbmodels.Reaction{}
 
 	reaction.UserId = userID
 

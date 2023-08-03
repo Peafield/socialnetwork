@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"socialnetwork/pkg/db/dbstatements"
 	"socialnetwork/pkg/db/dbutils"
+	db "socialnetwork/pkg/db/mocking"
 	"socialnetwork/pkg/middleware"
 	"socialnetwork/pkg/models/dbmodels"
 	"socialnetwork/pkg/models/helpermodels"
@@ -103,6 +104,11 @@ func main() {
 		if err != nil {
 			log.Fatalf("Failed to migrate changes down: %s", err)
 		}
+	}
+
+	err := db.CreateFakePosts(dbutils.DB)
+	if err != nil {
+		log.Fatalf("someting went wrong creating fakes: %s", err)
 	}
 
 	/*SERVER SETTINGS*/

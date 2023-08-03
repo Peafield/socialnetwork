@@ -69,7 +69,7 @@ func InitDBStatements(db *sql.DB) error {
 		likes,
 		dislikes
 	) VALUES (
-		?, ?, ?, ?, ?, ?, ?, ?, ?, ?
+		?, ?, ?, ?, ?, ?, ?, ?, ?
 	)`)
 	if err != nil {
 		return fmt.Errorf("failed to prepare insert posts statement: %s", err)
@@ -78,7 +78,7 @@ func InitDBStatements(db *sql.DB) error {
 	InsertPostsSelectedFollowerStmt, err = db.Prepare(`
 	INSERT INTO Posts_Selected_Followers  (
 		post_id,
-		user_id
+		allowed_follower_id
 	) VALUES (
 		?, ?
 	)`)

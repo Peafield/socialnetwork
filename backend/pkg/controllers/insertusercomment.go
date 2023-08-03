@@ -10,7 +10,7 @@ import (
 )
 
 func InsertComment(db *sql.DB, userId string, commentData map[string]interface{}) error {
-	var comment dbmodels.Comment
+	comment := &dbmodels.Comment{}
 
 	commentId, err := helpers.CreateUUID()
 	if err != nil {

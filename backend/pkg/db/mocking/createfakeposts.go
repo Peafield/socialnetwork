@@ -3,10 +3,14 @@ package db
 import (
 	"database/sql"
 	"fmt"
+	"io"
+	"log"
 	"math/rand"
+	"net/http"
 	"socialnetwork/pkg/controllers"
 	crud "socialnetwork/pkg/db/CRUD"
 	"socialnetwork/pkg/models/dbmodels"
+	"strings"
 )
 
 func CreateFakePosts(db *sql.DB) error {
@@ -30,7 +34,9 @@ func CreateFakePosts(db *sql.DB) error {
 	}
 
 	for i := 1; i <= postAmount; i++ {
-		postData["content"] = fmt.Sprintf("Content %v: Wow, I can't believe this content!", i)
+		content := ContentGenerator()
+		postData["content"] = content
+		postData["title"] = strings.Join(strings.Split(content, " ")[:6], " ")
 		postData["privacy_level"] = rand.Intn(3)
 
 		err := controllers.InsertPost(db, userIds[i-1], postData)
@@ -39,4 +45,20 @@ func CreateFakePosts(db *sql.DB) error {
 		}
 	}
 	return nil
+}
+
+func ContentGenerator() string {
+	loremIpsumGen := "https://loripsum.net/api/2/short/plaintext"
+	response, err := http.Get(loremIpsumGen)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer response.Body.Close()
+
+	body, err := io.ReadAll(response.Body)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	return string(body)
 }

@@ -106,7 +106,11 @@ func main() {
 		}
 	}
 
-	err := db.CreateFakePosts(dbutils.DB)
+	err := db.CreateFakeUsers(dbutils.DB)
+	if err != nil {
+		log.Fatalf("someting went wrong creating fakes: %s", err)
+	}
+	err = db.CreateFakePosts(dbutils.DB)
 	if err != nil {
 		log.Fatalf("someting went wrong creating fakes: %s", err)
 	}

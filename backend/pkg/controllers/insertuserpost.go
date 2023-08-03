@@ -25,6 +25,12 @@ func InsertPost(db *sql.DB, userId string, postData map[string]interface{}) erro
 
 	post.CreatorId = userId
 
+	postTitle, ok := postData["title"].(string)
+	if !ok {
+		return fmt.Errorf("titel data is not a string")
+	}
+	post.Title = postTitle
+
 	imgPathData, ok := postData["image_path"].(string)
 	if ok {
 		post.ImagePath = imgPathData

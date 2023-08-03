@@ -4,6 +4,7 @@ import (
 	"flag"
 	"log"
 	"net/http"
+	"socialnetwork/pkg/controllers"
 	"socialnetwork/pkg/db/dbstatements"
 	"socialnetwork/pkg/db/dbutils"
 	db "socialnetwork/pkg/db/mocking"
@@ -118,6 +119,12 @@ func main() {
 		}
 	}
 
+	/*ON SERVER RESTART*/
+	err := controllers.SignOutAllUsers(dbutils.DB)
+	if err != nil {
+		log.Fatalf("error signing out all users: %s", err)
+	}
+
 	/*SERVER SETTINGS*/
 	r := mux.NewRouter()
 	srv := &http.Server{
@@ -136,6 +143,7 @@ func main() {
 	r.Handle("/user", middleware.ValidateTokenMiddleware(middleware.ParseAndValidateData(http.HandlerFunc(routehandlers.UserHandler))))
 	r.Handle("/post", middleware.ValidateTokenMiddleware(middleware.ParseAndValidateData(http.HandlerFunc(routehandlers.PostHandler))))
 	r.Handle("/comment", middleware.ValidateTokenMiddleware(middleware.ParseAndValidateData(http.HandlerFunc(routehandlers.CommentHandler))))
+	r.Handle("/reaction", middleware.ValidateTokenMiddleware(middleware.ParseAndValidateData(http.HandlerFunc(routehandlers.ReactionHandler))))
 
 	/*LISTEN AND SERVER*/
 	log.Fatal(srv.ListenAndServe())

@@ -27,6 +27,7 @@ func main() {
 	dbopen := flag.Bool("dbopen", false, "Opens a database and prepares database statements")
 	dbup := flag.Bool("dbup", false, "Migrate database changes up")
 	dbdown := flag.Bool("dbdown", false, "Migrate database changes down")
+	dbmock := flag.Bool("dbmock", false, "Creates mock data for the database. You must run dbopen before running dbmock")
 
 	flag.Parse()
 
@@ -106,13 +107,15 @@ func main() {
 		}
 	}
 
-	err := db.CreateFakeUsers(dbutils.DB)
-	if err != nil {
-		log.Fatalf("someting went wrong creating fakes: %s", err)
-	}
-	err = db.CreateFakePosts(dbutils.DB)
-	if err != nil {
-		log.Fatalf("someting went wrong creating fakes: %s", err)
+	if *dbmock {
+		err := db.CreateFakeUsers(dbutils.DB)
+		if err != nil {
+			log.Fatalf("someting went wrong creating fakes: %s", err)
+		}
+		err = db.CreateFakePosts(dbutils.DB)
+		if err != nil {
+			log.Fatalf("someting went wrong creating fakes: %s", err)
+		}
 	}
 
 	/*SERVER SETTINGS*/

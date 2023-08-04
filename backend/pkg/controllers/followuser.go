@@ -10,7 +10,18 @@ import (
 )
 
 /*
-FollowUser
+FollowUser creates a Follower struct, fills out the properties using the passed in data,
+and then gets the values as a slice of interface{} to then insert into the database.
+
+Parameters:
+  - db (*sql.DB): an open database with which to interact.
+  - userId (string): the current user id.
+  - postFollowerData (map[string]interface{}): follower data from the request.
+
+Errors:
+  - if the asserted followee id is not a string.
+  - failure to get the follower values from the struct.
+  - failure to insert the follower record into the database.
 */
 func FollowUser(db *sql.DB, userId string, postFollowerData map[string]interface{}) error {
 	follower := &dbmodels.Follower{}

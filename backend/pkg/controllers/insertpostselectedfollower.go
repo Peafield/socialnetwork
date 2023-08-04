@@ -9,6 +9,20 @@ import (
 	"socialnetwork/pkg/models/dbmodels"
 )
 
+/*
+NewPostSelectedFollower creates a PostSelectedFollower struct, fills out the properties using the passed in data,
+and then gets the values as a slice of interface{} to then insert into the database.
+
+Parameters:
+  - db (*sql.DB): an open database with which to interact.
+  - userId (string): the current user id.
+  - postPostSelectedFollowerData (map[string]interface{}): post selected follower data from the request.
+
+Errors:
+  - if the asserted values are not the right type.
+  - failure to get the post selected follower values from the struct.
+  - failure to insert the post selected follower record into the database.
+*/
 func NewPostSelectedFollower(db *sql.DB, userId string, newPostSelectedFollowerData map[string]interface{}) error {
 	postSelectedFollower := &dbmodels.PostSelectedFollower{}
 

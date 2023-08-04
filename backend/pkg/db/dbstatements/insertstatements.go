@@ -144,10 +144,11 @@ func InitDBStatements(db *sql.DB) error {
 	InsertFollowersStmt, err = db.Prepare(`
 	INSERT INTO Followers (
 		follower_id,
+		followee_id,
 		following_status,
 		request_pending
 	) VALUES (
-		?, ?, ?
+		?, ?, ?, ?
 	)`)
 	if err != nil {
 		return fmt.Errorf("failed to prepare insert followers statement: %s", err)

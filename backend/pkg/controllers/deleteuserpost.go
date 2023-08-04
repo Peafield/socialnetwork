@@ -18,8 +18,10 @@ Returns:
   - error: if the post fails to be deleted from the database
 */
 func DeleteUserPost(db *sql.DB, userId string, postId string) error {
-	column := "post_id"
-	err := crud.DeleteFromDatabase(db, "Posts", column, postId)
+	conditions := make(map[string]interface{})
+	conditions["post_id"] = postId
+
+	err := crud.DeleteFromDatabase(db, "Posts", conditions)
 	if err != nil {
 		return fmt.Errorf("failed to delete post from database: %w", err)
 	}

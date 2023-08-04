@@ -10,7 +10,7 @@ import (
 )
 
 /*
-ReactionHandler is a general HTTP request handler for actions related to a reactions.
+ReactionHandler is a general HTTP request handler for actions related to reactions.
 It is designed to process different HTTP methods (GET, POST, PUT, DELETE) and call the corresponding functions for each method.
 
 Based on the HTTP method, it will:

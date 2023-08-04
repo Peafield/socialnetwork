@@ -18,8 +18,10 @@ Returns:
   - error: if the comment fails to be deleted from the database
 */
 func DeleteUserComment(db *sql.DB, userId string, commentId string) error {
-	column := "comment_id"
-	err := crud.DeleteFromDatabase(db, "Posts", column, commentId)
+	conditions := make(map[string]interface{})
+	conditions["comment_id"] = commentId
+
+	err := crud.DeleteFromDatabase(db, "Posts", conditions)
 	if err != nil {
 		return fmt.Errorf("failed to delete post from database: %w", err)
 	}

@@ -4,8 +4,10 @@ import (
 	"flag"
 	"log"
 	"net/http"
+	"socialnetwork/pkg/controllers"
 	"socialnetwork/pkg/db/dbstatements"
 	"socialnetwork/pkg/db/dbutils"
+	db "socialnetwork/pkg/db/mocking"
 	"socialnetwork/pkg/middleware"
 	"socialnetwork/pkg/models/dbmodels"
 	"socialnetwork/pkg/models/helpermodels"
@@ -26,6 +28,7 @@ func main() {
 	dbopen := flag.Bool("dbopen", false, "Opens a database and prepares database statements")
 	dbup := flag.Bool("dbup", false, "Migrate database changes up")
 	dbdown := flag.Bool("dbdown", false, "Migrate database changes down")
+	dbmock := flag.Bool("dbmock", false, "Creates mock data for the database. You must run dbopen before running dbmock")
 
 	flag.Parse()
 
@@ -105,6 +108,23 @@ func main() {
 		}
 	}
 
+	if *dbmock {
+		err := db.CreateFakeUsers(dbutils.DB)
+		if err != nil {
+			log.Fatalf("someting went wrong creating fakes: %s", err)
+		}
+		err = db.CreateFakePosts(dbutils.DB)
+		if err != nil {
+			log.Fatalf("someting went wrong creating fakes: %s", err)
+		}
+	}
+
+	/*ON SERVER RESTART*/
+	err := controllers.SignOutAllUsers(dbutils.DB)
+	if err != nil {
+		log.Fatalf("error signing out all users: %s", err)
+	}
+
 	/*SERVER SETTINGS*/
 	r := mux.NewRouter()
 	srv := &http.Server{
@@ -123,6 +143,7 @@ func main() {
 	r.Handle("/user", middleware.ValidateTokenMiddleware(middleware.ParseAndValidateData(http.HandlerFunc(routehandlers.UserHandler))))
 	r.Handle("/post", middleware.ValidateTokenMiddleware(middleware.ParseAndValidateData(http.HandlerFunc(routehandlers.PostHandler))))
 	r.Handle("/comment", middleware.ValidateTokenMiddleware(middleware.ParseAndValidateData(http.HandlerFunc(routehandlers.CommentHandler))))
+	r.Handle("/reaction", middleware.ValidateTokenMiddleware(middleware.ParseAndValidateData(http.HandlerFunc(routehandlers.ReactionHandler))))
 
 	/*LISTEN AND SERVER*/
 	log.Fatal(srv.ListenAndServe())

@@ -65,6 +65,7 @@ func InitDBStatements(db *sql.DB) error {
 		title,
 		image_path,
 		content,
+		num_of_comments,
 		privacy_level,
 		likes,
 		dislikes
@@ -78,7 +79,7 @@ func InitDBStatements(db *sql.DB) error {
 	InsertPostsSelectedFollowerStmt, err = db.Prepare(`
 	INSERT INTO Posts_Selected_Followers  (
 		post_id,
-		user_id
+		allowed_follower_id
 	) VALUES (
 		?, ?
 	)`)

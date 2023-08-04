@@ -10,7 +10,7 @@ import (
 )
 
 func InsertPost(db *sql.DB, userId string, postData map[string]interface{}) error {
-	var post dbmodels.Post
+	post := &dbmodels.Post{}
 
 	postId, err := helpers.CreateUUID()
 	if err != nil {
@@ -25,6 +25,12 @@ func InsertPost(db *sql.DB, userId string, postData map[string]interface{}) erro
 
 	post.CreatorId = userId
 
+	postTitle, ok := postData["title"].(string)
+	if !ok {
+		return fmt.Errorf("titel data is not a string")
+	}
+	post.Title = postTitle
+
 	imgPathData, ok := postData["image_path"].(string)
 	if ok {
 		post.ImagePath = imgPathData
@@ -38,15 +44,9 @@ func InsertPost(db *sql.DB, userId string, postData map[string]interface{}) erro
 
 	privacyLevelData, ok := postData["privacy_level"].(int)
 	if !ok {
-		return fmt.Errorf("privacy level dat is not a int")
+		return fmt.Errorf("privacy level data is not a int")
 	}
 	post.PrivacyLevel = privacyLevelData
-
-	allowedFollowersData, ok := postData["allowed_followers"].(string)
-	if !ok {
-		return fmt.Errorf("allowed followers data is not a string")
-	}
-	post.AllowedFollowers = allowedFollowersData
 
 	values, err := helpers.StructFieldValues(post)
 	if err != nil {

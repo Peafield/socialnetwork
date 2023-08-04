@@ -58,6 +58,11 @@ func SelectFromDatabase(db *sql.DB, table string, queryStatement string, queryVa
 		}
 		objectArray = append(objectArray, object)
 		found = true
+		// Declare a new object to avoid rewriting original object
+		object, err = helpers.DecideStructType(table)
+		if err != nil {
+			return nil, fmt.Errorf("no valid struct with table, or not a valid table, when selecting from database. err: %w", err)
+		}
 	}
 	if !found {
 		err = fmt.Errorf("no results found")

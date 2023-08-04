@@ -33,16 +33,15 @@ var (
 	userValues, _ = helpers.StructFieldValues(user)
 
 	post = &dbmodels.Post{
-		PostId:           "1",
-		GroupId:          "1",
-		CreatorId:        "1",
-		Title:            "TEST1",
-		ImagePath:        "path/to/image",
-		Content:          "A whole bunch of nonsense",
-		PrivacyLevel:     0,
-		AllowedFollowers: "ted, jill, andrew",
-		Likes:            100,
-		Dislikes:         100000,
+		PostId:       "1",
+		GroupId:      "1",
+		CreatorId:    "1",
+		Title:        "TEST1",
+		ImagePath:    "path/to/image",
+		Content:      "A whole bunch of nonsense",
+		PrivacyLevel: 0,
+		Likes:        100,
+		Dislikes:     100000,
 	}
 	postValues, _ = helpers.StructFieldValues(post)
 

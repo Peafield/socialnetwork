@@ -47,30 +47,28 @@ var (
 	user2Values, _ = helpers.StructFieldValues(user2)
 
 	post1 = &dbmodels.Post{
-		PostId:           TEST_POST_ID,
-		GroupId:          "1",
-		CreatorId:        "1",
-		Title:            "TEST1",
-		ImagePath:        "path/to/image",
-		Content:          "A whole bunch of nonsense",
-		PrivacyLevel:     0,
-		AllowedFollowers: "ted, jill, andrew",
-		Likes:            100,
-		Dislikes:         100000,
+		PostId:       TEST_POST_ID,
+		GroupId:      "1",
+		CreatorId:    "1",
+		Title:        "TEST1",
+		ImagePath:    "path/to/image",
+		Content:      "A whole bunch of nonsense",
+		PrivacyLevel: 0,
+		Likes:        100,
+		Dislikes:     100000,
 	}
 	post1Values, _ = helpers.StructFieldValues(post1)
 
 	post2 = &dbmodels.Post{
-		PostId:           TEST_POST_ID + "2",
-		GroupId:          "1",
-		CreatorId:        "1",
-		Title:            "TEST1",
-		ImagePath:        "path/to/image",
-		Content:          "A whole bunch of nonsense",
-		PrivacyLevel:     0,
-		AllowedFollowers: "ted, jill, andrew",
-		Likes:            100,
-		Dislikes:         100000,
+		PostId:       TEST_POST_ID + "2",
+		GroupId:      "1",
+		CreatorId:    "1",
+		Title:        "TEST1",
+		ImagePath:    "path/to/image",
+		Content:      "A whole bunch of nonsense",
+		PrivacyLevel: 0,
+		Likes:        100,
+		Dislikes:     100000,
 	}
 	post2Values, _ = helpers.StructFieldValues(post2)
 

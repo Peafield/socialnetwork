@@ -5,6 +5,7 @@ CREATE TABLE Posts (
   title TEXT NOT NULL,
   image_path TEXT,
   content TEXT NOT NULL,
+  num_of_comments INTEGER DEFAULT 0,
   privacy_level INTEGER DEFAULT 0,
   likes INTEGER DEFAULT 0,
   dislikes INTEGER DEFAULT 0,

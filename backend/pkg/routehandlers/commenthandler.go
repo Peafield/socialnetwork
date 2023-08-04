@@ -43,9 +43,9 @@ func CommentHandler(w http.ResponseWriter, r *http.Request) {
 	case http.MethodGet:
 		PostComments(w, r)
 		return
-	// case http.MethodPut:
-	// 	UpdateComment(w, r)
-	// 	return
+	case http.MethodPut:
+		UpdateComment(w, r)
+		return
 	case http.MethodDelete:
 		DeleteComment(w, r)
 		return
@@ -101,7 +101,7 @@ Parameters:
 Specifically, it:
   - Attempts to extract the comment data from the context of the request. If it fails, it sends an HTTP 500 (Internal Server Error) status to the client, with an error message indicating that it failed to read the user data from the context.
   - Calls controllers.SelectPostComments to select all comments related to a post. If it fails, it sends an HTTP 500 (Internal Server Error) status to the client, with an error message indicating that it failed to insert the post data.
-  - If all of the above steps are successful, it writes the posts to a response and sends an HTTP 200 (OK) status to the client, indicating that the comment was successfully selected.
+  - If all of the above steps are successful, it writes the posts to a response and sends an HTTP 200 (OK) status to the client, indicating that the comments were successfully selected.
 */
 func PostComments(w http.ResponseWriter, r *http.Request) {
 	postIDData, ok := r.Context().Value(middleware.DataKey).(readwritemodels.ReadData)
@@ -129,6 +129,42 @@ func PostComments(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 	w.Write(jsonReponse)
 
+}
+
+/*
+UpdateComment is an HTTP handler for updating a comment in the database.
+This function extracts user data and update comment data from the HTTP request context, then updates a specific comment
+based on that data in the database.
+
+Parameters:
+  - w (http.ResponseWriter): An HTTP ResponseWriter interface that forms the response that will be written to the HTTP connection.
+  - r (*http.Request): A pointer to the HTTP request received from the client.
+
+Specifically, it:
+  - Attempts to extract the user data from the context of the request. If it fails, it sends an HTTP 500 (Internal Server Error) status to the client, with an error message indicating that it failed to read the user data from the context.
+  - Attempts to extract the update comment data from the context of the request. If it fails, it sends an HTTP 500 (Internal Server Error) status to the client, with an error message indicating that it failed to read the post data from the context.
+  - Calls controllers.UpdateUserComment to update a comment. If it fails, it sends an HTTP 500 (Internal Server Error) status to the client, with an error message indicating that it failed to insert the post data.
+  - If all of the above steps are successful, it sends an HTTP 200 (OK) status to the client, indicating that the comment was successfully updated.
+*/
+func UpdateComment(w http.ResponseWriter, r *http.Request) {
+	userData, ok := r.Context().Value(middleware.UserDataKey).(readwritemodels.Payload)
+	if !ok {
+		http.Error(w, "failed to read user data from context", http.StatusInternalServerError)
+		return
+	}
+
+	updateCommentData, ok := r.Context().Value(middleware.DataKey).(readwritemodels.ReadData)
+	if !ok {
+		http.Error(w, "failed to read update comment data from context", http.StatusInternalServerError)
+		return
+	}
+
+	err := controllers.UpdateUserComment(dbutils.DB, userData.UserId, updateCommentData.Data)
+	if err != nil {
+		http.Error(w, "failed to update user comment", http.StatusInternalServerError)
+		return
+	}
+	w.WriteHeader(http.StatusOK)
 }
 
 /*

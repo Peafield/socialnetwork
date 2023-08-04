@@ -8,6 +8,24 @@ import (
 	"socialnetwork/pkg/models/dbmodels"
 )
 
+/*
+DeleteUserAccount is used to delete a user's account.
+
+In order to delete ones account, you have to retype your credentials and be currently logged in (user id from context).
+This function takes the credentials and compares them to the ones in the database.  If they match and the password matches,
+then it allows the deletion of the account from the database.
+
+Parameters:
+  - db (*sql.DB): an open database with which to interact.
+  - userId (string): the current users id.
+  - deleteUserData (map[string]interface{}): data about the user to delete.
+
+Errors:
+  - assertion failure of data types.
+  - error when selecting the user.
+  - error when any of the credentials don't match.
+  - failure to delete the follower record from the database.
+*/
 func DeleteUserAccount(db *sql.DB, userId string, deleteUserData map[string]interface{}) error {
 	username, ok := deleteUserData["display_name"].(string)
 	if !ok {
@@ -31,9 +49,11 @@ func DeleteUserAccount(db *sql.DB, userId string, deleteUserData map[string]inte
 	SELECT * FROM Users 
 	WHERE email = ?
 	AND display_name = ?
+	AND user_id = ?
 	`
 	queryValues = append(queryValues, email)
 	queryValues = append(queryValues, username)
+	queryValues = append(queryValues, userId)
 
 	//select user from inputted information
 	userData, err := crud.SelectFromDatabase(db, "Users", queryStatement, queryValues)

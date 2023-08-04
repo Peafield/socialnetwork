@@ -33,7 +33,7 @@ func UpdateUserComment(db *sql.DB, userId string, updateCommentData map[string]i
 	conditions := make(map[string]interface{})
 	conditions["comment_id"] = updateCommentData["comment_id"].(string)
 
-	immutableParameters := []string{"comment_id", "user_id", "post_id", "likes", "dislikes", "creation_date"}
+	immutableParameters := []string{"comment_id", "user_id", "post_id", "creation_date"}
 
 	dataContainsImmutableParameter := helpers.MapKeyContains(updateCommentData, immutableParameters)
 
@@ -44,6 +44,17 @@ func UpdateUserComment(db *sql.DB, userId string, updateCommentData map[string]i
 	err := crud.UpdateDatabaseRow(db, "Comments", conditions, updateCommentData)
 	if err != nil {
 		return fmt.Errorf("failed to update comment data: %w", err)
+	}
+
+	postUpdateCommentNumConditions := make(map[string]interface{})
+	postUpdateCommentNumConditions["post_id"] = updateCommentData["post_id"].(string)
+
+	postUpdateCommentNumData := make(map[string]interface{})
+	postUpdateCommentNumData["num_of_comments"] = "num_of_comments + 1"
+
+	err = crud.UpdateDatabaseRow(db, "Posts", postUpdateCommentNumConditions, postUpdateCommentNumData)
+	if err != nil {
+		return fmt.Errorf("failed to update post's number of comments data: %w", err)
 	}
 	return nil
 }

@@ -65,11 +65,12 @@ func InitDBStatements(db *sql.DB) error {
 		title,
 		image_path,
 		content,
+		num_of_comments,
 		privacy_level,
 		likes,
 		dislikes
 	) VALUES (
-		?, ?, ?, ?, ?, ?, ?, ?, ?
+		?, ?, ?, ?, ?, ?, ?, ?, ?, ?
 	)`)
 	if err != nil {
 		return fmt.Errorf("failed to prepare insert posts statement: %s", err)

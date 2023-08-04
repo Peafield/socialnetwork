@@ -87,7 +87,7 @@ func NewReaction(w http.ResponseWriter, r *http.Request) {
 }
 
 /*
-PostCommentReactions is an HTTP handler for selecting all reactions for a post or reaction from the database.
+PostCommentReactions is an HTTP handler for selecting all reactions or comments for a post or a comment from the database.
 This function extracts reaction data from the HTTP request context, then selects all related reactions rom the database
 
 Parameters:
@@ -155,7 +155,6 @@ func UpdateReaction(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// TO DO
 	err := controllers.UpdateUserReaction(dbutils.DB, userData.UserId, updateReactionData.Data)
 	if err != nil {
 		http.Error(w, "failed to update user reaction", http.StatusInternalServerError)

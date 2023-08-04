@@ -33,7 +33,7 @@ func UpdateUserPost(db *sql.DB, userId string, updatePostData map[string]interfa
 	conditions := make(map[string]interface{})
 	conditions["post_id"] = updatePostData["post_id"].(string)
 
-	immutableParameters := []string{"post_id", "group_id", "creator_id", "likes", "dislikes", "creation_date"}
+	immutableParameters := []string{"post_id", "group_id", "creator_id", "creation_date"}
 
 	dataContainsImmutableParameter := helpers.MapKeyContains(updatePostData, immutableParameters)
 

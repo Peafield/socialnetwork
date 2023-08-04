@@ -58,8 +58,11 @@ func DeleteUserAccount(db *sql.DB, userId string, deleteUserData map[string]inte
 		return fmt.Errorf("error comparing passwords when deleting user, err: %s", err)
 	}
 
+	conditions := make(map[string]interface{})
+	conditions["user_id"] = userId
+
 	//delete user
-	err = crud.DeleteFromDatabase(db, "Users", "user_id", userId)
+	err = crud.DeleteFromDatabase(db, "Users", conditions)
 	if err != nil {
 		return fmt.Errorf("error deleting user from database, err: %s", err)
 	}

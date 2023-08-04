@@ -19,29 +19,30 @@ func TestDeleteFromDatabase(t *testing.T) {
 	testCases := []struct {
 		Name          string
 		Table         string
-		Column        string
-		Value         string
+		Conditions    map[string]interface{}
 		ExpectedError bool
 	}{
 		{
-			Name:          "Delete Succesfully",
-			Table:         "Users",
-			Column:        "user_id",
-			Value:         "5",
+			Name:  "Delete Succesfully",
+			Table: "Users",
+			Conditions: map[string]interface{}{
+				"user_id": "5",
+			},
 			ExpectedError: false,
 		},
 		{
-			Name:          "Row does not exist to delete",
-			Table:         "Users",
-			Column:        "user_id",
-			Value:         "1",
+			Name:  "Row does not exist to delete",
+			Table: "Users",
+			Conditions: map[string]interface{}{
+				"user_id": "1",
+			},
 			ExpectedError: true,
 		},
 	}
 
 	for _, tc := range testCases {
 		t.Run(tc.Name, func(t *testing.T) {
-			err := crud.DeleteFromDatabase(db, tc.Table, tc.Column, tc.Value)
+			err := crud.DeleteFromDatabase(db, tc.Table, tc.Conditions)
 			if tc.ExpectedError {
 				if err == nil {
 					t.Errorf("expected and error but did not get one")

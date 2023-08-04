@@ -114,6 +114,7 @@ This function will UPDATE a group in the database if user has the adequate permi
 */
 func UpdateGroup(w http.ResponseWriter, r *http.Request) {
 	// check if the user has the necessary permissions to get the group
+
 }
 
 /*

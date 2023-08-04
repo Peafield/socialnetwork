@@ -1,6 +1,7 @@
 package routehandlers
 
 import (
+	"encoding/json"
 	"net/http"
 	"socialnetwork/pkg/controllers/routecontrollers"
 	"socialnetwork/pkg/db/dbutils"
@@ -61,13 +62,15 @@ func NewGroup(w http.ResponseWriter, r *http.Request) {
 	}
 
 	//redirect or send response?
-
+	w.WriteHeader(http.StatusOK)
 }
 
 /*
 Implements the GET method for the "/groups" endpoint.
-This function will SELECT a number of groups from the database (for what purpose??).
+This function will SELECT a number of groups from the database.
 */
+
+// what are the different ways a user can get a group?
 func GetGroup(w http.ResponseWriter, r *http.Request) {
 	userInfo, ok := r.Context().Value(middleware.UserDataKey).(readwritemodels.Payload)
 	if !ok {
@@ -75,25 +78,34 @@ func GetGroup(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	//check the relationship between the user and the group:
-	//- user == creator
-	//- user is a member of the group
-	//- user is not a member of the group
-
 	groupData, ok := r.Context().Value(middleware.DataKey).(readwritemodels.ReadData)
 	if !ok {
 		http.Error(w, "failed to read form data from context", http.StatusInternalServerError)
 		return
 	}
 
-	//sanitize group data: check if columns are correct
-	err := routecontrollers.SelectGroup(dbutils.DB, userInfo.UserId, groupData.Data)
+	//sanitize data
+	result, err := routecontrollers.SelectGroup(dbutils.DB, userInfo.UserId, groupData.Data)
 
 	if err != nil {
-		http.Error(w, "Failed to create a group", http.StatusInternalServerError)
+		http.Error(w, "Failed to GET group", http.StatusInternalServerError)
 	}
 
-	//redirect or send response?
+	//redirect or send Json response?
+	//add token to response type, marshal and send back
+	response := readwritemodels.WriteData{
+		Status: "success",
+		Data:   result,
+	}
+
+	jsonReponse, err := json.Marshal(response)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	w.Write(jsonReponse)
 }
 
 /*

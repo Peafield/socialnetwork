@@ -59,6 +59,10 @@ Example response body on success:
 	}
 */
 func SignInHandler(w http.ResponseWriter, r *http.Request) {
+	if r.Method != "POST" {
+		http.Error(w, "bad request", http.StatusBadRequest)
+	}
+
 	//retrieve sign in form data
 	formData, ok := r.Context().Value(middleware.DataKey).(readwritemodels.ReadData)
 	if !ok {

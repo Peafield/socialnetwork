@@ -48,3 +48,41 @@ func DoesColumnExist(db *sql.DB, tableName, columnName string) (bool, error) {
 
 	return false, nil
 }
+
+/*
+TableColumnNames returns a slice of string representing all of the columns from a given DB table.
+this function can be used, despite a table undergoing DB migration.
+
+Parameters:
+- db (*sql.DB): an open database
+- tableName (string): the name of the relevant database table.
+
+Returns:
+- []string: every single column found in the table
+- error: any errors encountered during the query process
+
+Example:
+- To prevent the usage of non existing columns in a table.
+*/
+func TableColumnNames(db *sql.DB, tableName string) ([]string, error) {
+	query := fmt.Sprintf("PRAGMA table_info(%s)", tableName)
+
+	rows, err := db.Query(query)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var result []string
+
+	for rows.Next() {
+		var name string
+
+		if err := rows.Scan(nil, &name, nil, nil, nil, nil); err != nil {
+			return nil, err
+		}
+		result = append(result, name)
+	}
+
+	return result, nil
+}

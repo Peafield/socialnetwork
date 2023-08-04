@@ -67,6 +67,10 @@ Example response body on success:
 	}
 */
 func SignUpHandler(w http.ResponseWriter, r *http.Request) {
+	if r.Method != "POST" {
+		http.Error(w, "bad request", http.StatusBadRequest)
+	}
+
 	formData, ok := r.Context().Value(middleware.DataKey).(readwritemodels.ReadData)
 	if !ok {
 		http.Error(w, "failed to read form data from context", http.StatusInternalServerError)

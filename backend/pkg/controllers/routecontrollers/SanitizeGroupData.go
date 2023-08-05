@@ -72,8 +72,6 @@ func SelectGroup(db *sql.DB, userId string, Conditions map[string]interface{}) (
 
 /**/
 func UpdateGroup(db *sql.DB, userId string, AffectedColumns map[string]interface{}) error {
-	// conditions := make(map[string]interface{})
-	// conditions["user_id"] = userId
 
 	//make sure immutable parameters are not trying to be changed
 	expectedParams := []string{"title", "description"}

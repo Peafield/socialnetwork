@@ -27,7 +27,7 @@ func InsertPost(db *sql.DB, userId string, postData map[string]interface{}) erro
 
 	postTitle, ok := postData["title"].(string)
 	if !ok {
-		return fmt.Errorf("titel data is not a string")
+		return fmt.Errorf("title data is not a string")
 	}
 	post.Title = postTitle
 

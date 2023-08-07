@@ -6,9 +6,13 @@ import (
 	"crypto/sha256"
 	"encoding/base64"
 	"encoding/json"
+	"fmt"
 	"log"
 	"net/http"
 	"os"
+	crud "socialnetwork/pkg/db/CRUD"
+	"socialnetwork/pkg/db/dbutils"
+	"socialnetwork/pkg/models/dbmodels"
 	"socialnetwork/pkg/models/readwritemodels"
 	"strings"
 )
@@ -59,14 +63,22 @@ func ValidateTokenMiddleware(next http.Handler) http.Handler {
 			http.Error(w, "failed to decode token", http.StatusUnauthorized)
 			return
 		}
-		var RecievedPayload readwritemodels.Payload
-		err = json.Unmarshal(payload, &RecievedPayload)
+
+		var recievedPayload readwritemodels.Payload
+		err = json.Unmarshal(payload, &recievedPayload)
 		if err != nil {
 			http.Error(w, "Invalid token when unmarshalling into payload struct", http.StatusUnauthorized)
 			return
 		}
 
-		ctx := context.WithValue(r.Context(), UserDataKey, RecievedPayload)
+		err = ValidateLoggedInStatus(recievedPayload)
+		if err != nil {
+			r.Header.Del("Authorization")
+			http.Error(w, error.Error(err), http.StatusUnauthorized)
+			return
+		}
+
+		ctx := context.WithValue(r.Context(), UserDataKey, recievedPayload)
 		next.ServeHTTP(w, r.WithContext(ctx))
 	})
 }
@@ -106,4 +118,28 @@ func VerifyToken(token string) (bool, error) {
 	}
 
 	return true, nil
+}
+
+func ValidateLoggedInStatus(payload readwritemodels.Payload) error {
+	queryStatement := `
+	SELECT * FROM Users WHERE user_id = ?
+	`
+	queryValues := []interface{}{
+		payload.UserId,
+	}
+
+	userData, err := crud.SelectFromDatabase(dbutils.DB, "Users", queryStatement, queryValues)
+	if err != nil {
+		return fmt.Errorf("failed to select user in validate logged in status: %w", err)
+	}
+
+	user, ok := userData[0].(dbmodels.User)
+	if !ok {
+		return fmt.Errorf("failed to assert user type when validating logged in status")
+	}
+
+	if user.IsLoggedIn != payload.IsLoggedIn {
+		return fmt.Errorf("mismatch in logged in status")
+	}
+	return nil
 }

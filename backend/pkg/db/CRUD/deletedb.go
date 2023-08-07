@@ -3,7 +3,6 @@ package crud
 import (
 	"database/sql"
 	"fmt"
-	"socialnetwork/pkg/db/dbutils"
 )
 
 /*
@@ -25,18 +24,8 @@ Returns:
 Example:
   - A user could be deleted from a the Users table by inserting the user's id as the value.
 */
-func DeleteFromDatabase(db *sql.DB, table string, conditions map[string]interface{}) error {
-	conditionStatement, values := dbutils.ConditionStatementConstructor(conditions)
-
-	stmtToPrepare := "DELETE FROM " + table + " " + conditionStatement
-
-	stmt, err := db.Prepare(stmtToPrepare)
-	if err != nil {
-		return fmt.Errorf("failed to prepare deletion from %s: %w", table, err)
-	}
-	defer stmt.Close()
-
-	result, err := stmt.Exec(values...)
+func DeleteFromDatabase(db *sql.DB, query string, args ...interface{}) error {
+	result, err := db.Exec(query, args...)
 	if err != nil {
 		return fmt.Errorf("failed to execute delete statement: %w", err)
 	}
@@ -47,7 +36,7 @@ func DeleteFromDatabase(db *sql.DB, table string, conditions map[string]interfac
 	}
 
 	if rowsAffected == 0 {
-		return fmt.Errorf("no rows affected during deletion: %w", err)
+		return fmt.Errorf("no rows affected during deletion")
 	}
 
 	return nil

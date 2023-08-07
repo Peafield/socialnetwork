@@ -42,12 +42,13 @@ func CreateWebToken(user *dbmodels.User) (string, error) {
 	}
 
 	payload := readwritemodels.Payload{
-		UserId:    user.UserId,
-		FirstName: user.FirstName,
-		LastName:  user.LastName,
-		Role:      0,
-		Exp:       time.Now().Add(time.Hour * 48).Unix(),
-		Iat:       time.Now().Unix(),
+		UserId:     user.UserId,
+		FirstName:  user.FirstName,
+		LastName:   user.LastName,
+		IsLoggedIn: user.IsLoggedIn,
+		Role:       0,
+		Exp:        time.Now().Add(time.Hour * 48).Unix(),
+		Iat:        time.Now().Unix(),
 	}
 	token, err := helpers.GenerateWebToken(header, payload)
 	if err != nil {

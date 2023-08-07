@@ -7,10 +7,11 @@ type Header struct {
 }
 
 type Payload struct {
-	UserId    string `json:"user_id"`
-	FirstName string `json:"first_name"`
-	LastName  string `json:"last_name"`
-	Role      int    `json:"role"`
-	Exp       int64  `json:"exp"`
-	Iat       int64  `json:"iat"`
+	UserId     string `json:"user_id"`
+	FirstName  string `json:"first_name"`
+	LastName   string `json:"last_name"`
+	IsLoggedIn int    `json:"is_logged_in"`
+	Role       int    `json:"role"`
+	Exp        int64  `json:"exp"`
+	Iat        int64  `json:"iat"`
 }

@@ -3,7 +3,6 @@ package crud
 import (
 	"database/sql"
 	"fmt"
-	"socialnetwork/pkg/db/dbutils"
 )
 
 /*
@@ -19,39 +18,19 @@ Parameters:
 Example:
   - A user would want to change his personal info (e.g nickname, profile picture ...).
 */
-func UpdateDatabaseRow(db *sql.DB, tableName string, conditions map[string]interface{}, affectedColumns map[string]interface{}) error {
-	//maybe check the fields first before accessing them
-
-	//seperate the keys and the values respectively as a string and an []interface{}
-	setStatement, setValues := dbutils.UpdateSetConstructor(affectedColumns)
-	updateStatement, updatedValues := dbutils.ConditionStatementConstructor(conditions)
-
-	//assemble the final form of the statement
-	finalStatement := fmt.Sprintf(`UPDATE %s %s %s;`, tableName, setStatement, updateStatement)
-
-	statement, err := db.Prepare(finalStatement)
-
-	if err != nil {
-		return fmt.Errorf("failed to prepare update statement: %w", err)
-	}
-
-	defer statement.Close()
-
-	//combine the values from both maps to pass in the "Exec()" method
-	combinedValues := append(setValues, updatedValues...)
-	result, err := statement.Exec(combinedValues...)
-
+func UpdateDatabaseRow(db *sql.DB, query string, args ...interface{}) error {
+	result, err := db.Exec(query, args...)
 	if err != nil {
 		return fmt.Errorf("failed to execute update statement: %w", err)
 	}
 
 	rowsAffected, err := result.RowsAffected()
 	if err != nil {
-		return fmt.Errorf("failed to retrieve affected rows for update: %s", err)
+		return fmt.Errorf("failed to retrieve affected rows for update: %w", err)
 	}
 
 	if rowsAffected == 0 {
-		return fmt.Errorf("no rows affected in update: %s", err)
+		return fmt.Errorf("no rows affected in update")
 	}
 
 	return nil

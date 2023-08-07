@@ -37,9 +37,12 @@ func UserHandler(w http.ResponseWriter, r *http.Request) {
 	method := r.Method
 	switch method {
 	case http.MethodGet:
-		//get one user or get all users?
-		//GetAllUsers(w, r)
-		return
+		// if r.URL.Query().Get("getAll") == "true" {
+		// 	GetAllUsers(w, r)
+		// } else {
+		// 	GetSingleUser(w, r)
+		// }
+		// return
 	case http.MethodPut:
 		UpdateUserHandler(w, r)
 		return

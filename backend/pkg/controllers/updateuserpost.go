@@ -4,7 +4,7 @@ import (
 	"database/sql"
 	"fmt"
 	crud "socialnetwork/pkg/db/CRUD"
-	"socialnetwork/pkg/helpers"
+	"strings"
 )
 
 /*
@@ -30,18 +30,36 @@ Returns:
   - error: An error object which will be nil if the operation was successful, or containing an error message if the operation was unsuccessful.
 */
 func UpdateUserPost(db *sql.DB, userId string, updatePostData map[string]interface{}) error {
-	conditions := make(map[string]interface{})
-	conditions["post_id"] = updatePostData["post_id"].(string)
+	var columns []string
+	var args []interface{}
 
-	immutableParameters := []string{"post_id", "group_id", "creator_id", "creation_date"}
-
-	dataContainsImmutableParameter := helpers.MapKeyContains(updatePostData, immutableParameters)
-
-	if dataContainsImmutableParameter {
-		return fmt.Errorf("error trying to update user immutable parameter")
+	if title, ok := updatePostData["title"].(string); ok {
+		columns = append(columns, "title = ?")
+		args = append(args, title)
+	}
+	if imagePath, ok := updatePostData["image_path"].(string); ok {
+		columns = append(columns, "image_path = ?")
+		args = append(args, imagePath)
+	}
+	if content, ok := updatePostData["content"].(string); ok {
+		columns = append(columns, "content = ?")
+		args = append(args, content)
+	}
+	if numOfComments, ok := updatePostData["num_of_comments"].(int); ok {
+		columns = append(columns, "num_of_comments = ?")
+		args = append(args, numOfComments)
+	}
+	if privacyLevel, ok := updatePostData["privacy_level"].(string); ok {
+		columns = append(columns, "privacy_level = ?")
+		args = append(args, privacyLevel)
+	}
+	if postId, ok := updatePostData["post_id"].(string); ok {
+		args = append(args, postId)
 	}
 
-	err := crud.UpdateDatabaseRow(db, "Posts", conditions, updatePostData)
+	query := fmt.Sprintf("UPDATE Posts SET %s WHERE post_id = ?", strings.Join(columns, ", "))
+
+	err := crud.InteractWithDatabase(db, query, args)
 	if err != nil {
 		return fmt.Errorf("failed to update post data: %w", err)
 	}

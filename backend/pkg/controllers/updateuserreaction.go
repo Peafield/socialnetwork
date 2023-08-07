@@ -4,65 +4,61 @@ import (
 	"database/sql"
 	"fmt"
 	crud "socialnetwork/pkg/db/CRUD"
-	"socialnetwork/pkg/helpers"
+	"strings"
 )
 
 func UpdateUserReaction(db *sql.DB, userID string, updateReactionData map[string]interface{}) error {
-	conditions := make(map[string]interface{})
-	conditions["user_id"] = userID
-	var table string
-	var affectedColumn string
-	var affectedValue string
-	var reactionColumn string
+	var columns []string
+	var args []interface{}
+	var updateTable string
+	var updateValues string
+	var updateColumn string
 
-	postId, ok := updateReactionData["post_id"].(string)
-	if ok {
-		conditions["post_id"] = postId
-		table = "Posts"
-		affectedColumn = "post_id"
-		affectedValue = postId
+	if likes, ok := updateReactionData["likes"].(string); ok {
+		columns = append(columns, "likes = ?")
+		args = append(args, likes)
+		updateValues = "likes = likes + 1"
+	}
+	if dislikes, ok := updateReactionData["dislikes"].(int); ok {
+		columns = append(columns, "dislikes = ?")
+		args = append(args, dislikes)
+		updateValues = "dislikes = dislikes + 1"
+	}
+	if postId, ok := updateReactionData["post_id"].(string); ok {
+		updateTable = "Posts"
+		updateColumn = "post_id = ?"
+		args = append(args, postId)
 
 	}
-
-	commentId, ok := updateReactionData["comment_id"].(string)
-	if ok {
-		conditions["comment_id"] = commentId
-		table = "Comments"
-		affectedColumn = "comment_id"
-		affectedValue = commentId
+	if commentId, ok := updateReactionData["comment_id"].(string); ok {
+		updateTable = "Comments"
+		updateColumn = "comment_id = ?"
+		args = append(args, commentId)
 	}
 
-	reactionInt, ok := updateReactionData["reaction"].(int)
-	if ok {
-		if reactionInt > 0 {
-			reactionColumn = "likes"
-		} else {
-			reactionColumn = "dislikes"
-		}
+	query := fmt.Sprintf("UPDATE Reactions SET %s WHERE %s", strings.Join(columns, ", "), updateColumn)
+	updateReactionsStatment, err := db.Prepare(query)
+	if err != nil {
+		return fmt.Errorf("failed to prepare update reactions statement: %w", err)
 	}
+	defer updateReactionsStatment.Close()
 
-	immutableParameters := []string{"user_id", "post_id", "comment_id", "creation_date"}
-
-	dataContainsImmutableParameter := helpers.MapKeyContains(updateReactionData, immutableParameters)
-
-	if dataContainsImmutableParameter {
-		return fmt.Errorf("error trying to update reaction immutable parameter")
-	}
-
-	err := crud.UpdateDatabaseRow(db, "Reactions", conditions, updateReactionData)
+	err = crud.InteractWithDatabase(db, updateReactionsStatment, args)
 	if err != nil {
 		return fmt.Errorf("failed to update reaction data: %w", err)
 	}
 
-	postOrCommentConditions := map[string]interface{}{}
-	postOrCommentConditions[affectedColumn] = affectedValue
-
-	updatePostOrCommentData := map[string]interface{}{}
-	updatePostOrCommentData[reactionColumn] = reactionColumn + "+ 1"
-
-	err = crud.UpdateDatabaseRow(db, table, postOrCommentConditions, updatePostOrCommentData)
+	query = fmt.Sprintf("UPDATE %s SET %s WHERE %s", updateTable, updateValues, updateColumn)
+	updatePostOrCommentStatment, err := db.Prepare(query)
 	if err != nil {
-		return fmt.Errorf("failed to update reaction data: %w", err)
+		return fmt.Errorf("failed to prepare update reactions statement: %w", err)
 	}
+	defer updatePostOrCommentStatment.Close()
+
+	err = crud.InteractWithDatabase(db, updatePostOrCommentStatment)
+	if err != nil {
+		return fmt.Errorf("failed to update %s reaction data: %w", updateTable, err)
+	}
+
 	return nil
 }

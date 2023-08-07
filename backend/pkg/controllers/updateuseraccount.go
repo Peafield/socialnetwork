@@ -4,7 +4,8 @@ import (
 	"database/sql"
 	"fmt"
 	crud "socialnetwork/pkg/db/CRUD"
-	"socialnetwork/pkg/helpers"
+	"strings"
+	"time"
 )
 
 /*
@@ -23,23 +24,48 @@ Errors:
   - failure to update the database
 */
 func UpdateUserAccount(db *sql.DB, userId string, updateUserData map[string]interface{}) error {
-	conditions := make(map[string]interface{})
-	conditions["user_id"] = userId
+	var columns []string
+	var args []interface{}
 
-	//make sure immutable parameters are not trying to be changed
-	immutableParameters := []string{"user_id", "is_logged_in", "creation_date"}
-
-	dataContainsImmutableParameter := helpers.MapKeyContains(updateUserData, immutableParameters)
-
-	if dataContainsImmutableParameter {
-		return fmt.Errorf("error trying to update user immutable parameter")
+	if email, ok := updateUserData["email"].(string); ok {
+		columns = append(columns, "email = ?")
+		args = append(args, email)
+	}
+	if firstName, ok := updateUserData["first_name"].(string); ok {
+		columns = append(columns, "first_name = ?")
+		args = append(args, firstName)
+	}
+	if lastName, ok := updateUserData["last_name"].(string); ok {
+		columns = append(columns, "last_name = ?")
+		args = append(args, lastName)
+	}
+	if dob, ok := updateUserData["data_of_birth"].(time.Time); ok {
+		columns = append(columns, "date_of_birth = ?")
+		args = append(args, dob)
+	}
+	if avatarPath, ok := updateUserData["avatar_path"].(string); ok {
+		columns = append(columns, "avatar_path = ?")
+		args = append(args, avatarPath)
+	}
+	if displayName, ok := updateUserData["display_name"].(string); ok {
+		args = append(args, displayName)
+	}
+	if aboutMe, ok := updateUserData["about_me"].(string); ok {
+		args = append(args, aboutMe)
 	}
 
-	//update user
-	err := crud.UpdateDatabaseRow(db, "Users", conditions, updateUserData)
+	query := fmt.Sprintf("UPDATE Users SET %s WHERE user_id = ?", strings.Join(columns, ", "))
+	updateUserDetailsStatment, err := db.Prepare(query)
 	if err != nil {
-		return fmt.Errorf("error updating user, err: %s", err)
+		return fmt.Errorf("failed to prepare update post statment: %w", err)
 	}
+	defer updateUserDetailsStatment.Close()
 
+	args = append(args, userId)
+
+	err = crud.InteractWithDatabase(db, updateUserDetailsStatment, args)
+	if err != nil {
+		return fmt.Errorf("failed to update post data: %w", err)
+	}
 	return nil
 }

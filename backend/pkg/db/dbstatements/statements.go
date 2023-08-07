@@ -9,6 +9,7 @@ const ()
 
 // Prepared insert statements
 var (
+	/*Insert Statements*/
 	InsertUserStmt                  *sql.Stmt
 	InsertSessionsStmt              *sql.Stmt
 	InsertPostStmt                  *sql.Stmt
@@ -23,6 +24,10 @@ var (
 	InsertGroupsEventsStmt          *sql.Stmt
 	InsertGroupsEventsAttendees     *sql.Stmt
 	InsertNotificationsStmt         *sql.Stmt
+
+	/*Update Statments*/
+	UpdatePostNumOfComments   *sql.Stmt
+	UpdateAllUsersToSignedOut *sql.Stmt
 )
 
 func InitDBStatements(db *sql.DB) error {
@@ -43,7 +48,7 @@ func InitDBStatements(db *sql.DB) error {
 		?, ?, ?, ?, ?, ?, ?, ?, ?, ?
 	)`)
 	if err != nil {
-		return fmt.Errorf("failed to prepare insert users statement: %s", err)
+		return fmt.Errorf("failed to prepare insert users statement: %w", err)
 	}
 
 	InsertSessionsStmt, err = db.Prepare(`
@@ -54,7 +59,7 @@ func InitDBStatements(db *sql.DB) error {
 		?, ?
 	)`)
 	if err != nil {
-		return fmt.Errorf("failed to prepare insert sessions statement: %s", err)
+		return fmt.Errorf("failed to prepare insert sessions statement: %w", err)
 	}
 
 	InsertPostStmt, err = db.Prepare(`
@@ -73,7 +78,7 @@ func InitDBStatements(db *sql.DB) error {
 		?, ?, ?, ?, ?, ?, ?, ?, ?, ?
 	)`)
 	if err != nil {
-		return fmt.Errorf("failed to prepare insert posts statement: %s", err)
+		return fmt.Errorf("failed to prepare insert posts statement: %w", err)
 	}
 
 	InsertPostsSelectedFollowerStmt, err = db.Prepare(`
@@ -84,7 +89,7 @@ func InitDBStatements(db *sql.DB) error {
 		?, ?
 	)`)
 	if err != nil {
-		return fmt.Errorf("failed to prepare insert post follower statement: %s", err)
+		return fmt.Errorf("failed to prepare insert post follower statement: %w", err)
 	}
 
 	InsertCommentsStmt, err = db.Prepare(`
@@ -100,7 +105,7 @@ func InitDBStatements(db *sql.DB) error {
 		?, ?, ?, ?, ?, ?, ?
 	)`)
 	if err != nil {
-		return fmt.Errorf("failed to prepare insert comments statement: %s", err)
+		return fmt.Errorf("failed to prepare insert comments statement: %w", err)
 	}
 
 	InsertReactionsStmt, err = db.Prepare(`
@@ -113,7 +118,7 @@ func InitDBStatements(db *sql.DB) error {
 		?, ?, ?, ?
 	)`)
 	if err != nil {
-		return fmt.Errorf("failed to prepare insert reactions statement: %s", err)
+		return fmt.Errorf("failed to prepare insert reactions statement: %w", err)
 	}
 
 	InsertChatsStmt, err = db.Prepare(`
@@ -125,7 +130,7 @@ func InitDBStatements(db *sql.DB) error {
 		?, ?, ?
 	)`)
 	if err != nil {
-		return fmt.Errorf("failed to prepare insert chats statement: %s", err)
+		return fmt.Errorf("failed to prepare insert chats statement: %w", err)
 	}
 
 	InsertChatsMessagesStmt, err = db.Prepare(`
@@ -138,7 +143,7 @@ func InitDBStatements(db *sql.DB) error {
 		?, ?, ?, ?
 	)`)
 	if err != nil {
-		return fmt.Errorf("failed to prepare insert chats messages statement: %s", err)
+		return fmt.Errorf("failed to prepare insert chats messages statement: %w", err)
 	}
 
 	InsertFollowersStmt, err = db.Prepare(`
@@ -151,7 +156,7 @@ func InitDBStatements(db *sql.DB) error {
 		?, ?, ?, ?
 	)`)
 	if err != nil {
-		return fmt.Errorf("failed to prepare insert followers statement: %s", err)
+		return fmt.Errorf("failed to prepare insert followers statement: %w", err)
 	}
 
 	InsertGroupsStmt, err = db.Prepare(`
@@ -164,7 +169,7 @@ func InitDBStatements(db *sql.DB) error {
 		?, ?, ?, ?
 	)`)
 	if err != nil {
-		return fmt.Errorf("failed to prepare insert groups statement: %s", err)
+		return fmt.Errorf("failed to prepare insert groups statement: %w", err)
 	}
 
 	InsertGroupsMembersStmt, err = db.Prepare(`
@@ -176,7 +181,7 @@ func InitDBStatements(db *sql.DB) error {
 		?, ?, ?
 	)`)
 	if err != nil {
-		return fmt.Errorf("failed to prepare insert groups members statement: %s", err)
+		return fmt.Errorf("failed to prepare insert groups members statement: %w", err)
 	}
 
 	InsertGroupsEventsStmt, err = db.Prepare(`
@@ -193,7 +198,7 @@ func InitDBStatements(db *sql.DB) error {
 		?, ?, ?, ?, ?, ?, ?, ?
 	)`)
 	if err != nil {
-		return fmt.Errorf("failed to prepare insert groups events statement: %s", err)
+		return fmt.Errorf("failed to prepare insert groups events statement: %w", err)
 	}
 
 	InsertGroupsEventsAttendees, err = db.Prepare(`
@@ -206,7 +211,7 @@ func InitDBStatements(db *sql.DB) error {
 		?, ?, ?, ?
 	)`)
 	if err != nil {
-		return fmt.Errorf("failed to prepare insert groups events attendees statement: %s", err)
+		return fmt.Errorf("failed to prepare insert groups events attendees statement: %w", err)
 	}
 
 	InsertNotificationsStmt, err = db.Prepare(`
@@ -225,13 +230,32 @@ func InitDBStatements(db *sql.DB) error {
 		?, ?, ?, ?, ?, ?, ?, ?, ?, ?
 	)`)
 	if err != nil {
-		return fmt.Errorf("failed to prepare insert notifications statement: %s", err)
+		return fmt.Errorf("failed to prepare insert notifications statement: %w", err)
+	}
+
+	UpdatePostNumOfComments, err = db.Prepare(`
+		UPDATE Posts 
+		SET num_of_comments = num_of_comments + 1 
+		WHERE post_id = ?
+		`)
+	if err != nil {
+		return fmt.Errorf("failed to prepare update number of post comments statement: %w", err)
+	}
+
+	UpdateAllUsersToSignedOut, err = db.Prepare(`
+	UPDATE Users
+	SET is_logged_in = 0
+	WHERE is_logged_in = 1
+	`)
+	if err != nil {
+		return fmt.Errorf("failed to prepare update all users to signed out statement: %w", err)
 	}
 
 	return nil
 }
 
 func CloseDBStatements() {
+	/*Insert Statment Closure*/
 	InsertUserStmt.Close()
 	InsertSessionsStmt.Close()
 	InsertPostStmt.Close()
@@ -246,4 +270,8 @@ func CloseDBStatements() {
 	InsertGroupsEventsStmt.Close()
 	InsertGroupsEventsAttendees.Close()
 	InsertNotificationsStmt.Close()
+
+	/*Update Statement Closure*/
+	UpdatePostNumOfComments.Close()
+	UpdateAllUsersToSignedOut.Close()
 }

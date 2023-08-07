@@ -30,8 +30,8 @@ import (
 //	if err != nil {
 //	    log.Fatal(err)
 //	}
-func InteractWithDatabase(db *sql.DB, statement string, args ...interface{}) error {
-	result, err := db.Exec(statement, args...)
+func InteractWithDatabase(db *sql.DB, statment *sql.Stmt, args ...interface{}) error {
+	result, err := statment.Exec(args...)
 	if err != nil {
 		return fmt.Errorf("failed to execute update statement: %w", err)
 	}

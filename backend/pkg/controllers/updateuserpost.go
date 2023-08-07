@@ -58,8 +58,13 @@ func UpdateUserPost(db *sql.DB, userId string, updatePostData map[string]interfa
 	}
 
 	query := fmt.Sprintf("UPDATE Posts SET %s WHERE post_id = ?", strings.Join(columns, ", "))
+	updatePostStatement, err := db.Prepare(query)
+	if err != nil {
+		fmt.Errorf("failed to prepare update post statement: %w", err)
+	}
+	defer updatePostStatement.Close()
 
-	err := crud.InteractWithDatabase(db, query, args)
+	err = crud.InteractWithDatabase(db, updatePostStatement, args)
 	if err != nil {
 		return fmt.Errorf("failed to update post data: %w", err)
 	}

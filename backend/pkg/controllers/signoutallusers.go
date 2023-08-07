@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"fmt"
 	crud "socialnetwork/pkg/db/CRUD"
+	"socialnetwork/pkg/db/dbstatements"
 )
 
 /*
@@ -27,12 +28,7 @@ func SignOutAllUsers(db *sql.DB) error {
 	if db == nil {
 		return fmt.Errorf("database connection is not initialised, please run -dbopen")
 	}
-	conditions := map[string]interface{}{}
-	conditions["is_logged_in"] = 1
-	affectedColumns := map[string]interface{}{}
-	affectedColumns["is_logged_in"] = 0
-	//conditions could be set to if logged in status is equal to 1 (for performance)
-	err := crud.UpdateDatabaseRow(db, "Users", conditions, affectedColumns)
+	err := crud.InteractWithDatabase(db, dbstatements.UpdateAllUsersToSignedOut)
 	if err != nil {
 		return fmt.Errorf("failed to reset all user logged in status to 0: %w", err)
 	}

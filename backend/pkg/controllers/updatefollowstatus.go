@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"fmt"
 	crud "socialnetwork/pkg/db/CRUD"
+	"strings"
 )
 
 /*
@@ -28,25 +29,34 @@ Example:
     and the following status from 0 to 1.
 */
 func UpdateFollowStatus(db *sql.DB, userId string, updateFollowerData map[string]interface{}) error {
-	conditions := make(map[string]interface{})
-	conditions["followee_id"] = updateFollowerData["followee_id"].(string)
-	conditions["follower_id"] = userId
+	var columns []string
+	var args []interface{}
 
-	parametersToBeChanged := make(map[string]interface{})
-
-	followingStatus, ok := updateFollowerData["following_status"].(int)
-	if ok {
-		parametersToBeChanged["following_status"] = followingStatus
+	if followingStatus, ok := updateFollowerData["following_status"].(string); ok {
+		columns = append(columns, "following_status = ?")
+		args = append(args, followingStatus)
+	}
+	if requestPendingStatus, ok := updateFollowerData["request_pending"].(string); ok {
+		columns = append(columns, "request_pending = ?")
+		args = append(args, requestPendingStatus)
+	}
+	if followeeId, ok := updateFollowerData["followee_id"].(string); ok {
+		args = append(args, followeeId)
+	}
+	if followerId, ok := updateFollowerData["follower_id"].(string); ok {
+		args = append(args, followerId)
 	}
 
-	requestPendingStatus, ok := updateFollowerData["request_pending"].(int)
-	if ok {
-		parametersToBeChanged["request_pending"] = requestPendingStatus
-	}
-
-	err := crud.UpdateDatabaseRow(db, "Followers", conditions, parametersToBeChanged)
+	query := fmt.Sprintf("UPDATE Followers SET %s WHERE followee_id = ? AND follower_id = ?", strings.Join(columns, ", "))
+	updateFollowStatusStatment, err := db.Prepare(query)
 	if err != nil {
-		return fmt.Errorf("failed to update follower data: %w", err)
+		return fmt.Errorf("failed to prepare update follow status: %w", err)
+	}
+	defer updateFollowStatusStatment.Close()
+
+	err = crud.InteractWithDatabase(db, updateFollowStatusStatment, args)
+	if err != nil {
+		return fmt.Errorf("failed to update post data: %w", err)
 	}
 	return nil
 }

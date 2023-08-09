@@ -2,7 +2,7 @@ import React from "react";
 import { Router, Routes, Route } from "react-router-dom";
 import { AuthContext } from "./context/AuthContext";
 import { useAuth } from "./hooks/useAuth";
-import SignIn from "./components/SignIn";
+import SignIn from "./components/Auth/SignIn";
 import SignUp from "./components/Auth/SignUp";
 import "./App.css";
 

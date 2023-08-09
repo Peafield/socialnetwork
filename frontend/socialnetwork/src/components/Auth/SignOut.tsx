@@ -3,7 +3,7 @@ import { useAuth } from "../../hooks/useAuth";
 import { handleAPIRequest } from "../../controllers/Api";
 
 const LogoutButton = () => {
-  const { user, logout } = useAuth();
+  const { user, clearUser } = useAuth();
   const [error, setError] = useState<string | null>(null)
 
   const signOut = async () => {
@@ -16,7 +16,7 @@ const LogoutButton = () => {
     };
     try {
       await handleAPIRequest("/signout", options);
-      logout();
+      clearUser();
 
     } catch (error) {
       setError(error.message);

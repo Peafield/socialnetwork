@@ -1,4 +1,5 @@
 import React, { ChangeEvent, useState } from "react";
+import {Link} from "react-router-dom";
 import { handleAPIRequest } from "../../controllers/Api";
 import { useAuth } from "../../hooks/useAuth";
 
@@ -8,7 +9,7 @@ interface SignInFormData {
 }
 
 export default function SignIn() {
-  const { login } = useAuth();
+  const { setUser } = useAuth();
   const [formData, setFormData] = useState<SignInFormData>({
     usernameEmail: "",
     password: "",
@@ -40,7 +41,7 @@ export default function SignIn() {
         authToken: response.Data.token,
       };
 
-      login(user);
+      setUser(user);
     } catch (error) {
       setError(error.message);
     }
@@ -74,7 +75,9 @@ export default function SignIn() {
           </label>
         </form>
       </div>
-      <div></div>
+      <div>
+        <Link to="/signup">Don't have an account? Sign up</Link>
+      </div>
     </>
   );
 }

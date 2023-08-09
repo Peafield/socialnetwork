@@ -18,7 +18,7 @@ export const useUser = () => {
   };
 
   const removeUser = () => {
-    setUser(null);
+    setUser({} as User);
     setItem("user", "");
   };
 

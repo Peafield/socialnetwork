@@ -13,13 +13,13 @@ export const useAuth = () => {
     }
   }, []);
 
-  const login = (user: User) => {
+  const setUser = (user: User) => {
     addUser(user);
   };
 
-  const logout = () => {
+  const clearUser = () => {
     removeUser();
   };
 
-  return { user, login, logout };
+  return { user, setUser, clearUser };
 };

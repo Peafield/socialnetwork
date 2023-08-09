@@ -9,9 +9,9 @@ func IsGroupMember(db *sql.DB, userId, groupId string) (bool, error) {
 
 	var exists bool
 
-	query := "SELECT EXISTS(SELECT 1 FROM Groups_Members WHERE user_id = ?)"
+	query := "SELECT EXISTS(SELECT 1 FROM Groups_Members WHERE user_id = ? AND group_id = ?)"
 	//not sure whether 0 should be an int or a string
-	err := db.QueryRow(query, userId).Scan(&exists)
+	err := db.QueryRow(query, userId, groupId).Scan(&exists)
 	if err != nil {
 		return false, err
 	}

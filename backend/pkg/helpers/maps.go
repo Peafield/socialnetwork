@@ -14,9 +14,18 @@ func MapKeyContains(m map[string]interface{}, values []string) bool {
 	return false
 }
 
+func UndesiredParam(m map[string]interface{}, expectedParameters []string) bool {
+	for _, v := range expectedParameters {
+		_, exists := m[v]
+		if !exists {
+			return true
+		}
+	}
+	return false
+}
+
 /*
-ValuesMapComparison returns a slice of string representing all of the columns from a given DB table.
-this function can be used, despite a table undergoing DB migration.
+ValuesMapComparison returns whether the arguments received are deeply equal.
 
 Parameters:
 - m map[string]interface{}: a set of key/value pairs representing data (SQL statements Conditions or Columns to be affected).
@@ -25,9 +34,6 @@ Parameters:
 
 Returns:
 - bool: return true if the keys and the slice of strings are deeply equal
-
-Example:
-- Compares a set of keys in a map to match the values in the slice of strings.
 */
 func ValuesMapComparison(m map[string]interface{}, values []string) bool {
 	temp := []string{}

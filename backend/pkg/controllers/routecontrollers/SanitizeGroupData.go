@@ -5,16 +5,32 @@ import (
 	"errors"
 	"fmt"
 	crud "socialnetwork/pkg/db/CRUD"
-	"socialnetwork/pkg/db/dbstatements"
 	"socialnetwork/pkg/db/dbutils"
 	"socialnetwork/pkg/helpers"
 	"socialnetwork/pkg/models/dbmodels"
 )
 
+const (
+	groupInsertStmnt = `INSERT INTO Groups (group_id, title, description, creator_id) VALUES (?, ?, ?, ?)`
+	groupUpdateStmnt = `UPDATE Groups (title, description) VALUES (?, ?)`
+	groupSelectStmnt = `SELECT * FROM Groups WHERE group_id = ?`
+
+	groupDeleteStatements = `
+DELETE FROM Groups WHERE group_id = ?;
+DELETE FROM Groups_Members WHERE group_id = ?;
+DELETE FROM Groups_Events WHERE group_id = ?;
+DELETE FROM Groups_Events_Attendees WHERE group_id = ?;
+DELETE FROM Groups_Invitations WHERE group_id = ?;
+`
+	postDeleteStatements = `
+DELETE FROM Posts WHERE post_id = ?;
+DELETE FROM Comments WHERE post_id = ?;
+DELETE FROM Reactions WHERE post_id = ?;
+`
+)
+
 /**/
 func InsertGroup(db *sql.DB, userId string, AffectedColumns map[string]interface{}) error {
-	// conditions := make(map[string]interface{})
-	// conditions["user_id"] = userId
 
 	//make sure immutable parameters are not trying to be changed
 	expectedParams := []string{"title", "description"}
@@ -30,8 +46,18 @@ func InsertGroup(db *sql.DB, userId string, AffectedColumns map[string]interface
 	if err != nil {
 		return nil
 	}
-	insertValues := []interface{}{uuid, AffectedColumns["title"], AffectedColumns["description"], userId}
-	crud.InsertIntoDatabase(dbutils.DB, dbstatements.InsertGroupsStmt, insertValues)
+
+	//prepare the arguments for InteractWithDatabase
+	Values := []interface{}{uuid, AffectedColumns["title"], AffectedColumns["description"], userId}
+	Stmnt, err := db.Prepare(groupInsertStmnt)
+	if err != nil {
+		return err
+	}
+
+	err = crud.InteractWithDatabase(db, Stmnt, Values...)
+	if err != nil {
+		return err
+	}
 
 	return nil
 }
@@ -61,13 +87,11 @@ func SelectGroup(db *sql.DB, userId string, Conditions map[string]interface{}) (
 	}
 
 	//Prompt Select Query
-	query := `SELECT * FROM Groups WHERE group_id = ?`
-
-	queryResult, err := crud.SelectFromDatabase(db, "Groups", query, []interface{}{groupId})
-
+	queryResult, err := crud.SelectFromDatabase(db, "Groups", groupSelectStmnt, []interface{}{groupId})
 	if err != nil {
-		return nil, errors.New("user has no rights to access group in question")
+		return nil, err
 	}
+
 	return queryResult, nil
 }
 
@@ -81,21 +105,26 @@ func UpdateGroup(db *sql.DB, userId, groupId string, AffectedColumns map[string]
 
 	}
 
-	//should maybe ignore immutable parameters received instead of returning errors
-	immutableParameters := []string{"group_id", "creator_id", "creation_date"}
-
-	//check whether the map's keys match the expected parameters
-	exists := helpers.MapKeyContains(AffectedColumns, immutableParameters)
-
-	if exists {
-		return fmt.Errorf("parameters received = %v expected parameters = %v at InsertGroup", AffectedColumns, immutableParameters)
+	//check whether the map meets the expected parameters
+	expectedParameters := []string{"title", "description"}
+	invalid := helpers.UndesiredParam(AffectedColumns, expectedParameters)
+	if invalid {
+		return fmt.Errorf("expected parameters = %v \nreceived = %v  at UpdateGroup", expectedParameters, AffectedColumns)
 	}
 
-	// updateErr := []interface{}{uuid, AffectedColumns["title"], AffectedColumns["description"], userId}
-	err = crud.UpdateDatabaseRow(dbutils.DB, "Groups", map[string]interface{}{"group_id": groupId}, AffectedColumns)
+	//prepare the arguments for InteractWithDatabase
+	Values := []interface{}{AffectedColumns["title"], AffectedColumns["description"]}
+	Stmnt, err := db.Prepare(groupUpdateStmnt)
 	if err != nil {
 		return err
 	}
+
+	//Execute the update statement
+	err = crud.InteractWithDatabase(db, Stmnt, Values...)
+	if err != nil {
+		return err
+	}
+
 	return nil
 }
 
@@ -104,54 +133,48 @@ func DeleteGroup(db *sql.DB, userId, groupId string) error {
 
 	isCreator, err := dbutils.IsGroupCreator(db, userId, groupId)
 	if !isCreator || err != nil {
-		return fmt.Errorf("user doesn't have permission to delete group: %s", groupId)
+		return errors.New("user doesn't have permission to delete group")
 	}
 
 	//delete group and all related info: events, members, posts, comments, likes&dislikes
-	err = crud.DeleteFromDatabase(dbutils.DB, "Groups", map[string]interface{}{"group_id": groupId})
+	//by initializing a transaction to handle all operations at once. If one fails then the transaction will never take effect
+
+	tx, err := db.Begin()
 	if err != nil {
-		return err
-	}
-	err = crud.DeleteFromDatabase(dbutils.DB, "Groups_Members", map[string]interface{}{"group_id": groupId})
-	if err != nil {
-		return err
-	}
-	err = crud.DeleteFromDatabase(dbutils.DB, "Groups_Events", map[string]interface{}{"group_id": groupId})
-	if err != nil {
-		return err
-	}
-	err = crud.DeleteFromDatabase(dbutils.DB, "Groups_Events_Attendees", map[string]interface{}{"group_id": groupId})
-	if err != nil {
-		return err
+		return errors.New("failed to begin transaction at DeleteGroup: " + err.Error())
 	}
 
-	//select the post id and comments id to delete the likes and dislikes associated with it
+	//supply the group Id 4 times as required by the groupDeleteStatement
+	_, err = tx.Exec(groupDeleteStatements, groupId, groupId, groupId, groupId)
+	if err != nil {
+		tx.Rollback()
+		return errors.New("failed to execute transaction at DeleteGroup: " + err.Error())
+	}
+
+	//select all posts related to the group in question
 	PostsData, err := crud.SelectFromDatabase(dbutils.DB, "Posts", "SELECT * FROM Posts WHERE group_id = ?", []interface{}{groupId})
 	if err != nil {
 		return err
 	}
-	//for each post delete the related comments and likes/dislikes associated with it
+
+	//for each post delete its related comments and reactions
 	for _, post := range PostsData {
-		//assign a variable for the postId
 		postId := (post.(dbmodels.Post)).PostId
-		err = crud.DeleteFromDatabase(dbutils.DB, "Posts", map[string]interface{}{"post_id": postId})
+
+		//supply the group ID once and the post ID twice as required by the postDeleteStatement
+		_, err = tx.Exec(postDeleteStatements, postId, postId, postId)
 		if err != nil {
-			return err
-		}
-		err = crud.DeleteFromDatabase(dbutils.DB, "Comments", map[string]interface{}{"post_id": postId})
-		if err != nil {
-			return err
-		}
-		err = crud.DeleteFromDatabase(dbutils.DB, "reactions", map[string]interface{}{"post_id": postId})
-		if err != nil {
-			return err
+			tx.Rollback()
+			return errors.New("failed to execute transaction at DeleteGroup: " + err.Error())
 		}
 
 	}
 
-	err = crud.DeleteFromDatabase(dbutils.DB, "Posts", map[string]interface{}{"group_id": groupId})
+	//finally, commit every query requested since the outset of the transaction
+	err = tx.Commit()
 	if err != nil {
-		return err
+		return errors.New("failed to commit transaction at DeleteGroup: " + err.Error())
+
 	}
 
 	return nil

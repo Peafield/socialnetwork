@@ -29,6 +29,8 @@ This function will INSERT a new group into the database.
 */
 func NewGroupMember(w http.ResponseWriter, r *http.Request) {
 
+	//insert new member
+
 }
 
 /*

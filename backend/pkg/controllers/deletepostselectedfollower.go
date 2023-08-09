@@ -20,11 +20,28 @@ Errors:
   - failure to delete the post selected follower record from the database.
 */
 func DeletePostSelectedFollower(db *sql.DB, userId string, deletePostSelectedFollowerData map[string]interface{}) error {
-	conditions := make(map[string]interface{})
-	conditions["post_id"] = deletePostSelectedFollowerData["post_id"]
-	conditions["allowed_follower_id"] = deletePostSelectedFollowerData["allowed_follower_id"]
+	postId, ok := deletePostSelectedFollowerData["post_id"].(string)
+	if !ok {
+		return fmt.Errorf("postId is not a string")
+	}
+	allowedFollowerId, ok := deletePostSelectedFollowerData["allowed_follower_id"].(string)
+	if !ok {
+		return fmt.Errorf("allowedFollowerId is not a string")
+	}
 
-	err := crud.DeleteFromDatabase(db, "Posts_Selected_Followers", conditions)
+	args := []interface{}{}
+	args = append(args, postId)
+	args = append(args, allowedFollowerId)
+
+	query := fmt.Sprintf("DELETE FROM Posts_Selected_Followers WHERE post_id = ? AND allowed_follower_id = ?")
+	deletePostSelectedFollowerStatment, err := db.Prepare(query)
+	if err != nil {
+		return fmt.Errorf("failed to prepare delete Post selected follower statement: %w", err)
+	}
+	defer deletePostSelectedFollowerStatment.Close()
+
+	//delete
+	err = crud.InteractWithDatabase(db, deletePostSelectedFollowerStatment, args)
 	if err != nil {
 		return fmt.Errorf("failed to delete post selected follower from database: %w", err)
 	}

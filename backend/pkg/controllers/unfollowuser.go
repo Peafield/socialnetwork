@@ -20,12 +20,24 @@ Errors:
   - failure to delete the follower record from the database.
 */
 func UnfollowUser(db *sql.DB, userId string, deleteFollowerData map[string]interface{}) error {
-	conditions := make(map[string]interface{})
-	conditions["followee_id"] = deleteFollowerData["followee_id"].(string)
-	conditions["follower_id"] = userId
+	var args []interface{}
+
+	if followeeId, ok := deleteFollowerData["followee_id"].(string); ok {
+		args = append(args, followeeId)
+	}
+	if followerId, ok := deleteFollowerData["follower_id"].(string); ok {
+		args = append(args, followerId)
+	}
+
+	query := fmt.Sprintf("DELETE FROM Followers WHERE followee_id = ? AND follower_id = ?")
+	deleteFollowerStatment, err := db.Prepare(query)
+	if err != nil {
+		return fmt.Errorf("failed to prepare delete follower statement: %w", err)
+	}
+	defer deleteFollowerStatment.Close()
 
 	//delete
-	err := crud.DeleteFromDatabase(db, "Followers", conditions)
+	err = crud.InteractWithDatabase(db, deleteFollowerStatment, args)
 	if err != nil {
 		return fmt.Errorf("failed to delete follower data: %w", err)
 	}

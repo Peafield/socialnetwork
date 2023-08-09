@@ -18,10 +18,18 @@ Returns:
   - error: if the post fails to be deleted from the database
 */
 func DeleteUserPost(db *sql.DB, userId string, postId string) error {
-	conditions := make(map[string]interface{})
-	conditions["post_id"] = postId
+	args := []interface{}{}
+	args = append(args, postId)
 
-	err := crud.DeleteFromDatabase(db, "Posts", conditions)
+	query := fmt.Sprintf("DELETE FROM Posts WHERE post_id = ?")
+	deleteUserPostStatment, err := db.Prepare(query)
+	if err != nil {
+		return fmt.Errorf("failed to prepare delete User Post statement: %w", err)
+	}
+	defer deleteUserPostStatment.Close()
+
+	//delete
+	err = crud.InteractWithDatabase(db, deleteUserPostStatment, args)
 	if err != nil {
 		return fmt.Errorf("failed to delete post from database: %w", err)
 	}

@@ -18,12 +18,20 @@ Returns:
   - error: if the comment fails to be deleted from the database
 */
 func DeleteUserComment(db *sql.DB, userId string, commentId string) error {
-	conditions := make(map[string]interface{})
-	conditions["comment_id"] = commentId
+	args := []interface{}{}
+	args = append(args, commentId)
 
-	err := crud.DeleteFromDatabase(db, "Posts", conditions)
+	query := fmt.Sprintf("DELETE FROM Comments WHERE comment_id = ?")
+	deleteUserCommentStatment, err := db.Prepare(query)
 	if err != nil {
-		return fmt.Errorf("failed to delete post from database: %w", err)
+		return fmt.Errorf("failed to prepare delete User Comment statement: %w", err)
+	}
+	defer deleteUserCommentStatment.Close()
+
+	//delete
+	err = crud.InteractWithDatabase(db, deleteUserCommentStatment, args)
+	if err != nil {
+		return fmt.Errorf("failed to delete comment from database: %w", err)
 	}
 	return nil
 }

@@ -15,7 +15,7 @@ func MapKeyContains(m map[string]interface{}, values []string) bool {
 }
 
 /*
-TableColumnNames returns a slice of string representing all of the columns from a given DB table.
+ValuesMapComparison returns a slice of string representing all of the columns from a given DB table.
 this function can be used, despite a table undergoing DB migration.
 
 Parameters:

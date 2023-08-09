@@ -1,6 +1,8 @@
-import React, { useState, FormEvent } from "react";
+import React, { useState, FormEvent, useContext } from "react";
+import { Link } from "react-router-dom";
 import { handleAPIRequest } from "../../controllers/Api";
-import { useAuth } from "../../hooks/useAuth";
+import { UserContext } from "../../context/AuthContext";
+import styles from "./Auth.module.css"
 
 interface FormData {
   email: string;
@@ -15,8 +17,8 @@ interface FormData {
 }
 
 export default function SignUp() {
-  const { login } = useAuth();
-  const [error, setError] = useState(null);
+  const userContext = useContext(UserContext); // Use the useContext hook
+  const [error, setError] = useState<string | null>(null);
   const [formData, setFormData] = useState<FormData>({
     email: "",
     display_name: "",
@@ -47,15 +49,17 @@ export default function SignUp() {
       }));
 
     }
-
-    setFormData(prevState => ({
-      ...prevState,
-      [name]: value,
-    }));
+    if (name !== "confirmPassword") {
+      setFormData(prevState => ({
+        ...prevState,
+        [name]: value,
+      }));
+    }
   };
 
-  const handleSubmit = async (e: FormEvent) => {
+  const HandleSubmit = async (e: FormEvent) => {
     e.preventDefault();
+
     const data = formData;
     const options = {
       method: "POST",
@@ -71,20 +75,25 @@ export default function SignUp() {
         authToken: response.Data.token,
       };
 
-      login(user);
+      userContext.setUser(user);
     } catch (error) {
-      setError(error.message);
+        if (error instanceof Error) {
+            setError(error.message);
+        } else {
+            setError('An unexpected error occurred.');
+        }
     }
-  };
+};
 
   return (
     <>
-      <div className="auth-container">
-        <h2>Sign Up</h2>
-        <form onSubmit={handleSubmit}>
-          <div className="input-group">
-            <label htmlFor="email">Email:</label>
+      <div className={styles.authContainer}>
+      <h2 className={styles.h2}>Sign Up</h2>
+        <form onSubmit={HandleSubmit}>
+          <div className={styles.inputGroup}>
+            <label className={styles.label} htmlFor="email">Email:</label>
             <input
+            className={styles.input}
               required
               type="text"
               id="email"
@@ -93,9 +102,10 @@ export default function SignUp() {
               onChange={handleChange}
             />
           </div>
-          <div className="input-group">
+          <div className={styles.inputGroup}>
             <label htmlFor="display_name">Display Name:</label>
             <input
+            className={styles.input}
               required
               type="text"
               id="display_name"
@@ -104,11 +114,12 @@ export default function SignUp() {
               onChange={handleChange}
             />
           </div>
-          <div className="input-group">
+          <div className={styles.inputGroup}>
             <label htmlFor="password">Password:</label>
             <input
+            className={styles.input}
               required
-              type="text"
+              type="password"
               id="password"
               name="password"
               value={formData.password}
@@ -116,17 +127,19 @@ export default function SignUp() {
             />
             <label htmlFor="confirmPassword">Confirm Password:</label>
             <input
+            className={styles.input}
               required
-              type="text"
+              type="password"
               id="confirmPassword"
               name="confirmPassword"
               value={formData.confirmPassword}
               onChange={handleChange}
             />
           </div>
-          <div className="input-group">
+          <div className={styles.inputGroup}>
             <label htmlFor="first_name">First Name:</label>
             <input
+            className={styles.input}
               required
               type="text"
               id="first_name"
@@ -135,9 +148,10 @@ export default function SignUp() {
               onChange={handleChange}
             />
           </div>
-          <div className="input-group">
+          <div className={styles.inputGroup}>
             <label htmlFor="last_name">Last Name:</label>
             <input
+            className={styles.input}
               required
               type="text"
               id="last_name"
@@ -146,9 +160,10 @@ export default function SignUp() {
               onChange={handleChange}
             />
           </div>
-          <div className="input-group">
+          <div className={styles.inputGroup}>
             <label htmlFor="dob">Date of Birth:</label>
             <input
+            className={styles.input}
               required
               type="date"
               id="dob"
@@ -157,27 +172,17 @@ export default function SignUp() {
               onChange={handleChange}
             />
           </div>
-          <div className="input-group">
-            <label htmlFor="avatar_path">Date of Birth:</label>
-            <input
-              required
-              type="date"
-              id="dob"
-              name="dob"
-              value={formData.dob}
-              onChange={handleChange}
-            />
-          </div>
-          <div className="input-group">
+          <div className={styles.inputGroup}>
             <label htmlFor="avatar_path">Profile Picture:</label>
             <input
+            className={styles.input}
               type="file"
               id="avatar_path"
               name="avatar_path"
               onChange={handleChange}
             />
           </div>
-          <div className="input-group">
+          <div className={styles.inputGroup}>
             <label htmlFor="about_me">About Me:</label>
             <textarea
               required
@@ -189,8 +194,9 @@ export default function SignUp() {
               onChange={handleChange}
             />
           </div>
-          <button type="submit">Sign Up</button>
+          <button className={styles.button} type="submit">Sign Up</button>
         </form>
+        <Link to="/signin">Already have an account? Sign in</Link>
       </div>
     </>
   );

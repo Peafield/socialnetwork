@@ -1,6 +1,7 @@
-import React, { ChangeEvent, useState } from "react";
+import React, { ChangeEvent, useContext, useState } from "react";
+import {Link} from "react-router-dom";
 import { handleAPIRequest } from "../../controllers/Api";
-import { useAuth } from "../../hooks/useAuth";
+import { UserContext } from "../../context/AuthContext";
 
 interface SignInFormData {
   usernameEmail: string;
@@ -8,12 +9,12 @@ interface SignInFormData {
 }
 
 export default function SignIn() {
-  const { login } = useAuth();
+  const userContext = useContext(UserContext)
   const [formData, setFormData] = useState<SignInFormData>({
     usernameEmail: "",
     password: "",
   });
-  const [error, setError] = useState(null);
+  const [error, setError] = useState<string | null>(null);
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -40,21 +41,25 @@ export default function SignIn() {
         authToken: response.Data.token,
       };
 
-      login(user);
+      userContext.setUser(user);
     } catch (error) {
-      setError(error.message);
+        if (error instanceof Error) {
+            setError(error.message);
+        } else {
+            setError('An unexpected error occurred.');
+        }
     }
   };
 
   return (
     <>
       <div>
-        <form>
+        <form onSubmit={handleSubmit}>
           <label>
             Username/Email:
             <input
               type="text"
-              value=""
+              value={formData.usernameEmail}
               name="usernameEmail"
               onChange={handleChange}
             />
@@ -62,19 +67,21 @@ export default function SignIn() {
           <label>
             Password:
             <input
-              type="text"
-              value=""
+              type="password"
+              value={formData.password}
               name="password"
               onChange={handleChange}
             />
           </label>
           <label>
             Submit
-            <button type="submit" onSubmit={handleSubmit} />
+            <button type="submit" />
           </label>
         </form>
       </div>
-      <div></div>
+      <div>
+        <Link to="/signup">Don't have an account? Sign up</Link>
+      </div>
     </>
   );
 }

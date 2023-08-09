@@ -1,12 +1,29 @@
-import { createContext } from "react";
-import { User } from "../hooks/useUser";
+import React, { createContext, useState } from "react";
 
-interface AuthContext {
-  user: User;
-  setUser: (user: User) => void;
-}
+type AuthUser = {
+  usernameEmail: string,
+  authToken: string,
+};
 
-export const AuthContext = createContext<AuthContext>({
-  user: {} as User,
-  setUser: () => {},
+export type UserContextType = {
+  user: AuthUser | null;
+  setUser: React.Dispatch<React.SetStateAction<AuthUser | null>>;
+};
+
+type UserContextProviderType = {
+  children: React.ReactNode;
+};
+
+export const UserContext = createContext<UserContextType>({
+  user: null,
+  setUser: () => {}
 });
+
+export const UserContextProvider = ({ children }: UserContextProviderType) => {
+  const [user, setUser] = useState<AuthUser | null>(null);
+  return (
+    <UserContext.Provider value={{ user, setUser }}>
+      {children}
+    </UserContext.Provider>
+  );
+};

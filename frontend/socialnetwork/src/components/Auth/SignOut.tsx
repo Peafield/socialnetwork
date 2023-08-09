@@ -1,29 +1,30 @@
-import React, { useState } from "react";
-import { useAuth } from "../../hooks/useAuth";
+import React, { useContext, useState } from "react";
 import { handleAPIRequest } from "../../controllers/Api";
+import { UserContext } from "../../context/AuthContext";
 
-const LogoutButton = () => {
-  const { user, clearUser } = useAuth();
+export default function LogoutButton() {
+  const userContext = useContext(UserContext)
   const [error, setError] = useState<string | null>(null)
 
   const signOut = async () => {
     const options = {
       method: "POST",
       headers: {
-        Authorization: "Bearer" + user?.authToken,
+        Authorization: "Bearer" + userContext.user?.authToken,
         "Content-Type": "application/json",
       },
     };
     try {
       await handleAPIRequest("/signout", options);
-      clearUser();
 
     } catch (error) {
-      setError(error.message);
+      if (error instanceof Error) {
+        setError(error.message);
+    } else {
+        setError('An unexpected error occurred.');
+    }
     }
   };
 
   return <button onClick={signOut}>Logout</button>;
 };
-
-export default LogoutButton;

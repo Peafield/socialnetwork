@@ -1,7 +1,7 @@
-import React, { useState, FormEvent } from "react";
+import React, { useState, FormEvent, useContext } from "react";
 import { Link } from "react-router-dom";
 import { handleAPIRequest } from "../../controllers/Api";
-import { useAuth } from "../../hooks/useAuth";
+import { UserContext } from "../../context/AuthContext";
 import styles from "./Auth.module.css"
 
 interface FormData {
@@ -17,8 +17,8 @@ interface FormData {
 }
 
 export default function SignUp() {
-  const { setUser } = useAuth();
-  const [error, setError] = useState(null);
+  const userContext = useContext(UserContext); // Use the useContext hook
+  const [error, setError] = useState<string | null>(null);
   const [formData, setFormData] = useState<FormData>({
     email: "",
     display_name: "",
@@ -57,8 +57,9 @@ export default function SignUp() {
     }
   };
 
-  const handleSubmit = async (e: FormEvent) => {
+  const HandleSubmit = async (e: FormEvent) => {
     e.preventDefault();
+
     const data = formData;
     const options = {
       method: "POST",
@@ -74,17 +75,21 @@ export default function SignUp() {
         authToken: response.Data.token,
       };
 
-      setUser(user);
+      userContext.setUser(user);
     } catch (error) {
-      setError(error.message);
+        if (error instanceof Error) {
+            setError(error.message);
+        } else {
+            setError('An unexpected error occurred.');
+        }
     }
-  };
+};
 
   return (
     <>
       <div className={styles.authContainer}>
       <h2 className={styles.h2}>Sign Up</h2>
-        <form onSubmit={handleSubmit}>
+        <form onSubmit={HandleSubmit}>
           <div className={styles.inputGroup}>
             <label className={styles.label} htmlFor="email">Email:</label>
             <input

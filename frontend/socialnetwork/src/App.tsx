@@ -1,17 +1,14 @@
 import React from "react";
-import { Router, Routes, Route } from "react-router-dom";
-import { AuthContext } from "./context/AuthContext";
-import { useAuth } from "./hooks/useAuth";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { UserContextProvider } from "./context/AuthContext";
 import SignIn from "./components/Auth/SignIn";
 import SignUp from "./components/Auth/SignUp";
 import "./App.css";
 
 function App() {
-  const { user, setUser } = useAuth();
-
   return (
-    <AuthContext.Provider value={{ user, setUser }}>
-      <Router>
+    <UserContextProvider>
+      <BrowserRouter>
         <Routes>
           <Route path="/" element={<SignIn />} />
           <Route path="/signin" element={<SignIn />} />
@@ -21,8 +18,8 @@ function App() {
             element={<ProtectedRoute element={<Dashboard />} />}
           /> */}
         </Routes>
-      </Router>
-    </AuthContext.Provider>
+      </BrowserRouter>
+    </UserContextProvider>
   );
 }
 

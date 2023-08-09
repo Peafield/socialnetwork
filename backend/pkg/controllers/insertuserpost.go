@@ -6,53 +6,48 @@ import (
 	crud "socialnetwork/pkg/db/CRUD"
 	"socialnetwork/pkg/db/dbstatements"
 	"socialnetwork/pkg/helpers"
-	"socialnetwork/pkg/models/dbmodels"
 )
 
 func InsertPost(db *sql.DB, userId string, postData map[string]interface{}) error {
-	post := &dbmodels.Post{}
+	args := []interface{}{}
 
 	postId, err := helpers.CreateUUID()
 	if err != nil {
 		return fmt.Errorf("failed to create post id: %w", err)
 	}
-	post.PostId = postId
+	args = append(args, postId)
 
 	groupIdData, ok := postData["group_id"].(string)
 	if ok {
-		post.GroupId = groupIdData
+		args = append(args, groupIdData)
 	}
 
-	post.CreatorId = userId
+	args = append(args, userId)
 
 	postTitle, ok := postData["title"].(string)
 	if !ok {
 		return fmt.Errorf("title data is not a string")
 	}
-	post.Title = postTitle
+	args = append(args, postTitle)
 
 	imgPathData, ok := postData["image_path"].(string)
 	if ok {
-		post.ImagePath = imgPathData
+		args = append(args, imgPathData)
 	}
 
 	contentData, ok := postData["content"].(string)
 	if !ok {
 		return fmt.Errorf("content data is not a string")
 	}
-	post.Content = contentData
+	args = append(args, contentData)
 
 	privacyLevelData, ok := postData["privacy_level"].(int)
 	if !ok {
 		return fmt.Errorf("privacy level data is not a int")
 	}
-	post.PrivacyLevel = privacyLevelData
+	args = append(args, privacyLevelData)
 
-	values, err := helpers.StructFieldValues(post)
-	if err != nil {
-		return fmt.Errorf("failed to get post struct values: %s", err)
-	}
-	err = crud.InsertIntoDatabase(db, dbstatements.InsertPostStmt, values)
+	err = crud.InteractWithDatabase(db, dbstatements.InsertPostStmt, args)
 	if err != nil {
 		return fmt.Errorf("failed to insert post into database: %s", err)
 	}

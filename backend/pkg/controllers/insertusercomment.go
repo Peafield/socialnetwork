@@ -6,42 +6,37 @@ import (
 	crud "socialnetwork/pkg/db/CRUD"
 	"socialnetwork/pkg/db/dbstatements"
 	"socialnetwork/pkg/helpers"
-	"socialnetwork/pkg/models/dbmodels"
 )
 
 func InsertComment(db *sql.DB, userId string, commentData map[string]interface{}) error {
-	comment := &dbmodels.Comment{}
+	args := []interface{}{}
 
 	commentId, err := helpers.CreateUUID()
 	if err != nil {
 		return fmt.Errorf("failed to create comment id: %w", err)
 	}
-	comment.CommentId = commentId
+	args = append(args, commentId)
 
-	comment.UserId = userId
+	args = append(args, userId)
 
 	postIdData, ok := commentData["post_id"].(string)
 	if !ok {
 		return fmt.Errorf("post id is not a string")
 	}
-	comment.PostId = postIdData
+	args = append(args, postIdData)
 
 	contentData, ok := commentData["content"].(string)
 	if !ok {
 		return fmt.Errorf("content data is not a string")
 	}
-	comment.Content = contentData
+	args = append(args, contentData)
 
 	imgPathData, ok := commentData["image_path"].(string)
 	if ok {
-		comment.ImagePath = imgPathData
+		args = append(args, imgPathData)
 	}
 
-	values, err := helpers.StructFieldValues(comment)
-	if err != nil {
-		return fmt.Errorf("failed to get comment struct values: %s", err)
-	}
-	err = crud.InsertIntoDatabase(db, dbstatements.InsertCommentsStmt, values)
+	err = crud.InteractWithDatabase(db, dbstatements.InsertCommentsStmt, args)
 	if err != nil {
 		return fmt.Errorf("failed to insert post into database: %s", err)
 	}

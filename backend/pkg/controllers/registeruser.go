@@ -43,37 +43,43 @@ Errors:
   - Returns an error if there is an issue inserting the User struct into the database
 */
 func RegisterUser(formData map[string]interface{}, db *sql.DB, statement *sql.Stmt) (*dbmodels.User, error) {
-	var user dbmodels.User
+	var args []interface{}
 
-	// Email
-	email, ok := formData["email"].(string)
-	if !ok {
-		return nil, fmt.Errorf("email is not a string")
+	// UUID
+	userId, err := helpers.CreateUUID()
+	if err != nil {
+		return nil, fmt.Errorf("failed to create userId: %s", err)
 	}
-	user.Email = email
+	args = append(args, userId)
 
-	// Display Name
-	displayName, ok := formData["display_name"].(string)
-	if !ok {
-		return nil, fmt.Errorf("display name is not a string")
+	// IsLoggedIn
+	args = append(args, 1)
+
+	// email
+	if email, ok := formData["email"].(string); ok {
+		args = append(args, email)
 	}
-	user.DisplayName = displayName
+
+	// displayName
+	if displayName, ok := formData["display_name"].(string); ok {
+		args = append(args, displayName)
+	}
 
 	//set query statements
 	queryStatement := ""
 	queryValues := make([]interface{}, 0)
-	if strings.Contains(user.Email, "@") {
+	if strings.Contains(formData["email"].(string), "@") {
 		queryStatement = `
 			SELECT * FROM Users 
 			WHERE email = ?
 			`
-		queryValues = append(queryValues, user.Email)
+		queryValues = append(queryValues, formData["email"].(string))
 	} else {
 		queryStatement = `
 			SELECT * FROM Users 
 			WHERE display_name = ?
 			`
-		queryValues = append(queryValues, user.DisplayName)
+		queryValues = append(queryValues, formData["display_name"].(string))
 	}
 
 	//get user data as interface
@@ -82,66 +88,62 @@ func RegisterUser(formData map[string]interface{}, db *sql.DB, statement *sql.St
 		return nil, fmt.Errorf("user display name or email already in use")
 	}
 
-	// UUID
-	userId, err := helpers.CreateUUID()
-	if err != nil {
-		return nil, fmt.Errorf("failed to create userId: %s", err)
-	}
-	user.UserId = userId
-
-	// IsLoggedIn
-	user.IsLoggedIn = 1
-
 	// Password
-	password, ok := formData["password"].(string)
-	if !ok {
-		return nil, fmt.Errorf("password is not a string")
+	if password, ok := formData["password"].(string); ok {
+		hashedPassedword, err := helpers.HashPassword(password)
+		if err != nil {
+			return nil, fmt.Errorf("failed to hash user's password: %s", err)
+		}
+		args = append(args, hashedPassedword)
 	}
-	hashedPassedword, err := helpers.HashPassword(password)
-	if err != nil {
-		return nil, fmt.Errorf("failed to hash user's password: %s", err)
-	}
-	user.HashedPassword = hashedPassedword
 
 	// First Name
-	firstName, ok := formData["first_name"].(string)
-	if !ok {
-		return nil, fmt.Errorf("first name is not a string")
+	if firstName, ok := formData["first_name"].(string); ok {
+		args = append(args, firstName)
 	}
-	user.FirstName = firstName
 
 	// Last Name
-	lastName, ok := formData["last_name"].(string)
-	if !ok {
-		return nil, fmt.Errorf("last name is not a string")
+	if lastName, ok := formData["last_name"].(string); ok {
+		args = append(args, lastName)
 	}
-	user.LastName = lastName
 
 	// DOB
-	dob, ok := formData["dob"].(time.Time)
-	if !ok {
-		return nil, fmt.Errorf("dob is not a type of time")
+	if dob, ok := formData["dob"].(time.Time); ok {
+		args = append(args, dob)
 	}
-	user.DOB = dob
 
-	// Avatar Path TO DO
-	user.AvatarPath = "path/to/image"
+	if avatarPath, ok := formData["avatar_path"].(string); ok {
+		args = append(args, avatarPath)
+	}
 
 	// About Me
-	aboutMe, ok := formData["about_me"].(string)
-	if !ok {
-		return nil, fmt.Errorf("about me is not a string")
+	if aboutMe, ok := formData["about_me"].(string); ok {
+		args = append(args, aboutMe)
 	}
-	user.AboutMe = aboutMe
 
-	userValues, err := helpers.StructFieldValues(&user)
-	if err != nil {
-		return nil, fmt.Errorf("failed to get user struct values: %s", err)
-	}
-	err = crud.InsertIntoDatabase(db, statement, userValues)
+	err = crud.InteractWithDatabase(db, statement, args)
 	if err != nil {
 		return nil, fmt.Errorf("failed to insert user into database: %s", err)
 	}
 
-	return &user, nil
+	//set query statements
+	queryStatement = `SELECT * FROM Users WHERE user_id =?`
+	queryValues = []interface{}{
+		userId,
+	}
+	userData, err := crud.SelectFromDatabase(db, "Users", queryStatement, queryValues)
+	if err != nil {
+		return nil, fmt.Errorf("error selecting user from database: %s", err)
+	}
+
+	if len(userData) > 1 {
+		return nil, fmt.Errorf("found multiple users with same credentials, ???")
+	}
+
+	user, ok := userData[0].(*dbmodels.User)
+	if !ok {
+		return nil, fmt.Errorf("returned database value is not a User struct: %s", err)
+	}
+
+	return user, nil
 }

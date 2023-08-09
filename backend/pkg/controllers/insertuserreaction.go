@@ -31,7 +31,7 @@ func InsertUserReaction(db *sql.DB, userID string, newReactionData map[string]in
 		return fmt.Errorf("failed to get reaction struct values: %w", err)
 	}
 
-	err = crud.InsertIntoDatabase(db, dbstatements.InsertReactionsStmt, values)
+	err = crud.InteractWithDatabase(db, dbstatements.InsertReactionsStmt, values)
 	if err != nil {
 		return fmt.Errorf("failed to insert reaction into database: %w", err)
 	}

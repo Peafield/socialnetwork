@@ -33,16 +33,16 @@ import (
 func InteractWithDatabase(db *sql.DB, statment *sql.Stmt, args ...interface{}) error {
 	result, err := statment.Exec(args...)
 	if err != nil {
-		return fmt.Errorf("failed to execute update statement: %w", err)
+		return fmt.Errorf("failed to execute statement: %w", err)
 	}
 
 	rowsAffected, err := result.RowsAffected()
 	if err != nil {
-		return fmt.Errorf("failed to retrieve affected rows for update: %w", err)
+		return fmt.Errorf("failed to retrieve affected rows: %w", err)
 	}
 
 	if rowsAffected == 0 {
-		return fmt.Errorf("no rows affected in update")
+		return fmt.Errorf("no rows affected")
 	}
 
 	return nil

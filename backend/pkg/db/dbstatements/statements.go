@@ -37,12 +37,12 @@ func InitDBStatements(db *sql.DB) error {
 		user_id,
 		is_logged_in,
 		email,
+		display_name,
 		hashed_password,
 		first_name,
 		last_name, 
 		date_of_birth,
 		avatar_path,
-		display_name,
 		about_me
 	) VALUES (
 		?, ?, ?, ?, ?, ?, ?, ?, ?, ?

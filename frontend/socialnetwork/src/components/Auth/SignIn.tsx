@@ -56,39 +56,41 @@ export default function SignIn() {
   return (
     <Container>
       <div className={styles.authcontainer}>
-        <h2 className={styles.h2}>Sign In</h2>
-        <form onSubmit={handleSubmit}>
-          <div className={styles.inputgroup}>
-            <label className={styles.label} htmlFor="usernameEmail">
-              Username/Email:
-              <input
-              className={styles.input}
-              type="text"
-              value={formData.usernameEmail}
-              name="usernameEmail"
-              onChange={handleChange}
-            />
-            </label>
-          </div>
-          <div className={styles.inputgroup}>
-            <label className={styles.label} htmlFor="password">
-              Password:
-              <input
-              className={styles.input}
-              type="password"
-              value={formData.password}
-              name="password"
-              onChange={handleChange}
-            />
-            </label>
-          </div>
-          <div className={styles.inputgroup}>
-            <button className={styles.button} type="submit">
-              Sign In
-            </button>
-          </div>
-        </form>
-        <Link to="/signup">Don't have an account? Sign up</Link>
+        <div className={styles.formwrapper}>
+          <h2 className={styles.h2}>Sign In</h2>
+          <form onSubmit={handleSubmit}>
+            <div className={styles.inputgroup}>
+              <label className={styles.label} htmlFor="usernameEmail">
+                Username/Email:
+                <input
+                  className={styles.input}
+                  type="text"
+                  value={formData.usernameEmail}
+                  name="usernameEmail"
+                  onChange={handleChange}
+                />
+              </label>
+            </div>
+            <div className={styles.inputgroup}>
+              <label className={styles.label} htmlFor="password">
+                Password:
+                <input
+                  className={styles.input}
+                  type="password"
+                  value={formData.password}
+                  name="password"
+                  onChange={handleChange}
+                />
+              </label>
+            </div>
+            <div className={styles.inputgroup}>
+              <button className={styles.button} type="submit">
+                Sign In
+              </button>
+            </div>
+          </form>
+          <Link to="/signup">Don't have an account? Sign up</Link>
+        </div>
       </div>
     </Container>
   );

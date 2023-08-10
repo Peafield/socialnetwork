@@ -1,7 +1,9 @@
 import React, { ChangeEvent, useContext, useState } from "react";
-import {Link} from "react-router-dom";
+import { Link } from "react-router-dom";
 import { handleAPIRequest } from "../../controllers/Api";
 import { UserContext } from "../../context/AuthContext";
+import Container from "../Containers/Container";
+import styles from "./Auth.module.css";
 
 interface SignInFormData {
   usernameEmail: string;
@@ -9,7 +11,7 @@ interface SignInFormData {
 }
 
 export default function SignIn() {
-  const userContext = useContext(UserContext)
+  const userContext = useContext(UserContext);
   const [formData, setFormData] = useState<SignInFormData>({
     usernameEmail: "",
     password: "",
@@ -24,7 +26,7 @@ export default function SignIn() {
     });
   };
 
-  const handleSubmit = async (e: { preventDefault: () => void; }) => {
+  const handleSubmit = async (e: { preventDefault: () => void }) => {
     e.preventDefault();
     const data = formData;
     const options = {
@@ -43,45 +45,51 @@ export default function SignIn() {
 
       userContext.setUser(user);
     } catch (error) {
-        if (error instanceof Error) {
-            setError(error.message);
-        } else {
-            setError('An unexpected error occurred.');
-        }
+      if (error instanceof Error) {
+        setError(error.message);
+      } else {
+        setError("An unexpected error occurred.");
+      }
     }
   };
 
   return (
-    <>
-      <div>
+    <Container>
+      <div className={styles.authcontainer}>
+        <h2 className={styles.h2}>Sign In</h2>
         <form onSubmit={handleSubmit}>
-          <label>
-            Username/Email:
-            <input
+          <div className={styles.inputgroup}>
+            <label className={styles.label} htmlFor="usernameEmail">
+              Username/Email:
+              <input
+              className={styles.input}
               type="text"
               value={formData.usernameEmail}
               name="usernameEmail"
               onChange={handleChange}
             />
-          </label>
-          <label>
-            Password:
-            <input
+            </label>
+          </div>
+          <div className={styles.inputgroup}>
+            <label className={styles.label} htmlFor="password">
+              Password:
+              <input
+              className={styles.input}
               type="password"
               value={formData.password}
               name="password"
               onChange={handleChange}
             />
-          </label>
-          <label>
-            Submit
-            <button type="submit" />
-          </label>
+            </label>
+          </div>
+          <div className={styles.inputgroup}>
+            <button className={styles.button} type="submit">
+              Sign In
+            </button>
+          </div>
         </form>
-      </div>
-      <div>
         <Link to="/signup">Don't have an account? Sign up</Link>
       </div>
-    </>
+    </Container>
   );
 }

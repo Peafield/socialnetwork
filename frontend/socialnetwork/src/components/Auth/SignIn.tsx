@@ -6,14 +6,14 @@ import Container from "../Containers/Container";
 import styles from "./Auth.module.css";
 
 interface SignInFormData {
-  usernameEmail: string;
+  username_email: string;
   password: string;
 }
 
 export default function SignIn() {
   const userContext = useContext(UserContext);
   const [formData, setFormData] = useState<SignInFormData>({
-    usernameEmail: "",
+    username_email: "",
     password: "",
   });
   const [error, setError] = useState<string | null>(null);
@@ -28,7 +28,7 @@ export default function SignIn() {
 
   const handleSubmit = async (e: { preventDefault: () => void }) => {
     e.preventDefault();
-    const data = formData;
+    const data = { data: formData };
     const options = {
       method: "POST",
       headers: {
@@ -39,7 +39,7 @@ export default function SignIn() {
     try {
       const response = await handleAPIRequest("/signin", options);
       const user = {
-        usernameEmail: data.usernameEmail,
+        usernameEmail: data.data.username_email,
         authToken: response.Data.token,
       };
 
@@ -65,7 +65,7 @@ export default function SignIn() {
                 <input
                   className={styles.input}
                   type="text"
-                  value={formData.usernameEmail}
+                  value={formData.username_email}
                   name="username_email"
                   onChange={handleChange}
                 />

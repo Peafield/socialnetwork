@@ -1,8 +1,9 @@
-import React, { useState, FormEvent } from "react";
+import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { handleAPIRequest } from "../../controllers/Api";
 import styles from "./Auth.module.css";
 import Container from "../Containers/Container";
+import { useSetUserContextAndCookie } from "../../controllers/SetUserContextAndCookie";
 
 interface FormData {
   email: string;
@@ -17,6 +18,7 @@ interface FormData {
 }
 
 export default function SignUp() {
+  const setUserContextAndCookie = useSetUserContextAndCookie();
   const navigate = useNavigate();
   const [error, setError] = useState<string | null>(null);
   const [formData, setFormData] = useState<FormData>({
@@ -50,16 +52,9 @@ export default function SignUp() {
     }
   };
 
-  const HandleSubmit = async (e: FormEvent) => {
+  const handleSubmit = async (e: { preventDefault: () => void }) => {
     e.preventDefault();
-
-    if (formData.password !== formData.confirmPassword) {
-      alert("passwords do not match!");
-      return;
-    }
-
-    const data = formData;
-
+    const data = { data: formData };
     const options = {
       method: "POST",
       headers: {
@@ -70,6 +65,7 @@ export default function SignUp() {
     try {
       const response = await handleAPIRequest("/signup", options);
       if (response && response.status === "success") {
+        setUserContextAndCookie(response.data);
         navigate("/dashboard");
       }
     } catch (error) {
@@ -85,7 +81,7 @@ export default function SignUp() {
     <Container>
       <div className={styles.authcontainer}>
         <div className={styles.formwrapper}>
-          <form onSubmit={HandleSubmit}>
+          <form onSubmit={handleSubmit}>
             <h2 className={styles.h2}>Sign Up</h2>
             <div className={styles.inputgrouprow}>
               <label htmlFor="first_name">

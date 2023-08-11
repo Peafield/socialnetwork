@@ -38,7 +38,7 @@ func ParseAndValidateData(next http.Handler) http.Handler {
 		fmt.Println(r.Body)
 		err := json.NewDecoder(r.Body).Decode(&data)
 		if err != nil {
-			http.Error(w, "Invalid request payload", http.StatusBadRequest)
+			http.Error(w, "invalid request payload", http.StatusBadRequest)
 			return
 		}
 		fmt.Println("data is equal to:", data)

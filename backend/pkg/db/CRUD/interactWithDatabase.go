@@ -2,8 +2,12 @@ package crud
 
 import (
 	"database/sql"
+	"errors"
 	"fmt"
+	errorhandling "socialnetwork/pkg/errorHandling"
 )
+
+var ErrNoRowsAffected = errors.New("no rows affected")
 
 // InteractWithDatabase executes a provided SQL statement on a given database connection
 // using the provided arguments. It ensures that the statement affects at least one row
@@ -45,7 +49,7 @@ func InteractWithDatabase(db *sql.DB, statement *sql.Stmt, args ...interface{}) 
 	}
 
 	if rowsAffected == 0 {
-		return fmt.Errorf("no rows affected")
+		return errorhandling.ErrNoRowsAffected
 	}
 
 	return nil

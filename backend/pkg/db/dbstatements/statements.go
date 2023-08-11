@@ -5,8 +5,6 @@ import (
 	"fmt"
 )
 
-const ()
-
 // Prepared insert statements
 var (
 	/*Insert Statements*/

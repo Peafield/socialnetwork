@@ -2,9 +2,11 @@ package controllers
 
 import (
 	"database/sql"
+	"errors"
 	"fmt"
 	crud "socialnetwork/pkg/db/CRUD"
 	"socialnetwork/pkg/db/dbstatements"
+	errorhandling "socialnetwork/pkg/errorHandling"
 )
 
 /*
@@ -30,7 +32,11 @@ func SignOutAllUsers(db *sql.DB) error {
 	}
 	err := crud.InteractWithDatabase(db, dbstatements.UpdateAllUsersToSignedOut)
 	if err != nil {
-		return fmt.Errorf("failed to reset all user logged in status to 0: %w", err)
+		if errors.Is(err, errorhandling.ErrNoRowsAffected) {
+			return nil
+		} else {
+			return fmt.Errorf("failed to reset all user logged in status to 0: %w", err)
+		}
 	}
 	return nil
 }

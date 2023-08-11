@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"fmt"
 	crud "socialnetwork/pkg/db/CRUD"
+	"socialnetwork/pkg/db/dbstatements"
 	"socialnetwork/pkg/helpers"
 	"socialnetwork/pkg/models/dbmodels"
 	"strings"
@@ -52,41 +53,87 @@ func RegisterUser(formData map[string]interface{}, db *sql.DB, statement *sql.St
 	}
 	args = append(args, userId)
 
-	// IsLoggedIn
+	// Set IsLoggedIn Status
 	args = append(args, 1)
 
+	formDataValues, err := validateAndSortIncomingFormData(formData, db)
+	if err != nil {
+		return nil, fmt.Errorf("error validating form data, error: %w", err)
+	}
+	args = append(args, formDataValues...)
+
+	//insert into db
+	err = crud.InteractWithDatabase(db, statement, args)
+	if err != nil {
+		return nil, fmt.Errorf("failed to insert user into database: %s", err)
+	}
+
+	user, err := selectRegisteredUser(db, userId)
+	if err != nil {
+		return nil, err
+	}
+
+	return user, nil
+}
+
+func validateAndSortIncomingFormData(formData map[string]interface{}, db *sql.DB) ([]interface{}, error) {
+	var args []interface{}
+
+	emailAndDisplayName, err := validateEmailAndDisplayName(formData, db)
+	if err != nil {
+		return nil, err
+	}
+	args = append(args, emailAndDisplayName...)
+
+	otherRequiredFields, err := validateOtherRequiredFields(formData)
+	if err != nil {
+		return nil, err
+	}
+	args = append(args, otherRequiredFields...)
+
+	remainingUnrequiredFields, err := validateAnyUnrequiredFields(formData)
+	if err != nil {
+		return nil, err
+	}
+	args = append(args, remainingUnrequiredFields...)
+
+	return args, nil
+}
+
+func validateEmailAndDisplayName(formData map[string]interface{}, db *sql.DB) ([]interface{}, error) {
+	var args []interface{}
+
 	// email
-	if email, ok := formData["email"].(string); ok {
+	if email, ok := formData["email"].(string); ok && strings.Contains(email, "@") {
 		args = append(args, email)
+	} else {
+		return nil, fmt.Errorf("email is not a string, or is not in a valid format, or doesn't exist when it should")
 	}
 
 	// displayName
 	if displayName, ok := formData["display_name"].(string); ok {
 		args = append(args, displayName)
+	} else {
+		return nil, fmt.Errorf("display name is not a string, or is not in a valid format, or doesn't exist when it should")
 	}
 
-	//set query statements
-	queryStatement := ""
-	queryValues := make([]interface{}, 0)
-	if strings.Contains(formData["email"].(string), "@") {
-		queryStatement = `
-			SELECT * FROM Users 
-			WHERE email = ?
-			`
-		queryValues = append(queryValues, formData["email"].(string))
-	} else {
-		queryStatement = `
-			SELECT * FROM Users 
-			WHERE display_name = ?
-			`
-		queryValues = append(queryValues, formData["display_name"].(string))
-	}
+	queryStatement := `
+	SELECT * FROM Users
+	WHERE email = ?
+	OR display_name = ?
+	`
 
 	//get user data as interface
-	users, err := crud.SelectFromDatabase(db, "Users", queryStatement, queryValues)
+	users, err := crud.SelectFromDatabase(db, "Users", queryStatement, args)
 	if err == nil && len(users) > 0 {
 		return nil, fmt.Errorf("user display name or email already in use")
 	}
+
+	return args, nil
+}
+
+func validateOtherRequiredFields(formData map[string]interface{}) ([]interface{}, error) {
+	var args []interface{}
 
 	// Password
 	if password, ok := formData["password"].(string); ok {
@@ -95,43 +142,63 @@ func RegisterUser(formData map[string]interface{}, db *sql.DB, statement *sql.St
 			return nil, fmt.Errorf("failed to hash user's password: %s", err)
 		}
 		args = append(args, hashedPassedword)
+	} else {
+		return nil, fmt.Errorf("password is not a string, or is not in a valid format, or doesn't exist when it should")
 	}
 
 	// First Name
 	if firstName, ok := formData["first_name"].(string); ok {
 		args = append(args, firstName)
+	} else {
+		return nil, fmt.Errorf("firstName is not a string, or is not in a valid format, or doesn't exist when it should")
 	}
 
 	// Last Name
 	if lastName, ok := formData["last_name"].(string); ok {
 		args = append(args, lastName)
+	} else {
+		return nil, fmt.Errorf("lastName is not a string, or is not in a valid format, or doesn't exist when it should")
 	}
 
 	// DOB
-	if dob, ok := formData["dob"].(time.Time); ok {
-		args = append(args, dob)
+	if dob, ok := formData["dob"].(string); ok {
+		formattedDOB, err := time.Parse("2006-01-02", dob)
+		if err != nil {
+			return nil, fmt.Errorf("DOB string can't be parsed into time.Time: %w", err)
+		}
+		args = append(args, formattedDOB)
+	} else {
+		return nil, fmt.Errorf("DOB is not a string, or is not in a valid format, or doesn't exist when it should")
 	}
+
+	return args, nil
+}
+
+func validateAnyUnrequiredFields(formData map[string]interface{}) ([]interface{}, error) {
+	var args []interface{}
 
 	if avatarPath, ok := formData["avatar_path"].(string); ok {
 		args = append(args, avatarPath)
+	} else {
+		args = append(args, "")
 	}
 
 	// About Me
 	if aboutMe, ok := formData["about_me"].(string); ok {
 		args = append(args, aboutMe)
+	} else {
+		args = append(args, "")
 	}
 
-	err = crud.InteractWithDatabase(db, statement, args)
-	if err != nil {
-		return nil, fmt.Errorf("failed to insert user into database: %s", err)
-	}
+	return args, nil
+}
 
-	//set query statements
-	queryStatement = `SELECT * FROM Users WHERE user_id =?`
-	queryValues = []interface{}{
+func selectRegisteredUser(db *sql.DB, userId string) (*dbmodels.User, error) {
+	//set query values
+	queryValues := []interface{}{
 		userId,
 	}
-	userData, err := crud.SelectFromDatabase(db, "Users", queryStatement, queryValues)
+	userData, err := crud.SelectFromDatabase(db, "Users", dbstatements.SelectUserByID, queryValues)
 	if err != nil {
 		return nil, fmt.Errorf("error selecting user from database: %s", err)
 	}

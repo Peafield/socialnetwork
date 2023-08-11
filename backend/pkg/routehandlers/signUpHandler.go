@@ -3,6 +3,7 @@ package routehandlers
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
 	"net/http"
 	"socialnetwork/pkg/controllers"
 	"socialnetwork/pkg/db/dbstatements"
@@ -82,6 +83,7 @@ func SignUpHandler(w http.ResponseWriter, r *http.Request) {
 		if errors.Is(err, ErrUserExists) {
 			http.Error(w, "user display name or email already in use", http.StatusBadRequest)
 		} else {
+			fmt.Println(err)
 			http.Error(w, "failed to reigster user", http.StatusInternalServerError)
 		}
 		return

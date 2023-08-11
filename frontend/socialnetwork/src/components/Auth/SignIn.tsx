@@ -1,10 +1,9 @@
-import React, { ChangeEvent, useContext, useState } from "react";
+import React, { ChangeEvent, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { handleAPIRequest } from "../../controllers/Api";
-import { UserContext } from "../../context/AuthContext";
 import Container from "../Containers/Container";
 import styles from "./Auth.module.css";
-import { DecodePayload } from "../../controllers/DecodeToken";
+import { useSetUserContextAndCookie } from "../../controllers/SetUserContextAndCookie";
 
 interface SignInFormData {
   username_email: string;
@@ -13,12 +12,13 @@ interface SignInFormData {
 
 export default function SignIn() {
   const navigate = useNavigate();
-  const userContext = useContext(UserContext);
   const [formData, setFormData] = useState<SignInFormData>({
     username_email: "",
     password: "",
   });
   const [error, setError] = useState<string | null>(null);
+
+  const setUserContextAndCookie = useSetUserContextAndCookie();
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -40,16 +40,10 @@ export default function SignIn() {
     };
     try {
       const response = await handleAPIRequest("/signin", options);
-      console.log("handle submit:", response);
-      const payloadData = DecodePayload(response.data);
-      console.log(payloadData);
-      const user = {
-        usernameEmail: payloadData.first_name,
-        authToken: response.data,
-      };
-      userContext.setUser(user);
-      console.log("I've made it in here");
-      navigate("/dashboard");
+      if (response && response.status === "success") {
+        setUserContextAndCookie(response.data);
+        navigate("/dashboard");
+      }
     } catch (error) {
       if (error instanceof Error) {
         setError(error.message);

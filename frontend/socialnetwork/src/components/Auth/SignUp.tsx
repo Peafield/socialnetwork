@@ -1,7 +1,6 @@
-import React, { useState, FormEvent, useContext } from "react";
-import { Link, redirect, useNavigate } from "react-router-dom";
+import React, { useState, FormEvent } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import { handleAPIRequest } from "../../controllers/Api";
-import { UserContext } from "../../context/AuthContext";
 import styles from "./Auth.module.css";
 import Container from "../Containers/Container";
 
@@ -19,7 +18,6 @@ interface FormData {
 
 export default function SignUp() {
   const navigate = useNavigate();
-  const userContext = useContext(UserContext);
   const [error, setError] = useState<string | null>(null);
   const [formData, setFormData] = useState<FormData>({
     email: "",
@@ -71,14 +69,9 @@ export default function SignUp() {
     };
     try {
       const response = await handleAPIRequest("/signup", options);
-      const user = {
-        usernameEmail: data.email,
-        authToken: response.Data.token,
-      };
-
-      userContext.setUser(user);
-
-      navigate('/dashboard')
+      if (response && response.status === "success") {
+        navigate("/dashboard");
+      }
     } catch (error) {
       if (error instanceof Error) {
         setError(error.message);

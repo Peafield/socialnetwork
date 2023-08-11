@@ -1,8 +1,14 @@
 import React, { createContext, useState } from "react";
 
 type AuthUser = {
-  usernameEmail: string,
-  authToken: string,
+  userId: string;
+  displayName: string;
+  firstName: string;
+  lastName: string;
+  isLoggedIn: number;
+  role: number;
+  exp: number;
+  authToken: string;
 };
 
 export type UserContextType = {
@@ -16,7 +22,7 @@ type UserContextProviderType = {
 
 export const UserContext = createContext<UserContextType>({
   user: null,
-  setUser: () => {}
+  setUser: () => {},
 });
 
 export const UserContextProvider = ({ children }: UserContextProviderType) => {

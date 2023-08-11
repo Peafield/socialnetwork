@@ -14,6 +14,7 @@ import (
 	"socialnetwork/pkg/routehandlers"
 	"time"
 
+	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
 )
 
@@ -130,15 +131,20 @@ func main() {
 
 	/*SERVER SETTINGS*/
 	r := mux.NewRouter()
+
+	headersOk := handlers.AllowedHeaders([]string{"X-Requested-With", "Accept", "Content-Type", "Authorization"})
+	originsOk := handlers.AllowedOrigins([]string{"*"})
+	methodsOk := handlers.AllowedMethods([]string{"GET", "HEAD", "POST", "PUT", "OPTIONS"})
+
+	// Attach CORS middleware to your router
+	r.Use(handlers.CORS(originsOk, headersOk, methodsOk))
+
 	srv := &http.Server{
 		Handler:      r,
 		Addr:         "localhost:8080",
 		WriteTimeout: 15 * time.Second,
 		ReadTimeout:  15 * time.Second,
 	}
-
-	r.Use(middleware.HandlePreflight)
-	r.Use(middleware.SetCORSHeaders)
 
 	/*AUTH ENDPOINTS*/
 	r.Handle("/signup", middleware.ParseAndValidateData(http.HandlerFunc(routehandlers.SignUpHandler))).Methods("POST")

@@ -9,13 +9,6 @@ import (
 	"socialnetwork/pkg/models/readwritemodels"
 )
 
-const (
-	InsertGRP = ``
-	SelectGRP = ``
-	UpdateGRP = ``
-	DeleteGRP = ``
-)
-
 func GroupsHandler(w http.ResponseWriter, r *http.Request) {
 	method := r.Method
 	switch method {

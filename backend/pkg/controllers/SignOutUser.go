@@ -1,4 +1,4 @@
-package routecontrollers
+package controllers
 
 import (
 	"database/sql"

@@ -1,6 +1,14 @@
 package routehandlers
 
-import "net/http"
+import (
+	"encoding/json"
+	"net/http"
+	"socialnetwork/pkg/controllers/routecontrollers"
+	"socialnetwork/pkg/db/dbutils"
+	"socialnetwork/pkg/helpers"
+	"socialnetwork/pkg/middleware"
+	"socialnetwork/pkg/models/readwritemodels"
+)
 
 func GroupMembersHandler(w http.ResponseWriter, r *http.Request) {
 	method := r.Method
@@ -28,9 +36,35 @@ Implements the POST method within the "/groups" endpoint.
 This function will INSERT a new group into the database.
 */
 func NewGroupMember(w http.ResponseWriter, r *http.Request) {
+	userInfo, ok := r.Context().Value(middleware.UserDataKey).(readwritemodels.Payload)
+	if !ok {
+		http.Error(w, "failed to read user data from context", http.StatusInternalServerError)
+		return
+	}
 
-	//insert new member
+	groupData, ok := r.Context().Value(middleware.DataKey).(readwritemodels.ReadData)
+	if !ok {
+		http.Error(w, "failed to read form data from context", http.StatusInternalServerError)
+		return
+	}
 
+	//check whether the map's keys match the expected parameters
+	expectedParams := []string{"group_id"}
+	found := helpers.FoundParameters(groupData.Data, expectedParams)
+	if !found {
+		http.Error(w, "expected parameters not found in NewGroupMember", http.StatusBadRequest)
+		return
+	}
+
+	groupId := groupData.Data["group_id"].(string)
+
+	err := routecontrollers.InsertMember(dbutils.DB, userInfo.UserId, groupId)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
 }
 
 /*
@@ -38,6 +72,41 @@ Implements the GET method within the "/groups" endpoint.
 This function will SELECT a number of groups from the database (for what purpose??).
 */
 func GetGroupMember(w http.ResponseWriter, r *http.Request) {
+	userInfo, ok := r.Context().Value(middleware.UserDataKey).(readwritemodels.Payload)
+	if !ok {
+		http.Error(w, "failed to read user data from context", http.StatusInternalServerError)
+		return
+	}
+
+	groupData, ok := r.Context().Value(middleware.DataKey).(readwritemodels.ReadData)
+	if !ok {
+		http.Error(w, "failed to read form data from context", http.StatusInternalServerError)
+		return
+	}
+
+	//sanitize data
+	result, err := routecontrollers.SelectMember(dbutils.DB, userInfo.UserId, groupData.Data)
+
+	if err != nil {
+		http.Error(w, "Failed to GET Member", http.StatusInternalServerError)
+	}
+
+	//redirect or send Json response?
+	//add token to response type, marshal and send back
+	response := readwritemodels.WriteData{
+		Status: "success",
+		Data:   result,
+	}
+
+	jsonReponse, err := json.Marshal(response)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.Write(jsonReponse)
+	w.WriteHeader(http.StatusOK)
 
 }
 
@@ -46,7 +115,35 @@ Implements the UPDATE method within the "/groups" endpoint.
 This function will UPDATE a group in the database if user has the adequate permissions.
 */
 func UpdateGroupMember(w http.ResponseWriter, r *http.Request) {
+	userInfo, ok := r.Context().Value(middleware.UserDataKey).(readwritemodels.Payload)
+	if !ok {
+		http.Error(w, "failed to read user data from context", http.StatusInternalServerError)
+		return
+	}
 
+	groupData, ok := r.Context().Value(middleware.DataKey).(readwritemodels.ReadData)
+	if !ok {
+		http.Error(w, "failed to read form data from context", http.StatusInternalServerError)
+		return
+	}
+
+	//check whether the map's keys match the expected parameters
+	expectedParams := []string{"group_id", "user_id"}
+	found := helpers.FoundParameters(groupData.Data, expectedParams)
+	if !found {
+		http.Error(w, "expected parameters not found in UpdateGroupMember", http.StatusBadRequest)
+		return
+	}
+
+	groupId := groupData.Data["group_id"].(string)
+	memberId := groupData.Data["user_id"].(string)
+
+	err := routecontrollers.UpdateMember(dbutils.DB, userInfo.UserId, memberId, groupId)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	}
+
+	w.WriteHeader(http.StatusOK)
 }
 
 /*
@@ -55,4 +152,31 @@ This function will DELETE a group from the database if the user has the adequate
 */
 func DeleteGroupMember(w http.ResponseWriter, r *http.Request) {
 
+	userInfo, ok := r.Context().Value(middleware.UserDataKey).(readwritemodels.Payload)
+	if !ok {
+		http.Error(w, "failed to read user data from context", http.StatusInternalServerError)
+		return
+	}
+
+	groupData, ok := r.Context().Value(middleware.DataKey).(readwritemodels.ReadData)
+	if !ok {
+		http.Error(w, "failed to read form data from context", http.StatusInternalServerError)
+		return
+	}
+
+	//check whether the map's keys match the expected parameters
+	expectedParams := []string{"group_id", "user_id"}
+	found := helpers.FoundParameters(groupData.Data, expectedParams)
+	if !found {
+		http.Error(w, "expected parameters not found in UpdateGroupMember", http.StatusBadRequest)
+		return
+	}
+
+	groupId := groupData.Data["group_id"].(string)
+	memberId := groupData.Data["user_id"].(string)
+
+	err := routecontrollers.DeleteMember(dbutils.DB, userInfo.UserId, memberId, groupId)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	}
 }

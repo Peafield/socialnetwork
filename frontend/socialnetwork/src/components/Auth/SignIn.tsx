@@ -4,6 +4,7 @@ import { handleAPIRequest } from "../../controllers/Api";
 import { UserContext } from "../../context/AuthContext";
 import Container from "../Containers/Container";
 import styles from "./Auth.module.css";
+import { DecodePayload } from "../../controllers/DecodeToken";
 
 interface SignInFormData {
   username_email: string;
@@ -39,12 +40,15 @@ export default function SignIn() {
     };
     try {
       const response = await handleAPIRequest("/signin", options);
+      console.log("handle submit:", response);
+      const payloadData = DecodePayload(response.data);
+      console.log(payloadData);
       const user = {
-        usernameEmail: data.data.username_email,
-        authToken: response.Data.token,
+        usernameEmail: payloadData.first_name,
+        authToken: response.data,
       };
-
       userContext.setUser(user);
+      console.log("I've made it in here");
       navigate("/dashboard");
     } catch (error) {
       if (error instanceof Error) {

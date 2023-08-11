@@ -60,13 +60,13 @@ export default function SignIn() {
           <h2 className={styles.h2}>Sign In</h2>
           <form onSubmit={handleSubmit}>
             <div className={styles.inputgroup}>
-              <label className={styles.label} htmlFor="usernameEmail">
+              <label className={styles.label} htmlFor="username_email">
                 Username/Email:
                 <input
                   className={styles.input}
                   type="text"
                   value={formData.usernameEmail}
-                  name="usernameEmail"
+                  name="username_email"
                   onChange={handleChange}
                 />
               </label>

@@ -147,9 +147,9 @@ func main() {
 	}
 
 	/*AUTH ENDPOINTS*/
-	r.Handle("/signup", middleware.ParseAndValidateData(http.HandlerFunc(routehandlers.SignUpHandler))).Methods("POST")
-	r.Handle("/signin", middleware.ParseAndValidateData(http.HandlerFunc(routehandlers.SignInHandler))).Methods("POST")
-	r.Handle("/signout", middleware.ValidateTokenMiddleware(http.HandlerFunc(routehandlers.SignOutHandler))).Methods("POST")
+	r.Handle("/signup", middleware.ParseAndValidateData(http.HandlerFunc(routehandlers.SignUpHandler)))
+	r.Handle("/signin", middleware.ParseAndValidateData(http.HandlerFunc(routehandlers.SignInHandler)))
+	r.Handle("/signout", middleware.ValidateTokenMiddleware(http.HandlerFunc(routehandlers.SignOutHandler)))
 
 	/*END POINTS*/
 	r.Handle("/user", middleware.ValidateTokenMiddleware(middleware.ParseAndValidateData(http.HandlerFunc(routehandlers.UserHandler))))

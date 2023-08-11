@@ -25,8 +25,16 @@ Returns:
 Errors:
   - If the request payload is invalid, sends an HTTP error with status code 400 (Bad Request).
 */
+func enableCors(w *http.ResponseWriter) {
+	(*w).Header().Set("Access-Control-Allow-Origin", "http://localhost:3000/signup")
+	(*w).Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
+	(*w).Header().Set("Access-Control-Allow-Headers", "Content-Type")
+	(*w).Header().Set("Access-Control-Allow-Credentials", "true")
+}
+
 func ParseAndValidateData(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		enableCors(&w)
 		var data readwritemodels.ReadData
 		fmt.Println(r.Body)
 		err := json.NewDecoder(r.Body).Decode(&data)

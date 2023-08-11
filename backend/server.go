@@ -120,10 +120,13 @@ func main() {
 	}
 
 	/*ON SERVER RESTART*/
-	err := controllers.SignOutAllUsers(dbutils.DB)
-	if err != nil {
-		log.Fatalf("error signing out all users: %s", err)
+	reset := func() {
+		err := controllers.SignOutAllUsers(dbutils.DB)
+		if err != nil {
+			log.Fatalf("error signing out all users: %s", err)
+		}
 	}
+	defer reset()
 
 	/*SERVER SETTINGS*/
 	r := mux.NewRouter()
@@ -133,6 +136,9 @@ func main() {
 		WriteTimeout: 15 * time.Second,
 		ReadTimeout:  15 * time.Second,
 	}
+
+	r.Use(middleware.HandlePreflight)
+	r.Use(middleware.SetCORSHeaders)
 
 	/*AUTH ENDPOINTS*/
 	r.Handle("/signup", middleware.ParseAndValidateData(http.HandlerFunc(routehandlers.SignUpHandler))).Methods("POST")

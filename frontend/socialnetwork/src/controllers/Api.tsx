@@ -2,6 +2,9 @@ const API_URL = "http://localhost:8080";
 
 export async function handleAPIRequest(url: string, options: object) {
   try {
+    console.log(API_URL + url);
+    console.log(options);
+    
     const response = await fetch(API_URL + url, options);
     if (response.ok) {
       const data = await response.json();

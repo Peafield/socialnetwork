@@ -1,5 +1,5 @@
 import React, { useState, FormEvent, useContext } from "react";
-import { Link } from "react-router-dom";
+import { Link, redirect, useNavigate } from "react-router-dom";
 import { handleAPIRequest } from "../../controllers/Api";
 import { UserContext } from "../../context/AuthContext";
 import styles from "./Auth.module.css";
@@ -18,6 +18,7 @@ interface FormData {
 }
 
 export default function SignUp() {
+  const navigate = useNavigate();
   const userContext = useContext(UserContext);
   const [error, setError] = useState<string | null>(null);
   const [formData, setFormData] = useState<FormData>({
@@ -37,21 +38,13 @@ export default function SignUp() {
   }) => {
     const { name, value } = e.target;
 
-    if (name === "password" || name === "confirmPassword") {
-      if (formData.password !== formData.confirmPassword) {
-        alert("passwords do not match!");
-        return;
-      }
-    }
-
     if (e.target.type === "file") {
       const file = e.target.files ? e.target.files[0] : null;
       setFormData((prevState) => ({
         ...prevState,
         avatar_path: file,
       }));
-    }
-    if (name !== "confirmPassword") {
+    } else {
       setFormData((prevState) => ({
         ...prevState,
         [name]: value,
@@ -62,7 +55,13 @@ export default function SignUp() {
   const HandleSubmit = async (e: FormEvent) => {
     e.preventDefault();
 
+    if (formData.password !== formData.confirmPassword) {
+      alert("passwords do not match!");
+      return;
+    }
+
     const data = formData;
+
     const options = {
       method: "POST",
       headers: {
@@ -78,6 +77,8 @@ export default function SignUp() {
       };
 
       userContext.setUser(user);
+
+      navigate('/dashboard')
     } catch (error) {
       if (error instanceof Error) {
         setError(error.message);

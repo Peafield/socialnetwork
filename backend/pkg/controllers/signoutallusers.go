@@ -30,7 +30,7 @@ func SignOutAllUsers(db *sql.DB) error {
 	if db == nil {
 		return fmt.Errorf("database connection is not initialised, please run -dbopen")
 	}
-	err := crud.InteractWithDatabase(db, dbstatements.UpdateAllUsersToSignedOut)
+	err := crud.InteractWithDatabase(db, dbstatements.UpdateAllUsersToSignedOut, []interface{}{})
 	if err != nil {
 		if errors.Is(err, errorhandling.ErrNoRowsAffected) {
 			return nil

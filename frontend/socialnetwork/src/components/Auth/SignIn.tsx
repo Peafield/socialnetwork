@@ -1,5 +1,5 @@
 import React, { ChangeEvent, useContext, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { handleAPIRequest } from "../../controllers/Api";
 import { UserContext } from "../../context/AuthContext";
 import Container from "../Containers/Container";
@@ -11,6 +11,7 @@ interface SignInFormData {
 }
 
 export default function SignIn() {
+  const navigate = useNavigate()
   const userContext = useContext(UserContext);
   const [formData, setFormData] = useState<SignInFormData>({
     username_email: "",
@@ -44,6 +45,8 @@ export default function SignIn() {
       };
 
       userContext.setUser(user);
+
+      navigate("/dashboard")
     } catch (error) {
       if (error instanceof Error) {
         setError(error.message);

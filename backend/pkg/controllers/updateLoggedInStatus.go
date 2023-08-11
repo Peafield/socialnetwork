@@ -28,6 +28,7 @@ func UpdateLoggedInStatus(db *sql.DB, userId string, loggedInStatus int) error {
 
 	err = crud.InteractWithDatabase(db, updateLoggedInStatusStatment, args)
 	if err != nil {
+		fmt.Println(err)
 		return fmt.Errorf("failed to update logged in status: %w", err)
 	}
 	return nil

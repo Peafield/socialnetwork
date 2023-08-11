@@ -77,6 +77,8 @@ func SignInHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	fmt.Println(user.UserId)
+
 	//update user logged in status
 	err = controllers.UpdateLoggedInStatus(dbutils.DB, user.UserId, 1)
 	if err != nil {

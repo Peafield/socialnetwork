@@ -54,7 +54,7 @@ func InsertGroup(db *sql.DB, userId string, AffectedColumns map[string]interface
 		return err
 	}
 
-	err = crud.InteractWithDatabase(db, Stmnt, Values...)
+	err = crud.InteractWithDatabase(db, Stmnt, Values)
 	if err != nil {
 		return err
 	}
@@ -120,7 +120,7 @@ func UpdateGroup(db *sql.DB, userId, groupId string, AffectedColumns map[string]
 	}
 
 	//Execute the update statement
-	err = crud.InteractWithDatabase(db, Stmnt, Values...)
+	err = crud.InteractWithDatabase(db, Stmnt, Values)
 	if err != nil {
 		return err
 	}

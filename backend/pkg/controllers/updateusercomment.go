@@ -58,7 +58,7 @@ func UpdateUserComment(db *sql.DB, userId string, updateCommentData map[string]i
 		return fmt.Errorf("failed to update comment data: %w", err)
 	}
 
-	err = crud.InteractWithDatabase(db, dbstatements.UpdatePostNumOfComments, updateCommentData["post_id"])
+	err = crud.InteractWithDatabase(db, dbstatements.UpdatePostNumOfComments, args)
 	if err != nil {
 		return fmt.Errorf("failed to update post comment count: %w", err)
 	}

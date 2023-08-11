@@ -121,7 +121,7 @@ func RegisterUser(formData map[string]interface{}, db *sql.DB, statement *sql.St
 		args = append(args, aboutMe)
 	}
 
-	err = crud.InteractWithDatabase(db, statement, args...)
+	err = crud.InteractWithDatabase(db, statement, args)
 	if err != nil {
 		return nil, fmt.Errorf("failed to insert user into database: %s", err)
 	}

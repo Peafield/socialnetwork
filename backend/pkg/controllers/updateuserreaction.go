@@ -55,7 +55,7 @@ func UpdateUserReaction(db *sql.DB, userID string, updateReactionData map[string
 	}
 	defer updatePostOrCommentStatment.Close()
 
-	err = crud.InteractWithDatabase(db, updatePostOrCommentStatment)
+	err = crud.InteractWithDatabase(db, updatePostOrCommentStatment, args)
 	if err != nil {
 		return fmt.Errorf("failed to update %s reaction data: %w", updateTable, err)
 	}

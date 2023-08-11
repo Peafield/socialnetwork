@@ -4,7 +4,6 @@ import (
 	"flag"
 	"log"
 	"net/http"
-	"socialnetwork/pkg/controllers"
 	"socialnetwork/pkg/db/dbstatements"
 	"socialnetwork/pkg/db/dbutils"
 	db "socialnetwork/pkg/db/mocking"
@@ -77,13 +76,13 @@ func main() {
 			defer dbstatements.CloseDBStatements()
 		}
 
-		reset := func() {
-			err := controllers.SignOutAllUsers(dbutils.DB)
-			if err != nil {
-				log.Fatalf("error signing out all users: %s", err)
-			}
-		}
-		reset()
+		// reset := func() {
+		// 	err := controllers.SignOutAllUsers(dbutils.DB)
+		// 	if err != nil {
+		// 		log.Fatalf("error signing out all users: %s", err)
+		// 	}
+		// }
+		// reset()
 
 	}
 

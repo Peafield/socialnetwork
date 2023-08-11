@@ -1,5 +1,5 @@
 import React, { ChangeEvent, useContext, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { handleAPIRequest } from "../../controllers/Api";
 import { UserContext } from "../../context/AuthContext";
 import Container from "../Containers/Container";
@@ -11,6 +11,7 @@ interface SignInFormData {
 }
 
 export default function SignIn() {
+  const navigate = useNavigate()
   const userContext = useContext(UserContext);
   const [formData, setFormData] = useState<SignInFormData>({
     username_email: "",
@@ -28,11 +29,7 @@ export default function SignIn() {
 
   const handleSubmit = async (e: { preventDefault: () => void }) => {
     e.preventDefault();
-<<<<<<< HEAD
     const data = { data: formData };
-=======
-    const data = {data: formData};
->>>>>>> b7b4c333dbb26b8f717b470a54eae64058922bb9
     const options = {
       method: "POST",
       headers: {
@@ -48,6 +45,8 @@ export default function SignIn() {
       };
 
       userContext.setUser(user);
+
+      navigate("/dashboard")
     } catch (error) {
       if (error instanceof Error) {
         setError(error.message);

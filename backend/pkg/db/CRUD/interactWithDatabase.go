@@ -30,7 +30,7 @@ import (
 //	if err != nil {
 //	    log.Fatal(err)
 //	}
-func InteractWithDatabase(db *sql.DB, statement *sql.Stmt, args ...interface{}) error {
+func InteractWithDatabase(db *sql.DB, statement *sql.Stmt, args []interface{}) error {
 
 	defer statement.Close()
 

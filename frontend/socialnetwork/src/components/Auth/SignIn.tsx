@@ -11,7 +11,7 @@ interface SignInFormData {
 }
 
 export default function SignIn() {
-  const navigate = useNavigate()
+  const navigate = useNavigate();
   const userContext = useContext(UserContext);
   const [formData, setFormData] = useState<SignInFormData>({
     username_email: "",
@@ -45,8 +45,7 @@ export default function SignIn() {
       };
 
       userContext.setUser(user);
-
-      navigate("/dashboard")
+      navigate("/dashboard");
     } catch (error) {
       if (error instanceof Error) {
         setError(error.message);

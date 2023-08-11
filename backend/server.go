@@ -77,6 +77,14 @@ func main() {
 			defer dbstatements.CloseDBStatements()
 		}
 
+		reset := func() {
+			err := controllers.SignOutAllUsers(dbutils.DB)
+			if err != nil {
+				log.Fatalf("error signing out all users: %s", err)
+			}
+		}
+		reset()
+
 	}
 
 	if *dbup {
@@ -119,15 +127,6 @@ func main() {
 			log.Fatalf("someting went wrong creating fakes: %s", err)
 		}
 	}
-
-	/*ON SERVER RESTART*/
-	reset := func() {
-		err := controllers.SignOutAllUsers(dbutils.DB)
-		if err != nil {
-			log.Fatalf("error signing out all users: %s", err)
-		}
-	}
-	defer reset()
 
 	/*SERVER SETTINGS*/
 	r := mux.NewRouter()

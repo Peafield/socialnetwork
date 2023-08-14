@@ -1,6 +1,12 @@
 import React from 'react'
 
-const PostComments: React.FC = () => {
+interface PostCommentsProps {
+  post_id: string
+}
+
+const PostComments: React.FC<PostCommentsProps> = ({
+  post_id
+}) => {
   return (
     <div>PostComments</div>
   )

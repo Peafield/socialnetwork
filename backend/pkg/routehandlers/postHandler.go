@@ -2,7 +2,6 @@ package routehandlers
 
 import (
 	"encoding/json"
-	"fmt"
 	"net/http"
 	"socialnetwork/pkg/controllers"
 	"socialnetwork/pkg/db/dbutils"
@@ -107,14 +106,11 @@ Specifically, it:
   - If all of the above steps are successful, it writes the posts to a response and sends an HTTP 200 (OK) status to the client, indicating that the posts were successfully selected.
 */
 func UserPosts(w http.ResponseWriter, r *http.Request) {
-	fmt.Println("At get user posts: ", r.Context().Value(middleware.UserDataKey))
 	userInfo, ok := r.Context().Value(middleware.UserDataKey).(readwritemodels.Payload)
 	if !ok {
 		http.Error(w, "failed to read user data from context", http.StatusInternalServerError)
 		return
 	}
-
-	fmt.Println(userInfo)
 
 	userPosts, err := controllers.SelectUserViewablePosts(dbutils.DB, userInfo.UserId)
 	if err != nil {

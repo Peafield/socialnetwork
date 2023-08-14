@@ -3,12 +3,9 @@ package middleware
 import (
 	"context"
 	"encoding/json"
-	"fmt"
 	"net/http"
 	"socialnetwork/pkg/models/readwritemodels"
 )
-
-const DataKey readwritemodels.ContextKey = iota
 
 /*
 ParseAndValidateData is a middleware function that extracts and decodes JSON data from the request body.
@@ -34,17 +31,12 @@ Errors:
 
 func ParseAndValidateData(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		payload, ok := r.Context().Value(UserDataKey).(readwritemodels.Payload)
-		if ok {
-			fmt.Println(payload)
-		}
 		var data readwritemodels.ReadData
 		err := json.NewDecoder(r.Body).Decode(&data)
 		if r.Method != http.MethodGet && err != nil {
 			http.Error(w, "invalid request payload", http.StatusBadRequest)
 			return
 		}
-		fmt.Println("data is equal to:", data)
 		ctx := context.WithValue(r.Context(), DataKey, data)
 		next.ServeHTTP(w, r.WithContext(ctx))
 	})

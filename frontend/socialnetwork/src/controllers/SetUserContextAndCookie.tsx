@@ -18,6 +18,9 @@ export function useSetUserContextAndCookie() {
             .join("")
         )
       );
+      
+      console.log(payload);
+      
 
       const user = {
         userId: payload.user_id,
@@ -42,4 +45,8 @@ function setCookie(name: string, value: string, expiryTimestamp: number): void {
   const date = new Date(expiryTimestamp * 1000);
   const expires = "; expires=" + date.toUTCString();
   document.cookie = name + "=" + (value || "") + expires + "; path=/";
+}
+
+export function getCookie(name: string) {
+  return document.cookie.split(name+"=")[1].split(";")[0]
 }

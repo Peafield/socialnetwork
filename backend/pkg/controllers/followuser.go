@@ -48,7 +48,7 @@ func FollowUser(db *sql.DB, userId string, postFollowerData map[string]interface
 		return fmt.Errorf("failed to get follower struct values: %s", err)
 	}
 
-	err = crud.InsertIntoDatabase(db, dbstatements.InsertFollowersStmt, values)
+	err = crud.InteractWithDatabase(db, dbstatements.InsertFollowersStmt, values)
 	if err != nil {
 		return fmt.Errorf("failed to insert follower into database, err: %s", err)
 	}

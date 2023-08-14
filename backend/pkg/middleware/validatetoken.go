@@ -11,6 +11,7 @@ import (
 	"net/http"
 	"os"
 	crud "socialnetwork/pkg/db/CRUD"
+	"socialnetwork/pkg/db/dbstatements"
 	"socialnetwork/pkg/db/dbutils"
 	"socialnetwork/pkg/models/dbmodels"
 	"socialnetwork/pkg/models/readwritemodels"
@@ -37,24 +38,29 @@ Example:
 func ValidateTokenMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		authorizationHeader := r.Header.Get("Authorization")
+		fmt.Println(authorizationHeader)
 		if authorizationHeader == "" {
 			http.Error(w, "Missing authorization header", http.StatusUnauthorized)
 			return
 		}
 
-		headerParts := strings.Split(authorizationHeader, " ")
-		if len(headerParts) != 2 || headerParts[0] != "Bearer" {
+		authType, token, found := strings.Cut(authorizationHeader, " ")
+		if !found || authType != "Bearer" {
+			fmt.Println(found, authType)
 			http.Error(w, "Invalid or missing authorization header", http.StatusUnauthorized)
 			return
 		}
+		fmt.Println("header parts 1 = ", token)
 
-		bearerToken := headerParts[1]
+		bearerToken := token
 
 		validToken, err := VerifyToken(bearerToken)
 		if !validToken || err != nil {
+			fmt.Println(err)
 			http.Error(w, "Invalid token verification", http.StatusUnauthorized)
 			return
 		}
+		fmt.Println(validToken)
 
 		tokenParts := strings.Split(bearerToken, ".")
 		payloadEncoded := tokenParts[1]
@@ -63,6 +69,7 @@ func ValidateTokenMiddleware(next http.Handler) http.Handler {
 			http.Error(w, "failed to decode token", http.StatusUnauthorized)
 			return
 		}
+		fmt.Println("payload = ", payload)
 
 		var recievedPayload readwritemodels.Payload
 		err = json.Unmarshal(payload, &recievedPayload)
@@ -70,13 +77,17 @@ func ValidateTokenMiddleware(next http.Handler) http.Handler {
 			http.Error(w, "Invalid token when unmarshalling into payload struct", http.StatusUnauthorized)
 			return
 		}
+		fmt.Println("received payload = ", recievedPayload)
 
 		err = ValidateLoggedInStatus(recievedPayload)
 		if err != nil {
+			fmt.Println(err)
 			r.Header.Del("Authorization")
 			http.Error(w, error.Error(err), http.StatusUnauthorized)
 			return
 		}
+
+		fmt.Println("completed validation: ", recievedPayload)
 
 		ctx := context.WithValue(r.Context(), UserDataKey, recievedPayload)
 		next.ServeHTTP(w, r.WithContext(ctx))
@@ -121,19 +132,20 @@ func VerifyToken(token string) (bool, error) {
 }
 
 func ValidateLoggedInStatus(payload readwritemodels.Payload) error {
-	queryStatement := `
-	SELECT * FROM Users WHERE user_id = ?
-	`
 	queryValues := []interface{}{
 		payload.UserId,
 	}
 
-	userData, err := crud.SelectFromDatabase(dbutils.DB, "Users", queryStatement, queryValues)
+	fmt.Println(payload.UserId)
+
+	userData, err := crud.SelectFromDatabase(dbutils.DB, "Users", dbstatements.SelectUserByID, queryValues)
 	if err != nil {
 		return fmt.Errorf("failed to select user in validate logged in status: %w", err)
 	}
 
-	user, ok := userData[0].(dbmodels.User)
+	fmt.Println(userData[0])
+
+	user, ok := userData[0].(*dbmodels.User)
 	if !ok {
 		return fmt.Errorf("failed to assert user type when validating logged in status")
 	}

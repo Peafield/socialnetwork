@@ -34,10 +34,13 @@ Errors:
 
 func ParseAndValidateData(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		payload, ok := r.Context().Value(UserDataKey).(readwritemodels.Payload)
+		if ok {
+			fmt.Println(payload)
+		}
 		var data readwritemodels.ReadData
-		fmt.Println(r.Body)
 		err := json.NewDecoder(r.Body).Decode(&data)
-		if err != nil {
+		if r.Method != http.MethodGet && err != nil {
 			http.Error(w, "invalid request payload", http.StatusBadRequest)
 			return
 		}

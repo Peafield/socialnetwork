@@ -206,7 +206,7 @@ func TestSelectFromDatabase(t *testing.T) {
 	for _, tc := range testCases {
 		t.Run(tc.Name, func(t *testing.T) {
 			if tc.Insert {
-				err := crud.InsertIntoDatabase(db, tc.InsertStatement, tc.InsertValues)
+				err := crud.InteractWithDatabase(db, tc.InsertStatement, tc.InsertValues)
 				fmt.Println(err)
 			}
 

@@ -85,6 +85,7 @@ func SignInHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "failed to update logged in status", http.StatusInternalServerError)
 		return
 	}
+	user.IsLoggedIn = 1
 
 	//generate web token
 	token, err := controllers.CreateWebToken(user)

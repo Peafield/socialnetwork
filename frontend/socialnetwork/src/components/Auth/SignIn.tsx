@@ -2,7 +2,7 @@ import React, { ChangeEvent, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { handleAPIRequest } from "../../controllers/Api";
 import Container from "../Containers/Container";
-import styles from "./Auth.module.css";
+import styles from "./Signin.module.css";
 import { useSetUserContextAndCookie } from "../../controllers/SetUserContextAndCookie";
 import Snackbar from "../feedback/Snackbar";
 
@@ -69,13 +69,11 @@ export default function SignIn() {
       }
     } catch (error) {
       if (error instanceof Error) {
-        setError(
-          "Oops something went wrong. Please wait a minute before trying again."
-        );
+        setError("Invalid username/email or password");
         setSnackbarType("error");
         setSnackbarOpen(true);
       } else {
-        setError("An unexpected error occurred.");
+        setError("An unexpected error occurred");
         setSnackbarType("error");
         setSnackbarOpen(true);
       }
@@ -89,28 +87,24 @@ export default function SignIn() {
           <h2 className={styles.h2}>Sign In</h2>
           <form onSubmit={handleSubmit}>
             <div className={styles.inputgroup}>
-              <label className={styles.label} htmlFor="username_email">
-                Username/Email:
-                <input
-                  className={styles.input}
-                  type="text"
-                  value={formData.username_email}
-                  name="username_email"
-                  onChange={handleChange}
-                />
-              </label>
+              <input
+                className={styles.input}
+                type="text"
+                placeholder="Username/Email"
+                value={formData.username_email}
+                name="username_email"
+                onChange={handleChange}
+              />
             </div>
             <div className={styles.inputgroup}>
-              <label className={styles.label} htmlFor="password">
-                Password:
-                <input
-                  className={styles.input}
-                  type="password"
-                  value={formData.password}
-                  name="password"
-                  onChange={handleChange}
-                />
-              </label>
+              <input
+                className={styles.input}
+                type="password"
+                placeholder="Password"
+                value={formData.password}
+                name="password"
+                onChange={handleChange}
+              />
             </div>
             <div className={styles.inputgroup}>
               <button className={styles.button} type="submit">

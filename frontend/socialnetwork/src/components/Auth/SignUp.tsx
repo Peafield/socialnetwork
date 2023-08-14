@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { handleAPIRequest } from "../../controllers/Api";
-import styles from "./Auth.module.css";
+import styles from "./Signup.module.css";
 import Container from "../Containers/Container";
 import { useSetUserContextAndCookie } from "../../controllers/SetUserContextAndCookie";
 
@@ -79,96 +79,83 @@ export default function SignUp() {
 
   return (
     <Container>
-      <div className={styles.authcontainer}>
+      <div className={styles.suauthcontainer}>
         <div className={styles.formwrapper}>
-          <form onSubmit={handleSubmit}>
-            <h2 className={styles.h2}>Sign Up</h2>
+          <h2 className={styles.h2}>Sign Up</h2>
+          <form className={styles.form} onSubmit={handleSubmit}>
             <div className={styles.inputgrouprow}>
-              <label htmlFor="first_name">
-                First Name:
-                <input
-                  className={styles.input}
-                  required
-                  type="text"
-                  id="first_name"
-                  name="first_name"
-                  value={formData.first_name}
-                  onChange={handleChange}
-                />
-              </label>
-
-              <label htmlFor="last_name">
-                Last Name:
-                <input
-                  className={styles.input}
-                  required
-                  type="text"
-                  id="last_name"
-                  name="last_name"
-                  value={formData.last_name}
-                  onChange={handleChange}
-                />
-              </label>
+              <input
+                className={styles.input}
+                placeholder="First name"
+                required
+                type="text"
+                id="first_name"
+                name="first_name"
+                value={formData.first_name}
+                onChange={handleChange}
+              />
+              <input
+                className={styles.input}
+                placeholder="Last name"
+                required
+                type="text"
+                id="last_name"
+                name="last_name"
+                value={formData.last_name}
+                onChange={handleChange}
+              />
             </div>
             <div className={styles.inputgroup}>
-              <label className={styles.label} htmlFor="email">
-                Email:
-                <input
-                  className={styles.input}
-                  required
-                  type="text"
-                  id="email"
-                  name="email"
-                  value={formData.email}
-                  onChange={handleChange}
-                />
-              </label>
+              <input
+                className={styles.input}
+                placeholder="Email"
+                required
+                type="text"
+                id="email"
+                name="email"
+                value={formData.email}
+                onChange={handleChange}
+              />
             </div>
             <div className={styles.inputgroup}>
-              <label htmlFor="display_name">
-                Display Name:
-                <input
-                  className={styles.input}
-                  required
-                  type="text"
-                  id="display_name"
-                  name="display_name"
-                  value={formData.display_name}
-                  onChange={handleChange}
-                />
-              </label>
+              <input
+                className={styles.input}
+                placeholder="Display Name"
+                required
+                type="text"
+                id="display_name"
+                name="display_name"
+                value={formData.display_name}
+                onChange={handleChange}
+              />
             </div>
 
             <div className={styles.inputgroup}>
-              <label htmlFor="password">
-                Password:
-                <input
-                  className={styles.input}
-                  required
-                  type="password"
-                  id="password"
-                  name="password"
-                  value={formData.password}
-                  onChange={handleChange}
-                />
-              </label>
+              <input
+                className={styles.input}
+                placeholder="Password"
+                required
+                type="password"
+                id="password"
+                name="password"
+                value={formData.password}
+                onChange={handleChange}
+              />
             </div>
             <div className={styles.inputgroup}>
-              <label htmlFor="confirmPassword">
-                Confirm Password:
-                <input
-                  className={styles.input}
-                  required
-                  type="password"
-                  id="confirmPassword"
-                  name="confirmPassword"
-                  value={formData.confirmPassword}
-                  onChange={handleChange}
-                />
-              </label>
+              <input
+                className={styles.input}
+                required
+                placeholder="Confirm Password"
+                type="password"
+                id="confirmPassword"
+                name="confirmPassword"
+                value={formData.confirmPassword}
+                onChange={handleChange}
+              />
             </div>
 
-            <div className={styles.inputgrouprow}>
+            <div className={styles.inputgroup}>
               <label htmlFor="dob">
                 Date of Birth:
                 <input
@@ -181,10 +168,12 @@ export default function SignUp() {
                   onChange={handleChange}
                 />
               </label>
+            </div>
+            <div className={styles.inputgroup}>
               <label htmlFor="avatar_path">
                 Profile Picture:
                 <input
-                  className={styles.customfileupload}
+                  className={styles.input}
                   type="file"
                   id="avatar_path"
                   name="avatar_path"
@@ -193,18 +182,15 @@ export default function SignUp() {
               </label>
             </div>
             <div className={styles.inputgroup}>
-              <label htmlFor="about_me">
-                About Me:
-                <textarea
-                  required
-                  maxLength={100}
-                  placeholder="Tell us about yourself..."
-                  id="about_me"
-                  name="about_me"
-                  value={formData.about_me}
-                  onChange={handleChange}
-                />
-              </label>
+              <textarea
+                required
+                maxLength={100}
+                placeholder="Tell us about yourself..."
+                id="about_me"
+                name="about_me"
+                value={formData.about_me}
+                onChange={handleChange}
+              />
             </div>
             <div className={styles.inputgroup}>
               <button className={styles.button} type="submit">
@@ -212,7 +198,9 @@ export default function SignUp() {
               </button>
             </div>
           </form>
-          <Link to="/signin">Already have an account? Sign in</Link>
+          <Link className={styles.a} to="/signin">
+            Already have an account? Sign in
+          </Link>
         </div>
       </div>
     </Container>

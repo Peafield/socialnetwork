@@ -1,6 +1,6 @@
 CREATE TABLE Posts (
   post_id TEXT NOT NULL PRIMARY KEY,
-  group_id TEXT,
+  group_id TEXT DEFAULT '',
   creator_id TEXT NOT NULL,
   creator_display_name TEXT NOT NULL,
   title TEXT NOT NULL,

@@ -9,7 +9,6 @@ import (
 	"socialnetwork/pkg/controllers"
 	"socialnetwork/pkg/db/dbstatements"
 	"strings"
-	"time"
 )
 
 type FakeName struct {
@@ -25,25 +24,20 @@ func CreateFakeUsers(db *sql.DB) error {
 	formData := map[string]interface{}{}
 	for i := 1; i <= userAmount; i++ {
 		fakeNameData := GetFakeUser()
-		formData["email"] = fakeNameData.EmailU + "@" + fakeNameData.EmailD
-		formData["password"] = "abc123"
-
 		nameSplit := strings.Split(fakeNameData.Name, " ")
-
+		nameSplit[0] = strings.ReplaceAll(nameSplit[0], ".", "")
 		formData["first_name"] = nameSplit[0]
 		formData["last_name"] = nameSplit[1]
+		formData["email"] = nameSplit[0] + "." + nameSplit[1] + "@" + fakeNameData.EmailD
+		formData["password"] = "abc123"
+
 		formData["display_name"] = fakeNameData.UserName
 
-		dob, err := time.Parse("2006-01-02", fakeNameData.BirthData)
-		if err != nil {
-			log.Fatal(err)
-		}
-
-		formData["dob"] = dob
+		formData["dob"] = fakeNameData.BirthData
 		formData["avatar_path"] = "path/to/avatar"
 		formData["about_me"] = fmt.Sprintf("Hi my name is %s! I'm excited to meet you", fakeNameData.Name)
 
-		_, err = controllers.RegisterUser(formData, db, dbstatements.InsertUserStmt)
+		_, err := controllers.RegisterUser(formData, db, dbstatements.InsertUserStmt)
 		if err != nil {
 			return fmt.Errorf("failed to insert fake users: %w", err)
 		}

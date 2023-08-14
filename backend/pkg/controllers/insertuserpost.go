@@ -9,43 +9,43 @@ import (
 )
 
 func InsertPost(db *sql.DB, userId string, postData map[string]interface{}) error {
-	args := []interface{}{}
+	args := make([]interface{}, 7)
 
 	postId, err := helpers.CreateUUID()
 	if err != nil {
 		return fmt.Errorf("failed to create post id: %w", err)
 	}
-	args = append(args, postId)
+	args[0] = postId
 
 	groupIdData, ok := postData["group_id"].(string)
 	if ok {
-		args = append(args, groupIdData)
+		args[1] = groupIdData
 	}
 
-	args = append(args, userId)
+	args[2] = userId
 
 	postTitle, ok := postData["title"].(string)
 	if !ok {
 		return fmt.Errorf("title data is not a string")
 	}
-	args = append(args, postTitle)
+	args[3] = postTitle
 
 	imgPathData, ok := postData["image_path"].(string)
 	if ok {
-		args = append(args, imgPathData)
+		args[4] = imgPathData
 	}
 
 	contentData, ok := postData["content"].(string)
 	if !ok {
 		return fmt.Errorf("content data is not a string")
 	}
-	args = append(args, contentData)
+	args[5] = contentData
 
 	privacyLevelData, ok := postData["privacy_level"].(int)
 	if !ok {
 		return fmt.Errorf("privacy level data is not a int")
 	}
-	args = append(args, privacyLevelData)
+	args[6] = privacyLevelData
 
 	err = crud.InteractWithDatabase(db, dbstatements.InsertPostStmt, args)
 	if err != nil {

@@ -4,6 +4,7 @@ import { handleAPIRequest } from "../../controllers/Api";
 import Container from "../Containers/Container";
 import styles from "./Auth.module.css";
 import { useSetUserContextAndCookie } from "../../controllers/SetUserContextAndCookie";
+import Snackbar from "../feedback/Snackbar";
 
 interface SignInFormData {
   username_email: string;
@@ -17,6 +18,10 @@ export default function SignIn() {
     password: "",
   });
   const [error, setError] = useState<string | null>(null);
+  const [snackbarOpen, setSnackbarOpen] = useState<boolean>(false);
+  const [snackbarType, setSnackbarType] = useState<
+    "success" | "error" | "warning"
+  >("error");
 
   const setUserContextAndCookie = useSetUserContextAndCookie();
 
@@ -41,14 +46,38 @@ export default function SignIn() {
     try {
       const response = await handleAPIRequest("/signin", options);
       if (response && response.status === "success") {
-        setUserContextAndCookie(response.data);
-        navigate("/dashboard");
+        const errorResult = setUserContextAndCookie(response.data);
+        if (errorResult) {
+          if (typeof errorResult === "string") {
+            setError(errorResult);
+            setSnackbarType("error");
+            setSnackbarOpen(true);
+          } else if (errorResult instanceof Error) {
+            setError(errorResult.message);
+            setSnackbarType("error");
+            setSnackbarOpen(true);
+          } else {
+            setError("An unexpected error occurred.");
+          }
+        } else {
+          setSnackbarType("success");
+          setSnackbarOpen(true);
+          setTimeout(() => {
+            navigate("/dashboard");
+          }, 1000);
+        }
       }
     } catch (error) {
       if (error instanceof Error) {
-        setError(error.message);
+        setError(
+          "Oops something went wrong. Please wait a minute before trying again."
+        );
+        setSnackbarType("error");
+        setSnackbarOpen(true);
       } else {
         setError("An unexpected error occurred.");
+        setSnackbarType("error");
+        setSnackbarOpen(true);
       }
     }
   };
@@ -92,6 +121,15 @@ export default function SignIn() {
           <Link to="/signup">Don't have an account? Sign up</Link>
         </div>
       </div>
+      <Snackbar
+        open={snackbarOpen}
+        onClose={() => {
+          setSnackbarOpen(false);
+          setError(null);
+        }}
+        message={error ? error : "Signed in successfully!"}
+        type={snackbarType}
+      />
     </Container>
   );
 }

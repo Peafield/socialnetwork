@@ -33,7 +33,7 @@ export function useSetUserContextAndCookie() {
       userContext.setUser(user);
       setCookie("sessionToken", token, user.exp);
     } catch (error) {
-      console.error("Error setting user context and cookie:", error);
+      return error;
     }
   };
 }

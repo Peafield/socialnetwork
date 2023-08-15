@@ -1,4 +1,4 @@
-package controllers
+package followercontrollers
 
 import (
 	"database/sql"

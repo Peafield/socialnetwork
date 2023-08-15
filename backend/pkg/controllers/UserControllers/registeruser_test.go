@@ -1,9 +1,9 @@
-package controllers_test
+package usercontrollers_test
 
 import (
 	"database/sql"
 	"fmt"
-	"socialnetwork/pkg/controllers"
+	usercontrollers "socialnetwork/pkg/controllers/UserControllers"
 	"socialnetwork/pkg/db/dbstatements"
 	"testing"
 	"time"
@@ -116,7 +116,7 @@ func TestRegisterUser(t *testing.T) {
 				tc.Data["password"] = fmt.Sprintf("PW%v", testingTime)
 				tc.Data["display_name"] = fmt.Sprintf("DN%v", testingTime)
 			}
-			_, err := controllers.RegisterUser(tc.Data, db, dbstatements.InsertUserStmt)
+			_, err := usercontrollers.RegisterUser(tc.Data, db, dbstatements.InsertUserStmt)
 			if tc.ExpectedError && err == nil {
 				t.Error("Expected an error, but got nil")
 			} else if !tc.ExpectedError && err != nil {

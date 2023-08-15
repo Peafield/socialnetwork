@@ -1,4 +1,4 @@
-package controllers
+package postcontrollers
 
 import (
 	"database/sql"

@@ -1,4 +1,4 @@
-package controllers
+package usercontrollers
 
 import (
 	"database/sql"

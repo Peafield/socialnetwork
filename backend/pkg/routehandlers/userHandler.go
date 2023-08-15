@@ -2,7 +2,7 @@ package routehandlers
 
 import (
 	"net/http"
-	"socialnetwork/pkg/controllers"
+	usercontrollers "socialnetwork/pkg/controllers/UserControllers"
 	"socialnetwork/pkg/db/dbutils"
 	"socialnetwork/pkg/middleware"
 	"socialnetwork/pkg/models/readwritemodels"
@@ -82,7 +82,7 @@ func UpdateUserHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err := controllers.UpdateUserAccount(dbutils.DB, userData.UserId, updateUserData.Data)
+	err := usercontrollers.UpdateUserAccount(dbutils.DB, userData.UserId, updateUserData.Data)
 	if err != nil {
 		http.Error(w, "failed to update user account", http.StatusInternalServerError)
 		return
@@ -119,7 +119,7 @@ func DeleteUserHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err := controllers.DeleteUserAccount(dbutils.DB, userData.UserId, deleteUserData.Data)
+	err := usercontrollers.DeleteUserAccount(dbutils.DB, userData.UserId, deleteUserData.Data)
 	if err != nil {
 		http.Error(w, "failed to delete user account", http.StatusInternalServerError)
 		return

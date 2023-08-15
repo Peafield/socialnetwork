@@ -1,4 +1,4 @@
-package controllers
+package reactioncontrollers
 
 import (
 	"database/sql"

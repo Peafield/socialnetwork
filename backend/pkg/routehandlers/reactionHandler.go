@@ -3,7 +3,7 @@ package routehandlers
 import (
 	"encoding/json"
 	"net/http"
-	"socialnetwork/pkg/controllers"
+	reactioncontrollers "socialnetwork/pkg/controllers/ReactionControllers"
 	"socialnetwork/pkg/db/dbutils"
 	"socialnetwork/pkg/middleware"
 	"socialnetwork/pkg/models/readwritemodels"
@@ -78,7 +78,7 @@ func NewReaction(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err := controllers.InsertUserReaction(dbutils.DB, userData.UserId, newReactionData.Data)
+	err := reactioncontrollers.InsertUserReaction(dbutils.DB, userData.UserId, newReactionData.Data)
 	if err != nil {
 		http.Error(w, "failed to insert reaction data", http.StatusInternalServerError)
 		return
@@ -106,7 +106,7 @@ func PostCommentReactions(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	reactions, err := controllers.SelectReactions(dbutils.DB, reactionData.Data)
+	reactions, err := reactioncontrollers.SelectReactions(dbutils.DB, reactionData.Data)
 	if err != nil {
 		http.Error(w, "failed to select reactions", http.StatusInternalServerError)
 		return
@@ -155,7 +155,7 @@ func UpdateReaction(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err := controllers.UpdateUserReaction(dbutils.DB, userData.UserId, updateReactionData.Data)
+	err := reactioncontrollers.UpdateUserReaction(dbutils.DB, userData.UserId, updateReactionData.Data)
 	if err != nil {
 		http.Error(w, "failed to update user reaction", http.StatusInternalServerError)
 		return

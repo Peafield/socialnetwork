@@ -1,4 +1,4 @@
-package controllers
+package commentcontrollers
 
 import (
 	"database/sql"

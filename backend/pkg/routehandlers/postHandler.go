@@ -6,6 +6,7 @@ import (
 	postcontrollers "socialnetwork/pkg/controllers/PostControllers"
 	"socialnetwork/pkg/db/dbutils"
 	"socialnetwork/pkg/middleware"
+	"socialnetwork/pkg/models/dbmodels"
 	"socialnetwork/pkg/models/readwritemodels"
 )
 
@@ -112,10 +113,23 @@ func UserPosts(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	userPosts, err := postcontrollers.SelectUserViewablePosts(dbutils.DB, userInfo.UserId)
-	if err != nil {
-		http.Error(w, "failed to select user viewable posts", http.StatusInternalServerError)
-		return
+	specificUserId := r.URL.Query().Get("user_id")
+
+	var userPosts *dbmodels.Posts
+	var err error
+
+	if specificUserId == "" {
+		userPosts, err = postcontrollers.SelectUserViewablePosts(dbutils.DB, userInfo.UserId)
+		if err != nil {
+			http.Error(w, "failed to select user viewable posts", http.StatusInternalServerError)
+			return
+		}
+	} else {
+		userPosts, err = postcontrollers.SelectSpecificUserPosts(dbutils.DB, userInfo.UserId, specificUserId)
+		if err != nil {
+			http.Error(w, "failed to select specific user posts", http.StatusInternalServerError)
+			return
+		}
 	}
 
 	response := readwritemodels.WriteData{

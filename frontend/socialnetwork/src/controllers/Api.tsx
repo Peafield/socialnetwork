@@ -3,8 +3,10 @@ const API_URL = "http://localhost:8080";
 export async function handleAPIRequest(url: string, options: object) {
   try {
     const response = await fetch(API_URL + url, options);
-    if (response.ok) {
+    if (response.ok) {      
       const data = await response.json();
+      console.log(data);
+      
       return data;
     } else {
       throw new Error(

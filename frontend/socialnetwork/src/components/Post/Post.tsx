@@ -36,7 +36,7 @@ const Post: React.FC<PostProps> = ({
 }) => {
     return (
         <>
-            <PostHeader headerText={title} creatorId={creator_display_name}/>
+            <PostHeader headerText={title} creatorDisplayName={creator_display_name} creatorId={creator_id}/>
             <PostContent text={content}/>
             <PostActions likes={likes} dislikes={dislikes} numOfComments={num_of_comments} />
             <PostTimestamp time={creation_date}/>

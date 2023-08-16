@@ -24,7 +24,7 @@
     z-index: 0;
 }
 
-.authcontainer {
+.createpostcontainer {
     position: relative;
     display: flex;
     flex-direction: column;

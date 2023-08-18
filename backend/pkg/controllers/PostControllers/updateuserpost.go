@@ -33,10 +33,6 @@ func UpdateUserPost(db *sql.DB, userId string, updatePostData map[string]interfa
 	var columns []string
 	var args []interface{}
 
-	if title, ok := updatePostData["title"].(string); ok {
-		columns = append(columns, "title = ?")
-		args = append(args, title)
-	}
 	if imagePath, ok := updatePostData["image_path"].(string); ok {
 		columns = append(columns, "image_path = ?")
 		args = append(args, imagePath)

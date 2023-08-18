@@ -57,13 +57,13 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
                     {display_name}
                 </div>
                 <div>
-                    {num_of_posts}
+                    Posts: {num_of_posts}
                 </div>
                 <div>
-                    {followers}
+                    Followers: {followers}
                 </div>
                 <div>
-                    {following}
+                    Following: {following}
                 </div>
             </div>
         </Container>

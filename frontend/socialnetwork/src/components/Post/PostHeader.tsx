@@ -50,7 +50,7 @@ const PostHeader: React.FC<PostHeaderProps> = ({
             <FaUserCircle />
           </span>
         )}
-        <Link to={"/dashboard/user/" + creatorDisplayName} >{creatorDisplayName}</Link>
+        <Link to={"/dashboard/user/" + creatorDisplayName}>{creatorDisplayName}</Link>
         <p>{creationDate}</p>
       </div>
     </>

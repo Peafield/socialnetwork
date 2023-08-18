@@ -45,7 +45,7 @@ func InsertMember(db *sql.DB, userId string, groupId string) error {
 	}
 
 	//Prompt the Insert Query with its respective values
-	err = crud.InteractWithDatabase(dbutils.DB, Stmnt, Values...)
+	err = crud.InteractWithDatabase(dbutils.DB, Stmnt, Values)
 	if err != nil {
 		return err
 	}
@@ -95,7 +95,7 @@ func UpdateMember(db *sql.DB, adminId string, AffectedColumns map[string]interfa
 		return err
 	}
 
-	err = crud.InteractWithDatabase(db, Stmnt, Values...)
+	err = crud.InteractWithDatabase(db, Stmnt, Values)
 	if err != nil {
 		return err
 	}
@@ -117,7 +117,7 @@ func DeleteMember(db *sql.DB, adminId, memberId, groupId string) error {
 		return err
 	}
 
-	err = crud.InteractWithDatabase(db, Stmnt, Values...)
+	err = crud.InteractWithDatabase(db, Stmnt, Values)
 	if err != nil {
 		return err
 	}

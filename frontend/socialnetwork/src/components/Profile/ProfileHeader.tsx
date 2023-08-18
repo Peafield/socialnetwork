@@ -27,7 +27,7 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
             avatarView[i] = decodedAvatar.charCodeAt(i);
         }
 
-        const blob = new Blob([avatarBuffer], { type: 'image/png' });
+        const blob = new Blob([avatarBuffer]);
         const url = URL.createObjectURL(blob);
         console.log(url);
 

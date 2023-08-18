@@ -96,7 +96,7 @@ func UpdateEvent(db *sql.DB, userId, groupId, eventId string, AffectedColumns ma
 		return err
 	}
 
-	err = crud.InteractWithDatabase(db, Stmnt, Values...)
+	err = crud.InteractWithDatabase(db, Stmnt, Values)
 	if err != nil {
 		return err
 	}
@@ -120,7 +120,7 @@ func DeleteEvent(db *sql.DB, userId, groupId, eventId string) error {
 		return err
 	}
 
-	err = crud.InteractWithDatabase(db, Stmnt, eventId, eventId)
+	err = crud.InteractWithDatabase(db, Stmnt, []interface{}{eventId})
 	if err != nil {
 		return err
 	}

@@ -15,6 +15,8 @@ func InsertImage(db *sql.DB) {
 }
 
 func DecodeImage(imageData string) (string, error) {
+	fmt.Println(strings.Split(imageData, ",")[0])
+
 	// Extract the Base64 encoded data - removing the data:image/png;base64, part
 	base64Data := imageData[strings.Index(imageData, ",")+1:]
 

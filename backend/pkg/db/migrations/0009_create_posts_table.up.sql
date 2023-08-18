@@ -3,7 +3,6 @@ CREATE TABLE Posts (
   group_id TEXT DEFAULT '',
   creator_id TEXT NOT NULL,
   creator_display_name TEXT NOT NULL,
-  title TEXT NOT NULL,
   image_path TEXT,
   content TEXT NOT NULL,
   num_of_comments INTEGER DEFAULT 0,

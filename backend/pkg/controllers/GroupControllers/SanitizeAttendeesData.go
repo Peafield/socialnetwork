@@ -78,7 +78,7 @@ func UpdateAttendee(db *sql.DB, userId, attendeeId, groupId, eventId string, att
 		return err
 	}
 
-	err = crud.InteractWithDatabase(db, Stmnt, Values...)
+	err = crud.InteractWithDatabase(db, Stmnt, Values)
 	if err != nil {
 		return err
 	}
@@ -99,7 +99,7 @@ func DeleteAttendee(db *sql.DB, userId, attendeeId, eventId, groupId string) err
 		return err
 	}
 
-	err = crud.InteractWithDatabase(db, Stmnt, Values...)
+	err = crud.InteractWithDatabase(db, Stmnt, Values)
 	if err != nil {
 		return err
 	}

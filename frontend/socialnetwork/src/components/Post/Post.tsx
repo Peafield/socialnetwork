@@ -1,7 +1,6 @@
 import React from 'react'
 import PostHeader from './PostHeader'
 import PostContent from './PostContent'
-import PostTimestamp from './PostTimestamp'
 import PostActions from './PostActions'
 
 
@@ -10,7 +9,6 @@ export interface PostProps {
     group_id: string,
     creator_id: string,
     creator_display_name: string,
-    title: string,
     image_path: string,
     content: string,
     num_of_comments: number,
@@ -25,7 +23,6 @@ const Post: React.FC<PostProps> = ({
     group_id,
     creator_id,
     creator_display_name,
-    title,
     image_path,
     content,
     num_of_comments,
@@ -36,10 +33,9 @@ const Post: React.FC<PostProps> = ({
 }) => {
     return (
         <>
-            <PostHeader headerText={title} creatorDisplayName={creator_display_name} creatorId={creator_id}/>
+            <PostHeader creatorDisplayName={creator_display_name} creatorId={creator_id} creationDate={creation_date}/>
             <PostContent text={content}/>
             <PostActions likes={likes} dislikes={dislikes} numOfComments={num_of_comments} />
-            <PostTimestamp time={creation_date}/>
         </>
 
     )

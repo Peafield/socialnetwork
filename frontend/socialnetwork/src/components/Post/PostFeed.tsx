@@ -59,7 +59,6 @@ const PostFeed: React.FC = () => {
                                 group_id={modalPost.group_id}
                                 creator_id={modalPost.creator_id}
                                 creator_display_name={modalPost.creator_display_name}
-                                title={modalPost.title}
                                 image_path={modalPost.image_path}
                                 content={modalPost.content}
                                 num_of_comments={modalPost.num_of_comments}
@@ -89,7 +88,6 @@ const PostFeed: React.FC = () => {
                                 group_id={postProps.group_id}
                                 creator_id={postProps.creator_id}
                                 creator_display_name={postProps.creator_display_name}
-                                title={postProps.title}
                                 image_path={postProps.image_path}
                                 content={postProps.content}
                                 num_of_comments={postProps.num_of_comments}

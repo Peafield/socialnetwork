@@ -1,22 +1,22 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
+import Container from '../Containers/Container'
+import styles from './Post.module.css'
 
 interface PostHeaderProps {
-  headerText: string,
   creatorId: string
   creatorDisplayName: string,
-  //size: number
+  creationDate: number
 }
 
 const PostHeader: React.FC<PostHeaderProps> = ({
-  headerText,
   creatorId,
-  creatorDisplayName
+  creatorDisplayName,
+  creationDate
 }) => {
   return (
     <>
-      <div>
-        <h1>{headerText}</h1>
+      <div className={styles.postheadercontainer}>
         <Link to={"/dashboard/user/" + creatorDisplayName} >{creatorDisplayName}</Link>
       </div>
     </>

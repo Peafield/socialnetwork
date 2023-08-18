@@ -35,7 +35,7 @@ func InsertInvitation(db *sql.DB, groupId, userId string, isInvited bool) error 
 		if err != nil {
 			return err
 		}
-		err = crud.InteractWithDatabase(db, Stmnt, Values...)
+		err = crud.InteractWithDatabase(db, Stmnt, Values)
 		if err != nil {
 			return err
 		}
@@ -81,7 +81,7 @@ func DeleteInvitation(db *sql.DB, userId, groupId string) error {
 	}
 
 	//Prompt DELETE query
-	err = crud.InteractWithDatabase(db, Stmnt, Values...)
+	err = crud.InteractWithDatabase(db, Stmnt, Values)
 	if err != nil {
 		return err
 	}

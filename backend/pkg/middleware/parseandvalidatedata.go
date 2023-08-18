@@ -3,6 +3,7 @@ package middleware
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"socialnetwork/pkg/models/readwritemodels"
 )
@@ -34,6 +35,7 @@ func ParseAndValidateData(next http.Handler) http.Handler {
 		var data readwritemodels.ReadData
 		err := json.NewDecoder(r.Body).Decode(&data)
 		if r.Method != http.MethodGet && err != nil {
+			fmt.Println(err)
 			http.Error(w, "invalid request payload", http.StatusBadRequest)
 			return
 		}

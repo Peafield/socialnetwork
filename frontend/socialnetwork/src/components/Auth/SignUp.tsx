@@ -5,7 +5,7 @@ import styles from "./Signup.module.css";
 import Container from "../Containers/Container";
 import { useSetUserContextAndCookie } from "../../controllers/SetUserContextAndCookie";
 
-interface FormData {
+interface SignUpFormData {
   email: string;
   display_name: string;
   password: string;
@@ -21,7 +21,7 @@ export default function SignUp() {
   const setUserContextAndCookie = useSetUserContextAndCookie();
   const navigate = useNavigate();
   const [error, setError] = useState<string | null>(null);
-  const [formData, setFormData] = useState<FormData>({
+  const [formData, setFormData] = useState<SignUpFormData>({
     email: "",
     display_name: "",
     password: "",
@@ -33,13 +33,11 @@ export default function SignUp() {
     about_me: "",
   });
 
-  const handleChange = (e: {
-    target: { type?: any; files?: any; name?: any; value?: any };
-  }) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
 
     if (e.target.type === "file") {
-      const file = e.target.files ? e.target.files[0] : null;
+      const file = (e.target as HTMLInputElement)?.files?.[0] || null;
       setFormData((prevState) => ({
         ...prevState,
         avatar_path: file,
@@ -52,9 +50,11 @@ export default function SignUp() {
     }
   };
 
-  const handleSubmit = async (e: { preventDefault: () => void }) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const data = { data: formData };
+    console.log(formData);
+    
     const options = {
       method: "POST",
       headers: {

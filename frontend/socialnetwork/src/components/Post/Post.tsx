@@ -16,7 +16,7 @@ export interface PostProps {
   privacy_level: number;
   likes: number;
   dislikes: number;
-  creation_date: number;
+  creation_date: string;
 }
 
 const Post: React.FC<PostProps> = ({
@@ -73,7 +73,7 @@ const Post: React.FC<PostProps> = ({
     };
 
     fetchData(); // Call the async function
-  }, []);
+  }, [creator_id]);
   return (
     <>
       {userData ? (
@@ -83,6 +83,7 @@ const Post: React.FC<PostProps> = ({
             creatorId={creator_id}
             creationDate={creation_date}
             creatorAvatar={userData.avatar}
+            postPrivacyLevel={privacy_level}
           />
           <PostContent text={content} />
           <PostActions

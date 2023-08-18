@@ -1,4 +1,4 @@
-package routecontrollers
+package groupcontrollers
 
 import (
 	"database/sql"
@@ -12,7 +12,7 @@ import (
 
 const (
 	groupInsertStmnt = `INSERT INTO Groups (group_id, title, description, creator_id) VALUES (?, ?, ?, ?)`
-	groupUpdateStmnt = `UPDATE Groups (title, description) VALUES (?, ?)`
+	groupUpdateStmnt = `UPDATE Groups SET title = ?, description = ? WHERE group_id = ?`
 	groupSelectStmnt = `SELECT * FROM Groups WHERE group_id = ?`
 
 	groupDeleteStatements = `
@@ -72,16 +72,9 @@ func SelectGroup(db *sql.DB, userId string, Conditions map[string]interface{}) (
 
 	// Check User/Group relationship
 	// If user isn't allowed access to group then return an error
-	isCreator, err := dbutils.IsGroupCreator(db, userId, groupId)
-	if err != nil {
-		return nil, fmt.Errorf("problem querying user/group relationship at SelectGroup: %v", err)
-	}
-	isMember, err := dbutils.IsGroupMember(db, userId, groupId)
-	if err != nil {
-		return nil, fmt.Errorf("problem querying user/group relationship at SelectGroup: %v", err)
-	}
+	isCreator := dbutils.IsGroupCreator(db, userId, groupId)
+	isMember := dbutils.DoesGroupRowExist(db, "Groups_Members", userId, groupId)
 
-	//if client isn't related to the group in question
 	if !isMember && !isCreator {
 		return nil, errors.New("user has no rights to access group in question")
 	}
@@ -107,13 +100,13 @@ func UpdateGroup(db *sql.DB, userId, groupId string, AffectedColumns map[string]
 
 	//check whether the map meets the expected parameters
 	expectedParameters := []string{"title", "description"}
-	invalid := helpers.UndesiredParam(AffectedColumns, expectedParameters)
-	if invalid {
+	found := helpers.FoundParameters(AffectedColumns, expectedParameters)
+	if !found {
 		return fmt.Errorf("expected parameters = %v \nreceived = %v  at UpdateGroup", expectedParameters, AffectedColumns)
 	}
 
 	//prepare the arguments for InteractWithDatabase
-	Values := []interface{}{AffectedColumns["title"], AffectedColumns["description"]}
+	Values := []interface{}{AffectedColumns["title"], AffectedColumns["description"], groupId}
 	Stmnt, err := db.Prepare(groupUpdateStmnt)
 	if err != nil {
 		return err
@@ -131,8 +124,8 @@ func UpdateGroup(db *sql.DB, userId, groupId string, AffectedColumns map[string]
 /**/
 func DeleteGroup(db *sql.DB, userId, groupId string) error {
 
-	isCreator, err := dbutils.IsGroupCreator(db, userId, groupId)
-	if !isCreator || err != nil {
+	isCreator := dbutils.IsGroupCreator(db, userId, groupId)
+	if !isCreator {
 		return errors.New("user doesn't have permission to delete group")
 	}
 

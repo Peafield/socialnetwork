@@ -3,7 +3,7 @@ package routehandlers
 import (
 	"log"
 	"net/http"
-	"socialnetwork/pkg/controllers/routecontrollers"
+	"socialnetwork/pkg/controllers"
 	"socialnetwork/pkg/db/dbutils"
 	"socialnetwork/pkg/middleware"
 	"socialnetwork/pkg/models/readwritemodels"
@@ -23,7 +23,7 @@ func SignOutHandler(w http.ResponseWriter, r *http.Request) {
 
 	affectedColumns := make(map[string]interface{})
 	affectedColumns["is_logged_in"] = 0
-	err := routecontrollers.SignOutUser(dbutils.DB, userInfo.UserId, affectedColumns)
+	err := controllers.SignOutUser(dbutils.DB, userInfo.UserId, affectedColumns)
 
 	if err != nil {
 		log.Println("Error signing out user: ", err)

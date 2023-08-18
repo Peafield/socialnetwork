@@ -14,14 +14,14 @@ func MapKeyContains(m map[string]interface{}, values []string) bool {
 	return false
 }
 
-func UndesiredParam(m map[string]interface{}, expectedParameters []string) bool {
-	for _, v := range expectedParameters {
+func FoundParameters(m map[string]interface{}, params []string) bool {
+	for _, v := range params {
 		_, exists := m[v]
 		if !exists {
-			return true
+			return false
 		}
 	}
-	return false
+	return true
 }
 
 /*

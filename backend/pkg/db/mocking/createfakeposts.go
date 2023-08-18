@@ -10,6 +10,7 @@ import (
 	postcontrollers "socialnetwork/pkg/controllers/PostControllers"
 	crud "socialnetwork/pkg/db/CRUD"
 	"socialnetwork/pkg/models/dbmodels"
+	"strings"
 )
 
 func CreateFakePosts(db *sql.DB) error {
@@ -57,6 +58,8 @@ func ContentGenerator() string {
 	if err != nil {
 		log.Fatal(err)
 	}
+	s := string(body)
+	pos := strings.Index(s, ".")
 
-	return string(body)
+	return s[pos+1:]
 }

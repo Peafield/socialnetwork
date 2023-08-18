@@ -34,7 +34,6 @@ func CreateFakeUsers(db *sql.DB) error {
 		formData["display_name"] = fakeNameData.UserName
 
 		formData["dob"] = fakeNameData.BirthData
-		formData["avatar_path"] = "path/to/avatar"
 		formData["about_me"] = fmt.Sprintf("Hi my name is %s! I'm excited to meet you", fakeNameData.Name)
 
 		_, err := usercontrollers.RegisterUser(formData, db, dbstatements.InsertUserStmt)

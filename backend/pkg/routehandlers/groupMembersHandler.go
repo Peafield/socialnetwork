@@ -3,7 +3,7 @@ package routehandlers
 import (
 	"encoding/json"
 	"net/http"
-	"socialnetwork/pkg/controllers/routecontrollers"
+	groupcontrollers "socialnetwork/pkg/controllers/GroupControllers"
 	"socialnetwork/pkg/db/dbutils"
 	"socialnetwork/pkg/helpers"
 	"socialnetwork/pkg/middleware"
@@ -58,7 +58,7 @@ func NewGroupMember(w http.ResponseWriter, r *http.Request) {
 
 	groupId := groupData.Data["group_id"].(string)
 
-	err := routecontrollers.InsertMember(dbutils.DB, userInfo.UserId, groupId)
+	err := groupcontrollers.InsertMember(dbutils.DB, userInfo.UserId, groupId)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -85,13 +85,12 @@ func GetGroupMember(w http.ResponseWriter, r *http.Request) {
 	}
 
 	//sanitize data
-	result, err := routecontrollers.SelectMember(dbutils.DB, userInfo.UserId, groupData.Data)
+	result, err := groupcontrollers.SelectMember(dbutils.DB, userInfo.UserId, groupData.Data)
 
 	if err != nil {
 		http.Error(w, "Failed to GET Member", http.StatusInternalServerError)
 	}
 
-	//redirect or send Json response?
 	//add token to response type, marshal and send back
 	response := readwritemodels.WriteData{
 		Status: "success",
@@ -128,17 +127,14 @@ func UpdateGroupMember(w http.ResponseWriter, r *http.Request) {
 	}
 
 	//check whether the map's keys match the expected parameters
-	expectedParams := []string{"group_id", "user_id"}
+	expectedParams := []string{"group_id", "user_id", "permission_level"}
 	found := helpers.FoundParameters(groupData.Data, expectedParams)
 	if !found {
 		http.Error(w, "expected parameters not found in UpdateGroupMember", http.StatusBadRequest)
 		return
 	}
 
-	groupId := groupData.Data["group_id"].(string)
-	memberId := groupData.Data["user_id"].(string)
-
-	err := routecontrollers.UpdateMember(dbutils.DB, userInfo.UserId, memberId, groupId)
+	err := groupcontrollers.UpdateMember(dbutils.DB, userInfo.UserId, groupData.Data)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
@@ -168,15 +164,18 @@ func DeleteGroupMember(w http.ResponseWriter, r *http.Request) {
 	expectedParams := []string{"group_id", "user_id"}
 	found := helpers.FoundParameters(groupData.Data, expectedParams)
 	if !found {
-		http.Error(w, "expected parameters not found in UpdateGroupMember", http.StatusBadRequest)
+		http.Error(w, "expected parameters not found in DeleteGroupMember", http.StatusBadRequest)
 		return
 	}
 
 	groupId := groupData.Data["group_id"].(string)
 	memberId := groupData.Data["user_id"].(string)
 
-	err := routecontrollers.DeleteMember(dbutils.DB, userInfo.UserId, memberId, groupId)
+	err := groupcontrollers.DeleteMember(dbutils.DB, userInfo.UserId, memberId, groupId)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
+
+	w.WriteHeader(http.StatusOK)
+
 }

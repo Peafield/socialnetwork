@@ -5,7 +5,7 @@ import (
 	"fmt"
 )
 
-func DoesRowExist(db *sql.DB, tableName, userId, groupId string) bool {
+func DoesGroupRowExist(db *sql.DB, tableName, userId, groupId string) bool {
 
 	var exists bool
 
@@ -43,4 +43,30 @@ func IsPermitted(db *sql.DB, userId, groupId, tableName string) (bool, error) {
 	}
 
 	return exists, nil
+}
+
+func IsEventCreator(db *sql.DB, userId, eventId string) bool {
+	var exists bool
+
+	query := "SELECT EXISTS(SELECT 1 FROM Groups_Events WHERE creator_id = ? AND event_id = ?)"
+
+	err := db.QueryRow(query, userId, eventId).Scan(&exists)
+	if err != nil {
+		return false
+	}
+
+	return exists
+}
+
+func IsEventAttendee(db *sql.DB, userId, eventId string) bool {
+	var exists bool
+
+	query := "SELECT EXISTS(SELECT 1 FROM Groups_Events_Attendees WHERE attendee_id = ? AND event_id = ?)"
+
+	err := db.QueryRow(query, userId, eventId).Scan(&exists)
+	if err != nil {
+		return false
+	}
+
+	return exists
 }

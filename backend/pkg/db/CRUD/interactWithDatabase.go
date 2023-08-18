@@ -31,9 +31,6 @@ import (
 //	    log.Fatal(err)
 //	}
 func InteractWithDatabase(db *sql.DB, statement *sql.Stmt, args ...interface{}) error {
-
-	defer statement.Close()
-
 	result, err := statement.Exec(args...)
 	if err != nil {
 		return fmt.Errorf("failed to execute statement: %w", err)

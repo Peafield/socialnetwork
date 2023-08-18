@@ -1,4 +1,4 @@
-package routecontrollers
+package groupcontrollers
 
 import (
 	"database/sql"
@@ -15,7 +15,7 @@ const (
 	`
 	oneMemberSelectStmnt = `SELECT * FROM Groups_Members WHERE group_id = ? AND user_id = ?`
 	allMemberSelectStmnt = `SELECT * FROM Groups_Members WHERE group_id = ?`
-	memberUpdateStmnt    = `UPDATE Groups_Members SET`
+	memberUpdateStmnt    = `UPDATE Groups_Members SET permission_level = ? WHERE group_id = ? AND user_id = ?`
 	memberDeleteStmnt    = `DELETE FROM Groups_Members WHERE group_id = ? AND user_id = ?`
 )
 
@@ -23,8 +23,8 @@ func InsertMember(db *sql.DB, userId string, groupId string) error {
 
 	//check whether user has already received an invitation from the specified group#
 	//or whether the user is already a member
-	isInvited := dbutils.DoesRowExist(db, "Groups_Invitations", userId, groupId)
-	isMember := dbutils.DoesRowExist(db, "Groups_Members", userId, groupId)
+	isInvited := dbutils.DoesGroupRowExist(db, "Groups_Invitations", userId, groupId)
+	isMember := dbutils.DoesGroupRowExist(db, "Groups_Members", userId, groupId)
 
 	if !isInvited && !isMember {
 		return fmt.Errorf("no invitation found for the user in relation to the requested group")
@@ -75,7 +75,7 @@ func SelectMember(db *sql.DB, groupId string, Conditions map[string]interface{})
 }
 
 // this one might be useless
-func UpdateMember(db *sql.DB, adminId, memberId, groupId string) error {
+func UpdateMember(db *sql.DB, adminId string, AffectedColumns map[string]interface{}) error {
 	//UpdateMember involves modifying the state of a member in the group by an admin
 	//might focus on transfering ownership to other members by the owner himself
 	//might involve the promotion or demotion of a member by the owner himself
@@ -84,13 +84,22 @@ func UpdateMember(db *sql.DB, adminId, memberId, groupId string) error {
 	//if the permission	is == 0 => return an error
 
 	//if the permission level is > 0
-	isCreator := dbutils.IsGroupCreator(db, adminId, groupId)
+	isCreator := dbutils.IsGroupCreator(db, adminId, AffectedColumns["group_id"].(string))
 	if !isCreator {
 		return errors.New("user doesn't have permissions to update members")
 	}
-	//  if adminId != memberId {
-	// 	return errors.New("user doesn't have permissions to update members")
-	// }
+
+	Values := []interface{}{AffectedColumns["permission_level"], AffectedColumns["group_id"], AffectedColumns["user_id"]}
+	Stmnt, err := db.Prepare(memberUpdateStmnt)
+	if err != nil {
+		return err
+	}
+
+	err = crud.InteractWithDatabase(db, Stmnt, Values...)
+	if err != nil {
+		return err
+	}
+	//must be able to transfer ownership to someone else
 
 	return nil
 }

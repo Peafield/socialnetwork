@@ -1,5 +1,6 @@
 CREATE TABLE Groups_Events (
-  event_id TEXT UNIQUE NOT NULL PRIMARY KEY,
+-- PRIMARY KEY = NOT NULL + UNIQUE
+  event_id TEXT PRIMARY KEY,
   group_id TEXT NOT NULL,
   creator_id TEXT NOT NULL,
   title TEXT NOT NULL,

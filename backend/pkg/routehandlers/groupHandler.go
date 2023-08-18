@@ -3,7 +3,7 @@ package routehandlers
 import (
 	"encoding/json"
 	"net/http"
-	"socialnetwork/pkg/controllers/routecontrollers"
+	groupcontrollers "socialnetwork/pkg/controllers/GroupControllers"
 	"socialnetwork/pkg/db/dbutils"
 	"socialnetwork/pkg/middleware"
 	"socialnetwork/pkg/models/readwritemodels"
@@ -43,12 +43,12 @@ func NewGroup(w http.ResponseWriter, r *http.Request) {
 
 	groupData, ok := r.Context().Value(middleware.DataKey).(readwritemodels.ReadData)
 	if !ok {
-		http.Error(w, "failed to read form data from context", http.StatusInternalServerError)
+		http.Error(w, "failed to read data from context", http.StatusInternalServerError)
 		return
 	}
 
 	//sanitize group data: check if columns are correct
-	err := routecontrollers.InsertGroup(dbutils.DB, userInfo.UserId, groupData.Data)
+	err := groupcontrollers.InsertGroup(dbutils.DB, userInfo.UserId, groupData.Data)
 
 	if err != nil {
 		http.Error(w, "Failed to create a group", http.StatusInternalServerError)
@@ -78,7 +78,7 @@ func GetGroup(w http.ResponseWriter, r *http.Request) {
 	}
 
 	//sanitize data
-	result, err := routecontrollers.SelectGroup(dbutils.DB, userInfo.UserId, groupData.Data)
+	result, err := groupcontrollers.SelectGroup(dbutils.DB, userInfo.UserId, groupData.Data)
 
 	if err != nil {
 		http.Error(w, "Failed to GET group", http.StatusInternalServerError)
@@ -106,8 +106,31 @@ Implements the UPDATE method for the "/groups" endpoint.
 This function will UPDATE a group in the database if user has the adequate permissions.
 */
 func UpdateGroup(w http.ResponseWriter, r *http.Request) {
-	// check if the user has the necessary permissions to get the group
+	userInfo, ok := r.Context().Value(middleware.UserDataKey).(readwritemodels.Payload)
+	if !ok {
+		http.Error(w, "failed to read user data from context", http.StatusInternalServerError)
+		return
+	}
 
+	groupData, ok := r.Context().Value(middleware.DataKey).(readwritemodels.ReadData)
+	if !ok {
+		http.Error(w, "failed to read form data from context", http.StatusInternalServerError)
+		return
+	}
+
+	groupId, ok := groupData.Data["group_id"].(string)
+	if !ok {
+		http.Error(w, "wrong data received for updating group", http.StatusBadRequest)
+		return
+	}
+
+	delete(groupData.Data, "group_id")
+	err := groupcontrollers.UpdateGroup(dbutils.DB, userInfo.UserId, groupId, groupData.Data)
+	if err != nil {
+		http.Error(w, "failed to update group", http.StatusBadRequest)
+		return
+	}
+	w.WriteHeader(http.StatusOK)
 }
 
 /*
@@ -115,5 +138,28 @@ Implements the DELETE method for the "/groups" endpoint.
 This function will DELETE a group from the database if the user has the adequate permissions.
 */
 func DeleteGroup(w http.ResponseWriter, r *http.Request) {
+	userInfo, ok := r.Context().Value(middleware.UserDataKey).(readwritemodels.Payload)
+	if !ok {
+		http.Error(w, "failed to read user data from context", http.StatusInternalServerError)
+		return
+	}
 
+	groupData, ok := r.Context().Value(middleware.DataKey).(readwritemodels.ReadData)
+	if !ok {
+		http.Error(w, "failed to read form data from context", http.StatusInternalServerError)
+		return
+	}
+
+	groupId, ok := groupData.Data["group_id"].(string)
+	if !ok {
+		http.Error(w, "wrong data received for updating group", http.StatusBadRequest)
+		return
+	}
+
+	err := groupcontrollers.DeleteGroup(dbutils.DB, userInfo.UserId, groupId)
+	if err != nil {
+		http.Error(w, "failed to update group", http.StatusBadRequest)
+		return
+	}
+	w.WriteHeader(http.StatusOK)
 }

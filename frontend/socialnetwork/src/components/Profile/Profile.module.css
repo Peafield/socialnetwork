@@ -1,0 +1,39 @@
+.profilepostsgridcontainer {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
+    border-radius: 5px;
+    border: 1mm solid black;
+    width: 80%;
+    height: 80%;
+    overflow-y: auto;
+}
+
+.postcontainer {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    border-radius: 5px;
+    border: 1mm solid black;
+    width: 90%;
+    margin: 10px;
+    z-index: 0;
+}
+
+.profilecontainer {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    border-radius: 5px;
+    border: 1mm solid black;
+    width: 90%;
+    height: 100%;
+    margin: 10px;
+    z-index: 0;
+}

@@ -3,7 +3,7 @@ package routehandlers
 import (
 	"encoding/json"
 	"net/http"
-	"socialnetwork/pkg/controllers"
+	commentcontrollers "socialnetwork/pkg/controllers/CommentControllers"
 	"socialnetwork/pkg/db/dbutils"
 	"socialnetwork/pkg/middleware"
 	"socialnetwork/pkg/models/readwritemodels"
@@ -82,7 +82,7 @@ func NewComment(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err := controllers.InsertComment(dbutils.DB, userData.UserId, newCommentData.Data)
+	err := commentcontrollers.InsertComment(dbutils.DB, userData.UserId, newCommentData.Data)
 	if err != nil {
 		http.Error(w, "failed to insert post data", http.StatusInternalServerError)
 		return
@@ -110,7 +110,7 @@ func PostComments(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	postComments, err := controllers.SelectPostComments(dbutils.DB, postIDData.Data["post_id"].(string))
+	postComments, err := commentcontrollers.SelectPostComments(dbutils.DB, postIDData.Data["post_id"].(string))
 	if err != nil {
 		http.Error(w, "failed to select post's comments", http.StatusInternalServerError)
 		return
@@ -159,7 +159,7 @@ func UpdateComment(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err := controllers.UpdateUserComment(dbutils.DB, userData.UserId, updateCommentData.Data)
+	err := commentcontrollers.UpdateUserComment(dbutils.DB, userData.UserId, updateCommentData.Data)
 	if err != nil {
 		http.Error(w, "failed to update user comment", http.StatusInternalServerError)
 		return
@@ -195,7 +195,7 @@ func DeleteComment(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err := controllers.DeleteUserComment(dbutils.DB, userData.UserId, deleteCommentData.Data["comment_id"].(string))
+	err := commentcontrollers.DeleteUserComment(dbutils.DB, userData.UserId, deleteCommentData.Data["comment_id"].(string))
 	if err != nil {
 		http.Error(w, "failed to delete user comment", http.StatusInternalServerError)
 		return

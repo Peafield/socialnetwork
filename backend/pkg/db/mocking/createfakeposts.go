@@ -7,7 +7,7 @@ import (
 	"log"
 	"math/rand"
 	"net/http"
-	"socialnetwork/pkg/controllers"
+	postcontrollers "socialnetwork/pkg/controllers/PostControllers"
 	crud "socialnetwork/pkg/db/CRUD"
 	"socialnetwork/pkg/models/dbmodels"
 	"strings"
@@ -39,7 +39,7 @@ func CreateFakePosts(db *sql.DB) error {
 		postData["title"] = strings.Join(strings.Split(content, " ")[:6], " ")
 		postData["privacy_level"] = rand.Intn(3)
 
-		err := controllers.InsertPost(db, userIds[i-1], postData)
+		err := postcontrollers.InsertPost(db, userIds[i-1], postData)
 		if err != nil {
 			return fmt.Errorf("failed to insert mock post data: %w", err)
 		}

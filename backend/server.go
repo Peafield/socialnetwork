@@ -14,6 +14,7 @@ import (
 	"socialnetwork/pkg/routehandlers"
 	"time"
 
+	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
 )
 
@@ -76,6 +77,14 @@ func main() {
 			defer dbstatements.CloseDBStatements()
 		}
 
+		reset := func() {
+			err := controllers.SignOutAllUsers(dbutils.DB)
+			if err != nil {
+				log.Fatalf("error signing out all users: %s", err)
+			}
+		}
+		reset()
+
 	}
 
 	if *dbup {
@@ -119,14 +128,16 @@ func main() {
 		}
 	}
 
-	/*ON SERVER RESTART*/
-	err := controllers.SignOutAllUsers(dbutils.DB)
-	if err != nil {
-		log.Fatalf("error signing out all users: %s", err)
-	}
-
 	/*SERVER SETTINGS*/
 	r := mux.NewRouter()
+
+	headersOk := handlers.AllowedHeaders([]string{"X-Requested-With", "Accept", "Content-Type", "Authorization"})
+	originsOk := handlers.AllowedOrigins([]string{"*"})
+	methodsOk := handlers.AllowedMethods([]string{"GET", "HEAD", "POST", "PUT", "OPTIONS"})
+
+	// Attach CORS middleware to your router
+	r.Use(handlers.CORS(originsOk, headersOk, methodsOk))
+
 	srv := &http.Server{
 		Handler:      r,
 		Addr:         "localhost:8080",
@@ -135,9 +146,9 @@ func main() {
 	}
 
 	/*AUTH ENDPOINTS*/
-	r.Handle("/signup", middleware.ParseAndValidateData(http.HandlerFunc(routehandlers.SignUpHandler))).Methods("POST")
-	r.Handle("/signin", middleware.ParseAndValidateData(http.HandlerFunc(routehandlers.SignInHandler))).Methods("POST")
-	r.Handle("/signout", middleware.ValidateTokenMiddleware(http.HandlerFunc(routehandlers.SignOutHandler))).Methods("POST")
+	r.Handle("/signup", middleware.ParseAndValidateData(http.HandlerFunc(routehandlers.SignUpHandler)))
+	r.Handle("/signin", middleware.ParseAndValidateData(http.HandlerFunc(routehandlers.SignInHandler)))
+	r.Handle("/signout", middleware.ValidateTokenMiddleware(http.HandlerFunc(routehandlers.SignOutHandler)))
 
 	/*END POINTS*/
 	r.Handle("/user", middleware.ValidateTokenMiddleware(middleware.ParseAndValidateData(http.HandlerFunc(routehandlers.UserHandler))))

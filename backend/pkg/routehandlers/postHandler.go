@@ -3,9 +3,10 @@ package routehandlers
 import (
 	"encoding/json"
 	"net/http"
-	"socialnetwork/pkg/controllers"
+	postcontrollers "socialnetwork/pkg/controllers/PostControllers"
 	"socialnetwork/pkg/db/dbutils"
 	"socialnetwork/pkg/middleware"
+	"socialnetwork/pkg/models/dbmodels"
 	"socialnetwork/pkg/models/readwritemodels"
 )
 
@@ -83,7 +84,7 @@ func NewPost(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err := controllers.InsertPost(dbutils.DB, userData.UserId, newPostData.Data)
+	err := postcontrollers.InsertPost(dbutils.DB, userData.UserId, newPostData.Data)
 	if err != nil {
 		http.Error(w, "failed to insert post data", http.StatusInternalServerError)
 		return
@@ -112,10 +113,23 @@ func UserPosts(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	userPosts, err := controllers.SelectUserViewablePosts(dbutils.DB, userInfo.UserId)
-	if err != nil {
-		http.Error(w, "failed to select user viewable posts", http.StatusInternalServerError)
-		return
+	specificUserId := r.URL.Query().Get("user_id")
+
+	var userPosts *dbmodels.Posts
+	var err error
+
+	if specificUserId == "" {
+		userPosts, err = postcontrollers.SelectUserViewablePosts(dbutils.DB, userInfo.UserId)
+		if err != nil {
+			http.Error(w, "failed to select user viewable posts", http.StatusInternalServerError)
+			return
+		}
+	} else {
+		userPosts, err = postcontrollers.SelectSpecificUserPosts(dbutils.DB, userInfo.UserId, specificUserId)
+		if err != nil {
+			http.Error(w, "failed to select specific user posts", http.StatusInternalServerError)
+			return
+		}
 	}
 
 	response := readwritemodels.WriteData{
@@ -160,7 +174,7 @@ func UpdatePost(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err := controllers.UpdateUserPost(dbutils.DB, userData.UserId, updatePostData.Data)
+	err := postcontrollers.UpdateUserPost(dbutils.DB, userData.UserId, updatePostData.Data)
 	if err != nil {
 		http.Error(w, "failed to update user post", http.StatusInternalServerError)
 		return
@@ -196,7 +210,7 @@ func DeletePost(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err := controllers.DeleteUserPost(dbutils.DB, userData.UserId, deletePostData.Data["post_id"].(string))
+	err := postcontrollers.DeleteUserPost(dbutils.DB, userData.UserId, deletePostData.Data["post_id"].(string))
 	if err != nil {
 		http.Error(w, "failed to delete user post", http.StatusInternalServerError)
 		return

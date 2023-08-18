@@ -3,8 +3,10 @@ package routehandlers
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
 	"net/http"
 	"socialnetwork/pkg/controllers"
+	usercontrollers "socialnetwork/pkg/controllers/UserControllers"
 	"socialnetwork/pkg/db/dbstatements"
 	"socialnetwork/pkg/db/dbutils"
 	"socialnetwork/pkg/middleware"
@@ -77,11 +79,12 @@ func SignUpHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	user, err := controllers.RegisterUser(formData.Data, dbutils.DB, dbstatements.InsertUserStmt)
+	user, err := usercontrollers.RegisterUser(formData.Data, dbutils.DB, dbstatements.InsertUserStmt)
 	if err != nil {
 		if errors.Is(err, ErrUserExists) {
 			http.Error(w, "user display name or email already in use", http.StatusBadRequest)
 		} else {
+			fmt.Println(err)
 			http.Error(w, "failed to reigster user", http.StatusInternalServerError)
 		}
 		return

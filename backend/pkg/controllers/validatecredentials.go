@@ -33,6 +33,7 @@ Errors:
 */
 func ValidateCredentials(formData map[string]interface{}, db *sql.DB) (*dbmodels.User, error) {
 	// Email
+
 	username_email, ok := formData["username_email"].(string)
 	if !ok {
 		return nil, fmt.Errorf("username_email is not a string")

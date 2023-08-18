@@ -2,7 +2,7 @@ package routehandlers
 
 import (
 	"net/http"
-	"socialnetwork/pkg/controllers"
+	postselectedfollowercontrollers "socialnetwork/pkg/controllers/PostSelectedFollowerControllers"
 	"socialnetwork/pkg/db/dbutils"
 	"socialnetwork/pkg/middleware"
 	"socialnetwork/pkg/models/readwritemodels"
@@ -83,7 +83,7 @@ func NewPostSelectedFollowerHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err := controllers.NewPostSelectedFollower(dbutils.DB, userData.UserId, newPostSelectedFollowerData.Data)
+	err := postselectedfollowercontrollers.NewPostSelectedFollower(dbutils.DB, userData.UserId, newPostSelectedFollowerData.Data)
 	if err != nil {
 		http.Error(w, "failed to insert new post selected follower", http.StatusInternalServerError)
 		return
@@ -143,7 +143,7 @@ func DeletePostSelectedFollowerHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err := controllers.DeletePostSelectedFollower(dbutils.DB, userData.UserId, deletePostSelectedFollowerData.Data)
+	err := postselectedfollowercontrollers.DeletePostSelectedFollower(dbutils.DB, userData.UserId, deletePostSelectedFollowerData.Data)
 	if err != nil {
 		http.Error(w, "failed to delete post selected follower", http.StatusInternalServerError)
 		return

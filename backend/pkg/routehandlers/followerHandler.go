@@ -2,7 +2,7 @@ package routehandlers
 
 import (
 	"net/http"
-	"socialnetwork/pkg/controllers"
+	followercontrollers "socialnetwork/pkg/controllers/FollowerControllers"
 	"socialnetwork/pkg/db/dbutils"
 	"socialnetwork/pkg/middleware"
 	"socialnetwork/pkg/models/readwritemodels"
@@ -82,7 +82,7 @@ func NewFollowerHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err := controllers.FollowUser(dbutils.DB, userData.UserId, postFollowerData.Data)
+	err := followercontrollers.FollowUser(dbutils.DB, userData.UserId, postFollowerData.Data)
 	if err != nil {
 		http.Error(w, "failed to follow user", http.StatusInternalServerError)
 		return
@@ -108,7 +108,7 @@ func UpdateFollowerHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err := controllers.UpdateFollowStatus(dbutils.DB, userData.UserId, updateFollowerData.Data)
+	err := followercontrollers.UpdateFollowStatus(dbutils.DB, userData.UserId, updateFollowerData.Data)
 	if err != nil {
 		http.Error(w, "failed to update follower status", http.StatusInternalServerError)
 		return
@@ -144,7 +144,7 @@ func DeleteFollowerHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err := controllers.UnfollowUser(dbutils.DB, userData.UserId, deleteFollowerData.Data)
+	err := followercontrollers.UnfollowUser(dbutils.DB, userData.UserId, deleteFollowerData.Data)
 	if err != nil {
 		http.Error(w, "failed to delete follower", http.StatusInternalServerError)
 		return

@@ -1,8 +1,9 @@
 package routehandlers
 
 import (
+	"encoding/json"
 	"net/http"
-	"socialnetwork/pkg/controllers"
+	usercontrollers "socialnetwork/pkg/controllers/UserControllers"
 	"socialnetwork/pkg/db/dbutils"
 	"socialnetwork/pkg/middleware"
 	"socialnetwork/pkg/models/readwritemodels"
@@ -37,12 +38,8 @@ func UserHandler(w http.ResponseWriter, r *http.Request) {
 	method := r.Method
 	switch method {
 	case http.MethodGet:
-		// if r.URL.Query().Get("getAll") == "true" {
-		// 	GetAllUsers(w, r)
-		// } else {
-		// 	GetSingleUser(w, r)
-		// }
-		// return
+		GetUserHandler(w, r)
+		return
 	case http.MethodPut:
 		UpdateUserHandler(w, r)
 		return
@@ -52,6 +49,38 @@ func UserHandler(w http.ResponseWriter, r *http.Request) {
 	default:
 		http.Error(w, "invalid method", http.StatusBadRequest)
 		return
+	}
+}
+
+func GetUserHandler(w http.ResponseWriter, r *http.Request) {
+	userData, ok := r.Context().Value(middleware.UserDataKey).(readwritemodels.Payload)
+	if !ok {
+		http.Error(w, "failed to read user data from context", http.StatusInternalServerError)
+		return
+	}
+
+	specificUserDisplayName := r.URL.Query().Get("displayName")
+
+	if specificUserDisplayName == "" {
+		//get all users?
+	} else {
+		user, err := usercontrollers.GetUser(dbutils.DB, userData.UserId, specificUserDisplayName)
+		if err != nil {
+			http.Error(w, "failed to get specific user data", http.StatusInternalServerError)
+		}
+
+		response := readwritemodels.WriteData{
+			Status: "success",
+			Data:   user,
+		}
+		jsonReponse, err := json.Marshal(response)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusOK)
+		w.Write(jsonReponse)
 	}
 }
 
@@ -82,7 +111,7 @@ func UpdateUserHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err := controllers.UpdateUserAccount(dbutils.DB, userData.UserId, updateUserData.Data)
+	err := usercontrollers.UpdateUserAccount(dbutils.DB, userData.UserId, updateUserData.Data)
 	if err != nil {
 		http.Error(w, "failed to update user account", http.StatusInternalServerError)
 		return
@@ -119,7 +148,7 @@ func DeleteUserHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err := controllers.DeleteUserAccount(dbutils.DB, userData.UserId, deleteUserData.Data)
+	err := usercontrollers.DeleteUserAccount(dbutils.DB, userData.UserId, deleteUserData.Data)
 	if err != nil {
 		http.Error(w, "failed to delete user account", http.StatusInternalServerError)
 		return

@@ -1,10 +1,11 @@
-import React, { useState, FormEvent, useContext } from "react";
-import { Link } from "react-router-dom";
+import React, { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import { handleAPIRequest } from "../../controllers/Api";
-import { UserContext } from "../../context/AuthContext";
-import styles from "./Auth.module.css"
+import styles from "./Signup.module.css";
+import Container from "../Containers/Container";
+import { useSetUserContextAndCookie } from "../../controllers/SetUserContextAndCookie";
 
-interface FormData {
+interface SignUpFormData {
   email: string;
   display_name: string;
   password: string;
@@ -12,14 +13,15 @@ interface FormData {
   first_name: string;
   last_name: string;
   dob: string;
-  avatar_path: File | null;
+  avatar_path: string;
   about_me: string;
 }
 
 export default function SignUp() {
-  const userContext = useContext(UserContext); // Use the useContext hook
+  const setUserContextAndCookie = useSetUserContextAndCookie();
+  const navigate = useNavigate();
   const [error, setError] = useState<string | null>(null);
-  const [formData, setFormData] = useState<FormData>({
+  const [formData, setFormData] = useState<SignUpFormData>({
     email: "",
     display_name: "",
     password: "",
@@ -27,177 +29,187 @@ export default function SignUp() {
     first_name: "",
     last_name: "",
     dob: "",
-    avatar_path: null,
+    avatar_path: "",
     about_me: "",
   });
 
-  const handleChange = (e: { target: { type?: any; files?: any; name?: any; value?: any; }; }) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
 
-    if (name === "password" || name === "confirmPassword") {
-      if (formData.password !== formData.confirmPassword) {
-        alert("passwords do not match!");
-        return;
-      }
-    }
-
     if (e.target.type === "file") {
-      const file = e.target.files ? e.target.files[0] : null;
-      setFormData(prevState => ({
-          ...prevState,
-          avatar_path: file
-      }));
+      const file = (e.target as HTMLInputElement)?.files?.[0] || null;
+      if (file) {
+        const reader = new FileReader();
+        reader.onloadend = () => {
+          setFormData((prevState) => ({
+            ...prevState,
+            avatar_path: reader.result as string,
+          }));
+        }
+        reader.readAsDataURL(file)
+      }
 
-    }
-    if (name !== "confirmPassword") {
-      setFormData(prevState => ({
+    } else {
+      setFormData((prevState) => ({
         ...prevState,
         [name]: value,
       }));
     }
   };
 
-  const HandleSubmit = async (e: FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    const data = { data: formData };
+    console.log(formData);
 
-    const data = formData;
     const options = {
       method: "POST",
       headers: {
-        "Content-Type": "application/json"
+        "Content-Type": "application/json",
       },
-      body: JSON.stringify(data)
+      body: JSON.stringify(data),
     };
     try {
       const response = await handleAPIRequest("/signup", options);
-      const user = {
-        usernameEmail: data.email,
-        authToken: response.Data.token,
-      };
-
-      userContext.setUser(user);
+      if (response && response.status === "success") {
+        setUserContextAndCookie(response.data);
+        navigate("/dashboard");
+      }
     } catch (error) {
-        if (error instanceof Error) {
-            setError(error.message);
-        } else {
-            setError('An unexpected error occurred.');
-        }
+      if (error instanceof Error) {
+        setError(error.message);
+      } else {
+        setError("An unexpected error occurred.");
+      }
     }
-};
+  };
 
   return (
-    <>
-      <div className={styles.authContainer}>
-      <h2 className={styles.h2}>Sign Up</h2>
-        <form onSubmit={HandleSubmit}>
-          <div className={styles.inputGroup}>
-            <label className={styles.label} htmlFor="email">Email:</label>
-            <input
-            className={styles.input}
-              required
-              type="text"
-              id="email"
-              name="email"
-              value={formData.email}
-              onChange={handleChange}
-            />
-          </div>
-          <div className={styles.inputGroup}>
-            <label htmlFor="display_name">Display Name:</label>
-            <input
-            className={styles.input}
-              required
-              type="text"
-              id="display_name"
-              name="display_name"
-              value={formData.display_name}
-              onChange={handleChange}
-            />
-          </div>
-          <div className={styles.inputGroup}>
-            <label htmlFor="password">Password:</label>
-            <input
-            className={styles.input}
-              required
-              type="password"
-              id="password"
-              name="password"
-              value={formData.password}
-              onChange={handleChange}
-            />
-            <label htmlFor="confirmPassword">Confirm Password:</label>
-            <input
-            className={styles.input}
-              required
-              type="password"
-              id="confirmPassword"
-              name="confirmPassword"
-              value={formData.confirmPassword}
-              onChange={handleChange}
-            />
-          </div>
-          <div className={styles.inputGroup}>
-            <label htmlFor="first_name">First Name:</label>
-            <input
-            className={styles.input}
-              required
-              type="text"
-              id="first_name"
-              name="first_name"
-              value={formData.first_name}
-              onChange={handleChange}
-            />
-          </div>
-          <div className={styles.inputGroup}>
-            <label htmlFor="last_name">Last Name:</label>
-            <input
-            className={styles.input}
-              required
-              type="text"
-              id="last_name"
-              name="last_name"
-              value={formData.last_name}
-              onChange={handleChange}
-            />
-          </div>
-          <div className={styles.inputGroup}>
-            <label htmlFor="dob">Date of Birth:</label>
-            <input
-            className={styles.input}
-              required
-              type="date"
-              id="dob"
-              name="dob"
-              value={formData.dob}
-              onChange={handleChange}
-            />
-          </div>
-          <div className={styles.inputGroup}>
-            <label htmlFor="avatar_path">Profile Picture:</label>
-            <input
-            className={styles.input}
-              type="file"
-              id="avatar_path"
-              name="avatar_path"
-              onChange={handleChange}
-            />
-          </div>
-          <div className={styles.inputGroup}>
-            <label htmlFor="about_me">About Me:</label>
-            <textarea
-              required
-              maxLength={100}
-              placeholder="Tell us about yourself..."
-              id="about_me"
-              name="about_me"
-              value={formData.about_me}
-              onChange={handleChange}
-            />
-          </div>
-          <button className={styles.button} type="submit">Sign Up</button>
-        </form>
-        <Link to="/signin">Already have an account? Sign in</Link>
+    <Container>
+      <div className={styles.suauthcontainer}>
+        <div className={styles.formwrapper}>
+          <h2 className={styles.h2}>Sign Up</h2>
+          <form className={styles.form} onSubmit={handleSubmit}>
+            <div className={styles.inputgrouprow}>
+              <input
+                className={styles.input}
+                placeholder="First name"
+                required
+                type="text"
+                id="first_name"
+                name="first_name"
+                value={formData.first_name}
+                onChange={handleChange}
+              />
+              <input
+                className={styles.input}
+                placeholder="Last name"
+                required
+                type="text"
+                id="last_name"
+                name="last_name"
+                value={formData.last_name}
+                onChange={handleChange}
+              />
+            </div>
+            <div className={styles.inputgroup}>
+              <input
+                className={styles.input}
+                placeholder="Email"
+                required
+                type="text"
+                id="email"
+                name="email"
+                value={formData.email}
+                onChange={handleChange}
+              />
+            </div>
+            <div className={styles.inputgroup}>
+              <input
+                className={styles.input}
+                placeholder="Display Name"
+                required
+                type="text"
+                id="display_name"
+                name="display_name"
+                value={formData.display_name}
+                onChange={handleChange}
+              />
+            </div>
+
+            <div className={styles.inputgroup}>
+              <input
+                className={styles.input}
+                placeholder="Password"
+                required
+                type="password"
+                id="password"
+                name="password"
+                value={formData.password}
+                onChange={handleChange}
+              />
+            </div>
+            <div className={styles.inputgroup}>
+              <input
+                className={styles.input}
+                required
+                placeholder="Confirm Password"
+                type="password"
+                id="confirmPassword"
+                name="confirmPassword"
+                value={formData.confirmPassword}
+                onChange={handleChange}
+              />
+            </div>
+
+            <div className={styles.inputgroup}>
+              <label htmlFor="dob">
+                Date of Birth:
+                <input
+                  className={styles.input}
+                  required
+                  type="date"
+                  id="dob"
+                  name="dob"
+                  value={formData.dob}
+                  onChange={handleChange}
+                />
+              </label>
+            </div>
+            <div className={styles.inputgroup}>
+              <label htmlFor="avatar_path">
+                Profile Picture:
+                <input
+                  className={styles.input}
+                  type="file"
+                  id="avatar_path"
+                  name="avatar_path"
+                  onChange={handleChange}
+                />
+              </label>
+            </div>
+            <div className={styles.inputgroup}>
+              <textarea
+                required
+                maxLength={100}
+                placeholder="Tell us about yourself..."
+                id="about_me"
+                name="about_me"
+                value={formData.about_me}
+                onChange={handleChange}
+              />
+            </div>
+            <div className={styles.inputgroup}>
+              <button className={styles.button} type="submit">
+                Sign Up
+              </button>
+            </div>
+          </form>
+          <Link className={styles.a} to="/signin">
+            Already have an account? Sign in
+          </Link>
+        </div>
       </div>
-    </>
+    </Container>
   );
 }

@@ -7,17 +7,20 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
-	"log"
 	"net/http"
 	"os"
 	crud "socialnetwork/pkg/db/CRUD"
+	"socialnetwork/pkg/db/dbstatements"
 	"socialnetwork/pkg/db/dbutils"
 	"socialnetwork/pkg/models/dbmodels"
 	"socialnetwork/pkg/models/readwritemodels"
 	"strings"
 )
 
-const UserDataKey readwritemodels.ContextKey = iota
+const (
+	UserDataKey readwritemodels.ContextKey = iota
+	DataKey
+)
 
 /*
 ValidateTokenMiddleware is a middleware function that validates a webtoken included in the Authorization header of a http request.
@@ -42,13 +45,13 @@ func ValidateTokenMiddleware(next http.Handler) http.Handler {
 			return
 		}
 
-		headerParts := strings.Split(authorizationHeader, " ")
-		if len(headerParts) != 2 || headerParts[0] != "Bearer" {
+		authType, token, found := strings.Cut(authorizationHeader, " ")
+		if !found || authType != "Bearer" {
 			http.Error(w, "Invalid or missing authorization header", http.StatusUnauthorized)
 			return
 		}
 
-		bearerToken := headerParts[1]
+		bearerToken := token
 
 		validToken, err := VerifyToken(bearerToken)
 		if !validToken || err != nil {
@@ -110,9 +113,6 @@ func VerifyToken(token string) (bool, error) {
 
 	signature := base64.StdEncoding.EncodeToString(h.Sum(nil))
 
-	log.Println(signature)
-	log.Println(splitToken[2])
-
 	if signature != splitToken[2] {
 		return false, nil
 	}
@@ -121,19 +121,16 @@ func VerifyToken(token string) (bool, error) {
 }
 
 func ValidateLoggedInStatus(payload readwritemodels.Payload) error {
-	queryStatement := `
-	SELECT * FROM Users WHERE user_id = ?
-	`
 	queryValues := []interface{}{
 		payload.UserId,
 	}
 
-	userData, err := crud.SelectFromDatabase(dbutils.DB, "Users", queryStatement, queryValues)
+	userData, err := crud.SelectFromDatabase(dbutils.DB, "Users", dbstatements.SelectUserByID, queryValues)
 	if err != nil {
 		return fmt.Errorf("failed to select user in validate logged in status: %w", err)
 	}
 
-	user, ok := userData[0].(dbmodels.User)
+	user, ok := userData[0].(*dbmodels.User)
 	if !ok {
 		return fmt.Errorf("failed to assert user type when validating logged in status")
 	}

@@ -5,8 +5,6 @@ import (
 	"fmt"
 )
 
-const ()
-
 // Prepared insert statements
 var (
 	/*Insert Statements*/
@@ -28,27 +26,20 @@ var (
 	/*Update Statments*/
 	UpdatePostNumOfComments   *sql.Stmt
 	UpdateAllUsersToSignedOut *sql.Stmt
+	UpdateUserLoggedIn        *sql.Stmt
+	UpdateUserLoggedOut       *sql.Stmt
+
+	/*Select Statements*/
+	SelectUserByID          string
+	SelectUserByDisplayName string
 )
 
 func InitDBStatements(db *sql.DB) error {
 	var err error
-	InsertUserStmt, err = db.Prepare(`
-	INSERT INTO Users (
-		user_id,
-		is_logged_in,
-		email,
-		display_name,
-		hashed_password,
-		first_name,
-		last_name, 
-		date_of_birth,
-		avatar_path,
-		about_me
-	) VALUES (
-		?, ?, ?, ?, ?, ?, ?, ?, ?, ?
-	)`)
+
+	err = initUserDBStatements(db)
 	if err != nil {
-		return fmt.Errorf("failed to prepare insert users statement: %w", err)
+		return fmt.Errorf("failed to prepare user statements: %w", err)
 	}
 
 	InsertSessionsStmt, err = db.Prepare(`
@@ -67,15 +58,13 @@ func InitDBStatements(db *sql.DB) error {
 		post_id,
 		group_id,
 		creator_id,
+		creator_display_name,
 		title,
 		image_path,
 		content,
-		num_of_comments,
-		privacy_level,
-		likes,
-		dislikes
+		privacy_level
 	) VALUES (
-		?, ?, ?, ?, ?, ?, ?, ?, ?, ?
+		?, ?, ?, ?, ?, ?, ?, ?
 	)`)
 	if err != nil {
 		return fmt.Errorf("failed to prepare insert posts statement: %w", err)
@@ -242,15 +231,6 @@ func InitDBStatements(db *sql.DB) error {
 		return fmt.Errorf("failed to prepare update number of post comments statement: %w", err)
 	}
 
-	UpdateAllUsersToSignedOut, err = db.Prepare(`
-	UPDATE Users
-	SET is_logged_in = 0
-	WHERE is_logged_in = 1
-	`)
-	if err != nil {
-		return fmt.Errorf("failed to prepare update all users to signed out statement: %w", err)
-	}
-
 	return nil
 }
 
@@ -274,4 +254,76 @@ func CloseDBStatements() {
 	/*Update Statement Closure*/
 	UpdatePostNumOfComments.Close()
 	UpdateAllUsersToSignedOut.Close()
+	UpdateUserLoggedIn.Close()
+	UpdateUserLoggedOut.Close()
+}
+
+func initUserDBStatements(db *sql.DB) error {
+	var err error
+
+	InsertUserStmt, err = db.Prepare(`
+	INSERT INTO Users (
+		user_id,
+		is_logged_in,
+		email,
+		display_name,
+		hashed_password,
+		first_name,
+		last_name, 
+		date_of_birth,
+		avatar_path,
+		about_me
+	) VALUES (
+		?, ?, ?, ?, ?, ?, ?, ?, ?, ?
+	)`)
+	if err != nil {
+		return fmt.Errorf("failed to prepare insert users statement: %w", err)
+	}
+
+	err = initUserUpdateStatements(db)
+	if err != nil {
+		return fmt.Errorf("failed to prepare update users statement: %w", err)
+	}
+
+	initUserSelectStatements()
+
+	return nil
+}
+
+func initUserSelectStatements() {
+	SelectUserByID = `SELECT * FROM Users WHERE user_id = ?`
+	SelectUserByDisplayName = `SELECT * FROM Users WHERE display_name = ?`
+}
+
+func initUserUpdateStatements(db *sql.DB) error {
+	var err error
+
+	UpdateUserLoggedIn, err = db.Prepare(`
+	UPDATE Users
+	SET is_logged_in = 1
+	WHERE user_id = ?
+	`)
+	if err != nil {
+		return fmt.Errorf("failed to prepare update user logged in statement: %w", err)
+	}
+
+	UpdateUserLoggedOut, err = db.Prepare(`
+	UPDATE Users
+	SET is_logged_in = 0
+	WHERE user_id = ?
+	`)
+	if err != nil {
+		return fmt.Errorf("failed to prepare update user logged out statement: %w", err)
+	}
+
+	UpdateAllUsersToSignedOut, err = db.Prepare(`
+	UPDATE Users
+	SET is_logged_in = 0
+	WHERE is_logged_in = 1
+	`)
+	if err != nil {
+		return fmt.Errorf("failed to prepare update all users to signed out statement: %w", err)
+	}
+
+	return nil
 }

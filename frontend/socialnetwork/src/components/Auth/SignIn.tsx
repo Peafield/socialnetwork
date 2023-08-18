@@ -1,20 +1,29 @@
-import React, { ChangeEvent, useContext, useState } from "react";
-import {Link} from "react-router-dom";
+import React, { ChangeEvent, useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import { handleAPIRequest } from "../../controllers/Api";
-import { UserContext } from "../../context/AuthContext";
+import Container from "../Containers/Container";
+import styles from "./Signin.module.css";
+import { useSetUserContextAndCookie } from "../../controllers/SetUserContextAndCookie";
+import Snackbar from "../feedback/Snackbar";
 
 interface SignInFormData {
-  usernameEmail: string;
+  username_email: string;
   password: string;
 }
 
 export default function SignIn() {
-  const userContext = useContext(UserContext)
+  const navigate = useNavigate();
   const [formData, setFormData] = useState<SignInFormData>({
-    usernameEmail: "",
+    username_email: "",
     password: "",
   });
   const [error, setError] = useState<string | null>(null);
+  const [snackbarOpen, setSnackbarOpen] = useState<boolean>(false);
+  const [snackbarType, setSnackbarType] = useState<
+    "success" | "error" | "warning"
+  >("error");
+
+  const setUserContextAndCookie = useSetUserContextAndCookie();
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -24,9 +33,9 @@ export default function SignIn() {
     });
   };
 
-  const handleSubmit = async (e: { preventDefault: () => void; }) => {
+  const handleSubmit = async (e: { preventDefault: () => void }) => {
     e.preventDefault();
-    const data = formData;
+    const data = { data: formData };
     const options = {
       method: "POST",
       headers: {
@@ -36,52 +45,85 @@ export default function SignIn() {
     };
     try {
       const response = await handleAPIRequest("/signin", options);
-      const user = {
-        usernameEmail: data.usernameEmail,
-        authToken: response.Data.token,
-      };
-
-      userContext.setUser(user);
-    } catch (error) {
-        if (error instanceof Error) {
-            setError(error.message);
+      if (response && response.status === "success") {
+        const errorResult = setUserContextAndCookie(response.data);
+        if (errorResult) {
+          if (typeof errorResult === "string") {
+            setError(errorResult);
+            setSnackbarType("error");
+            setSnackbarOpen(true);
+          } else if (errorResult instanceof Error) {
+            setError(errorResult.message);
+            setSnackbarType("error");
+            setSnackbarOpen(true);
+          } else {
+            setError("An unexpected error occurred.");
+          }
         } else {
-            setError('An unexpected error occurred.');
+          setSnackbarType("success");
+          setSnackbarOpen(true);
+          setTimeout(() => {
+            navigate("/dashboard");
+          }, 1000);
         }
+      }
+    } catch (error) {
+      if (error instanceof Error) {
+        setError("Invalid username/email or password");
+        setSnackbarType("error");
+        setSnackbarOpen(true);
+      } else {
+        setError("An unexpected error occurred");
+        setSnackbarType("error");
+        setSnackbarOpen(true);
+      }
     }
   };
 
   return (
-    <>
-      <div>
-        <form onSubmit={handleSubmit}>
-          <label>
-            Username/Email:
-            <input
-              type="text"
-              value={formData.usernameEmail}
-              name="usernameEmail"
-              onChange={handleChange}
-            />
-          </label>
-          <label>
-            Password:
-            <input
-              type="password"
-              value={formData.password}
-              name="password"
-              onChange={handleChange}
-            />
-          </label>
-          <label>
-            Submit
-            <button type="submit" />
-          </label>
-        </form>
+    <Container>
+      <div className={styles.authcontainer}>
+        <div className={styles.formwrapper}>
+          <h2 className={styles.h2}>Sign In</h2>
+          <form onSubmit={handleSubmit}>
+            <div className={styles.inputgroup}>
+              <input
+                className={styles.input}
+                type="text"
+                placeholder="Username/Email"
+                value={formData.username_email}
+                name="username_email"
+                onChange={handleChange}
+              />
+            </div>
+            <div className={styles.inputgroup}>
+              <input
+                className={styles.input}
+                type="password"
+                placeholder="Password"
+                value={formData.password}
+                name="password"
+                onChange={handleChange}
+              />
+            </div>
+            <div className={styles.inputgroup}>
+              <button className={styles.button} type="submit">
+                Sign In
+              </button>
+            </div>
+          </form>
+          <Link to="/signup">Don't have an account? Sign up</Link>
+        </div>
       </div>
-      <div>
-        <Link to="/signup">Don't have an account? Sign up</Link>
-      </div>
-    </>
+      <Snackbar
+        open={snackbarOpen}
+        onClose={() => {
+          setSnackbarOpen(false);
+          setError(null);
+        }}
+        message={error ? error : "Signed in successfully!"}
+        type={snackbarType}
+      />
+    </Container>
   );
 }

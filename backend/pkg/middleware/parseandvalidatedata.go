@@ -8,8 +8,6 @@ import (
 	"socialnetwork/pkg/models/readwritemodels"
 )
 
-const DataKey readwritemodels.ContextKey = iota
-
 /*
 ParseAndValidateData is a middleware function that extracts and decodes JSON data from the request body.
 
@@ -25,15 +23,22 @@ Returns:
 Errors:
   - If the request payload is invalid, sends an HTTP error with status code 400 (Bad Request).
 */
+// func enableCors(w *http.ResponseWriter) {
+// 	(*w).Header().Set("Access-Control-Allow-Origin", "http://localhost:3000/signup")
+// 	(*w).Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
+// 	(*w).Header().Set("Access-Control-Allow-Headers", "Content-Type")
+// 	(*w).Header().Set("Access-Control-Allow-Credentials", "true")
+// }
+
 func ParseAndValidateData(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		var data readwritemodels.ReadData
-		fmt.Println(r.Body)
 		err := json.NewDecoder(r.Body).Decode(&data)
-		if err != nil {
-			http.Error(w, "Invalid request payload", http.StatusBadRequest)
+		if r.Method != http.MethodGet && err != nil {
+			fmt.Println(err)
+			http.Error(w, "invalid request payload", http.StatusBadRequest)
+			return
 		}
-		fmt.Println("data is equal to:", data)
 		ctx := context.WithValue(r.Context(), DataKey, data)
 		next.ServeHTTP(w, r.WithContext(ctx))
 	})

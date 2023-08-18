@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net/http"
 	"socialnetwork/pkg/controllers"
+	usercontrollers "socialnetwork/pkg/controllers/UserControllers"
 	"socialnetwork/pkg/db/dbutils"
 	"socialnetwork/pkg/middleware"
 	"socialnetwork/pkg/models/readwritemodels"
@@ -78,11 +79,12 @@ func SignInHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	//update user logged in status
-	err = controllers.UpdateLoggedInStatus(dbutils.DB, user.UserId, 1)
+	err = usercontrollers.UpdateLoggedInStatus(dbutils.DB, user.UserId, 1)
 	if err != nil {
 		http.Error(w, "failed to update logged in status", http.StatusInternalServerError)
 		return
 	}
+	user.IsLoggedIn = 1
 
 	//generate web token
 	token, err := controllers.CreateWebToken(user)

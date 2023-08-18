@@ -34,11 +34,7 @@ var ErrNoRowsAffected = errors.New("no rows affected")
 //	if err != nil {
 //	    log.Fatal(err)
 //	}
-<<<<<<< HEAD
-func InteractWithDatabase(db *sql.DB, statement *sql.Stmt, args ...interface{}) error {
-=======
 func InteractWithDatabase(db *sql.DB, statement *sql.Stmt, args []interface{}) error {
->>>>>>> 708dd49def396fb891712545395789996656e00f
 	result, err := statement.Exec(args...)
 	if err != nil {
 		return fmt.Errorf("failed to execute statement: %w", err)

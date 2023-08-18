@@ -10,7 +10,6 @@ import (
 	postcontrollers "socialnetwork/pkg/controllers/PostControllers"
 	crud "socialnetwork/pkg/db/CRUD"
 	"socialnetwork/pkg/models/dbmodels"
-	"strings"
 )
 
 func CreateFakePosts(db *sql.DB) error {
@@ -36,7 +35,6 @@ func CreateFakePosts(db *sql.DB) error {
 	for i := 1; i <= postAmount; i++ {
 		content := ContentGenerator()
 		postData["content"] = content
-		postData["title"] = strings.Join(strings.Split(content, " ")[:6], " ")
 		postData["privacy_level"] = rand.Intn(3)
 
 		err := postcontrollers.InsertPost(db, userIds[i-1], postData)

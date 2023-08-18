@@ -11,6 +11,7 @@ import styles from './Profile.module.css'
 interface ProfileProps {
     user_id: string,
     display_name: string,
+    avatar: string
     first_name: string,
     last_name: string,
     dob: string,
@@ -45,9 +46,16 @@ const Profile: React.FC = () => {
             };
             try {
                 const response = await handleAPIRequest(url, options);
-                console.log(response);
+                console.log(response.data);
+
+                const newprofile = response.data.UserInfo
+                const avatar = response.data.ProfilePic
+
+                newprofile.avatar = avatar
                 
-                setProfile(response.data);
+                console.log(newprofile);
+                
+                setProfile(newprofile);
 
             } catch (error) {
                 if (error instanceof Error) {
@@ -67,7 +75,7 @@ const Profile: React.FC = () => {
   return (
     <Container>
     {profile? <div className={styles.profilecontainer}>
-        <ProfileHeader display_name={profile.display_name} num_of_posts={0} followers={0} following={0}/>
+        <ProfileHeader display_name={profile.display_name} avatar={profile.avatar} num_of_posts={0} followers={0} following={0}/>
         <ProfileBio bio={profile.about_me}/>  
         <ProfilePostsGrid user_id={profile.user_id}/>
         </div> : null}

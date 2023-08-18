@@ -3,6 +3,7 @@ package usercontrollers
 import (
 	"database/sql"
 	"fmt"
+	imagecontrollers "socialnetwork/pkg/controllers/ImageControllers"
 	crud "socialnetwork/pkg/db/CRUD"
 	"socialnetwork/pkg/db/dbstatements"
 	"socialnetwork/pkg/helpers"
@@ -178,7 +179,11 @@ func validateAnyUnrequiredFields(formData map[string]interface{}) ([]interface{}
 	var args []interface{}
 
 	if avatarPath, ok := formData["avatar_path"].(string); ok {
-		args = append(args, avatarPath)
+		avatarFilePath, err := imagecontrollers.DecodeImage(avatarPath)
+		if err != nil {
+			return nil, fmt.Errorf("error decoding image: %w", err)
+		}
+		args = append(args, avatarFilePath)
 	} else {
 		args = append(args, "")
 	}

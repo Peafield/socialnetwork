@@ -13,7 +13,7 @@ interface SignUpFormData {
   first_name: string;
   last_name: string;
   dob: string;
-  avatar_path: File | null;
+  avatar_path: string;
   about_me: string;
 }
 
@@ -29,7 +29,7 @@ export default function SignUp() {
     first_name: "",
     last_name: "",
     dob: "",
-    avatar_path: null,
+    avatar_path: "",
     about_me: "",
   });
 
@@ -38,10 +38,17 @@ export default function SignUp() {
 
     if (e.target.type === "file") {
       const file = (e.target as HTMLInputElement)?.files?.[0] || null;
-      setFormData((prevState) => ({
-        ...prevState,
-        avatar_path: file,
-      }));
+      if (file) {
+        const reader = new FileReader();
+        reader.onloadend = () => {
+          setFormData((prevState) => ({
+            ...prevState,
+            avatar_path: reader.result as string,
+          }));
+        }
+        reader.readAsDataURL(file)
+      }
+
     } else {
       setFormData((prevState) => ({
         ...prevState,
@@ -54,7 +61,7 @@ export default function SignUp() {
     e.preventDefault();
     const data = { data: formData };
     console.log(formData);
-    
+
     const options = {
       method: "POST",
       headers: {

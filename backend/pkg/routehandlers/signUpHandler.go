@@ -4,9 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"io"
 	"net/http"
-	"os"
 	"socialnetwork/pkg/controllers"
 	usercontrollers "socialnetwork/pkg/controllers/UserControllers"
 	"socialnetwork/pkg/db/dbstatements"
@@ -80,42 +78,6 @@ func SignUpHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "failed to read form data from context", http.StatusInternalServerError)
 		return
 	}
-
-	/*IMAGE HANDLING CODE*/ //////////////////////////////////////////////////////
-
-	// Parse the multipart form data
-	err := r.ParseMultipartForm(10 << 20) // Limit the size of uploaded files
-	if err != nil {
-		fmt.Println(err)
-		http.Error(w, "Unable to parse form", http.StatusBadRequest)
-		return
-	}
-
-	// Get the uploaded file
-	file, handler, err := r.FormFile("avatar_path")
-	if err != nil {
-		http.Error(w, "Unable to get uploaded file", http.StatusBadRequest)
-		return
-	}
-	defer file.Close()
-
-	// Create a new file on the server to store the uploaded image
-	filepath := "backend/pkg/db/images/" + handler.Filename
-	newFile, err := os.Create(filepath)
-	if err != nil {
-		http.Error(w, "Unable to create file on server", http.StatusInternalServerError)
-		return
-	}
-	defer newFile.Close()
-
-	// Copy the uploaded file's content to the new file
-	_, err = io.Copy(newFile, file)
-	if err != nil {
-		http.Error(w, "Unable to copy file content", http.StatusInternalServerError)
-		return
-	}
-
-	/////////////////////////////////////////////////////////////////////
 
 	user, err := usercontrollers.RegisterUser(formData.Data, dbutils.DB, dbstatements.InsertUserStmt)
 	if err != nil {

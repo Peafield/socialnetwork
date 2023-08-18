@@ -17,6 +17,11 @@ type User struct {
 	CreationDate   time.Time `json:"creation_date"`
 }
 
+type UserProfileData struct {
+	UserInfo   User
+	ProfilePic []byte
+}
+
 // Users is a slice of User
 type Users struct {
 	Users []User

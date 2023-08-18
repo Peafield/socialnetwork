@@ -60,9 +60,9 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
           )}
         </div>
         <div>{display_name}</div>
-        <div>{num_of_posts}</div>
-        <div>{followers}</div>
-        <div>{following}</div>
+        <div>Posts: {num_of_posts}</div>
+        <div>Followers: {followers}</div>
+        <div>Following: {following}</div>
       </div>
     </Container>
   );

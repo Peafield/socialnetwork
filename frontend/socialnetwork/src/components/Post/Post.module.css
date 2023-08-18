@@ -26,13 +26,33 @@
 }
 
 .postheadercontainer {
-  position: relative;
   display: flex;
   flex-direction: row;
-  justify-content: center;
+  justify-content: space-between;
   align-items: center;
   width: 90%;
   height: 100%;
+  margin: 5%;
+}
+
+.postactionscontainer {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-around;
+  align-items: center;
+  width: 90%;
+  height: 100%;
+  margin: 5%;
+}
+
+.postcontentcontainer {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+  align-items: center;
+  width: 90%;
+  height: 100%;
+  margin: 5%;
 }
 
 .profileIconStyle {

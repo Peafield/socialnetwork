@@ -13,14 +13,11 @@ const PostActions: React.FC<PostActionsProps> = ({
     numOfComments
 }) => {
   return (
-    <>
     <div className={styles.postactionscontainer}>
     <p>Likes: {likes}</p>
     <p>Dislikes: {dislikes}</p>
     <p>Number of Comments: {numOfComments}</p>
     </div>
-
-    </>
   )
 }
 

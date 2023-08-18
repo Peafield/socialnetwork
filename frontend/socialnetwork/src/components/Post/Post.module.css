@@ -49,6 +49,12 @@
   font-weight: bold;
 }
 
+.postHeaderInfoContainer p {
+  color: lightslategrey;
+  font-size: 0.8rem;
+  font-weight: bolder;
+}
+
 .postHeaderInfoContainer a:hover {
   text-decoration: underline;
 }

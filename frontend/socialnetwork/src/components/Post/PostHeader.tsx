@@ -1,9 +1,9 @@
-import React, { CSSProperties, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import Container from "../Containers/Container";
-import { FaUserCircle } from "react-icons/fa";
+import { FaUserCircle, FaGlobeAfrica } from "react-icons/fa";
+import {FaPeopleGroup } from "react-icons/fa6"
+import { IoPeopleCircle } from "react-icons/io5"
 import styles from "./Post.module.css";
-import DateConversion from "../../helpers/DateConversion";
 import FormatDate from "../../helpers/DateConversion";
 
 interface PostHeaderProps {
@@ -19,6 +19,8 @@ const PostHeader: React.FC<PostHeaderProps> = ({
   creatorDisplayName,
   creatorAvatar,
   creationDate,
+  postPrivacyLevel,
+
 }) => {
   const [profilePicUrl, setProfilePicUrl] = useState<string | null>(null);
 
@@ -44,6 +46,9 @@ const PostHeader: React.FC<PostHeaderProps> = ({
     }
   }, [creatorAvatar]);
   let formattedDate = FormatDate(creationDate);
+  let PrivacyIconType = postPrivacyLevel === 0 ? FaGlobeAfrica : 
+                      postPrivacyLevel === 1 ? FaPeopleGroup : IoPeopleCircle;
+
   return (
     <div className={styles.postheadercontainer}>
       <div className={styles.postHeaderInfoContainer}>
@@ -56,7 +61,7 @@ const PostHeader: React.FC<PostHeaderProps> = ({
             />
           )) || (
             <span className={styles.profileIconStyle}>
-              <FaUserCircle />
+              <IoPeopleCircle />
             </span>
           )}
         </div>
@@ -64,7 +69,7 @@ const PostHeader: React.FC<PostHeaderProps> = ({
           <Link to={"/dashboard/user/" + creatorDisplayName}>
             {creatorDisplayName}
           </Link>
-          <p>{formattedDate}</p>
+          <p>{formattedDate} <PrivacyIconType /></p>
         </div>
       </div>
     </div>

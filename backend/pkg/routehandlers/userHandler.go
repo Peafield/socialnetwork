@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"net/http"
 	usercontrollers "socialnetwork/pkg/controllers/UserControllers"
+	"socialnetwork/pkg/db/dbstatements"
 	"socialnetwork/pkg/db/dbutils"
 	"socialnetwork/pkg/middleware"
 	"socialnetwork/pkg/models/readwritemodels"
@@ -59,12 +60,24 @@ func GetUserHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	specificUserDisplayName := r.URL.Query().Get("displayName")
+	specificUserId := r.URL.Query().Get("user_id")
+	specificUserDisplayName := r.URL.Query().Get("display_name")
 
-	if specificUserDisplayName == "" {
+	if specificUserId == "" && specificUserDisplayName == "" {
 		//get all users?
 	} else {
-		user, err := usercontrollers.GetUser(dbutils.DB, userData.UserId, specificUserDisplayName)
+		statement := ""
+		userDetails := ""
+
+		if specificUserId != "" {
+			statement = dbstatements.SelectUserByID
+			userDetails = specificUserId
+		} else {
+			userDetails = specificUserDisplayName
+			statement = dbstatements.SelectUserByDisplayName
+		}
+
+		user, err := usercontrollers.GetUser(dbutils.DB, userData.UserId, statement, userDetails)
 		if err != nil {
 			http.Error(w, "failed to get specific user data", http.StatusInternalServerError)
 		}

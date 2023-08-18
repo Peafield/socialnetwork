@@ -8,7 +8,7 @@ import ProfileHeader from './ProfileHeader'
 import ProfilePostsGrid from './ProfilePostsGrid'
 import styles from './Profile.module.css'
 
-interface ProfileProps {
+export interface ProfileProps {
     user_id: string,
     display_name: string,
     avatar: string
@@ -32,7 +32,7 @@ const Profile: React.FC = () => {
 
             let url
 
-            {username ? url = `/user?displayName=${encodeURIComponent(username)}` : url = "/user"}
+            {username ? url = `/user?display_name=${encodeURIComponent(username)}` : url = "/user"}
             
             const options = {
                 method: "GET",

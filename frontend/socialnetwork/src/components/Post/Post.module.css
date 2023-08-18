@@ -35,6 +35,18 @@
   height: 100%;
 }
 
+.profileIconStyle {
+  margin-right: 8px;
+  vertical-align: middle
+}
+
+.avatar {
+  vertical-align: "middle";
+  width: 2%;
+  height: 2%;
+  border-radius: 50%;
+}
+
 .createpostcontainer {
     position: relative;
     display: flex;
@@ -133,4 +145,6 @@
   button:hover {
     background-color: #0056b3;
   }
+
+
   

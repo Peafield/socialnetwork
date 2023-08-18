@@ -2,6 +2,7 @@ package routehandlers
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 	postcontrollers "socialnetwork/pkg/controllers/PostControllers"
 	"socialnetwork/pkg/db/dbutils"
@@ -121,6 +122,7 @@ func UserPosts(w http.ResponseWriter, r *http.Request) {
 	if specificUserId == "" {
 		userPosts, err = postcontrollers.SelectUserViewablePosts(dbutils.DB, userInfo.UserId)
 		if err != nil {
+			fmt.Println(err)
 			http.Error(w, "failed to select user viewable posts", http.StatusInternalServerError)
 			return
 		}

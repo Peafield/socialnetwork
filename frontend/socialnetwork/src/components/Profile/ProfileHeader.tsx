@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from 'react'
+import { FaUserCircle } from 'react-icons/fa'
 import { defer } from 'react-router-dom'
 import Container from '../Containers/Container'
+import styles from './Profile.module.css'
 
 interface ProfileHeaderProps {
     display_name: string,
@@ -20,33 +22,39 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
     const [profilePicUrl, setProfilePicUrl] = useState<string | null>(null)
 
     useEffect(() => {
-        const decodedAvatar = atob(avatar); // Decode base64-encoded avatar data
-        const avatarBuffer = new ArrayBuffer(decodedAvatar.length);
-        const avatarView = new Uint8Array(avatarBuffer);
-        for (let i = 0; i < decodedAvatar.length; i++) {
-            avatarView[i] = decodedAvatar.charCodeAt(i);
+        if (avatar) {
+            const decodedAvatar = atob(avatar); // Decode base64-encoded avatar data
+            const avatarBuffer = new ArrayBuffer(decodedAvatar.length);
+            const avatarView = new Uint8Array(avatarBuffer);
+            for (let i = 0; i < decodedAvatar.length; i++) {
+                avatarView[i] = decodedAvatar.charCodeAt(i);
+            }
+
+            const blob = new Blob([avatarBuffer]);
+            const url = URL.createObjectURL(blob);
+            console.log(url);
+
+            setProfilePicUrl(url)
+
+            // Clean up the Blob URL when the component unmounts
+            return () => {
+                URL.revokeObjectURL(url);
+            };
         }
-
-        const blob = new Blob([avatarBuffer]);
-        const url = URL.createObjectURL(blob);
-        console.log(url);
-
-        setProfilePicUrl(url)
-
-        // Clean up the Blob URL when the component unmounts
-        return () => {
-            URL.revokeObjectURL(url);
-        };
     }, [avatar])
 
     return (
         <Container>
-            <div>
+            <div className={styles.profileheadercontainer}>
                 <div>
-                    {display_name}
+                    {(profilePicUrl && <img src={profilePicUrl} alt='Profile pic' className={styles.avatar} />) || (
+                        <span className={styles.profileIconStyle}>
+                            <FaUserCircle />
+                        </span>
+                    )}
                 </div>
                 <div>
-                    {profilePicUrl && <img src={profilePicUrl} alt='Profile pic' />}
+                    {display_name}
                 </div>
                 <div>
                     {num_of_posts}

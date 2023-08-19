@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 import { FaUserCircle } from "react-icons/fa";
-import { defer } from "react-router-dom";
 import Container from "../Containers/Container";
 import styles from "./Profile.module.css";
 
@@ -43,31 +42,29 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
     }
   }, [avatar]);
 
-    return (
-        <Container>
-            <div className={styles.profileheadercontainer}>
-                <div>
-                    {(profilePicUrl && <img src={profilePicUrl} alt='Profile pic' className={styles.avatar} />) || (
-                        <span className={styles.profileIconStyle}>
-                            <FaUserCircle />
-                        </span>
-                    )}
-                </div>
-                <div>
-                    {display_name}
-                </div>
-                <div>
-                    Posts: {num_of_posts}
-                </div>
-                <div>
-                    Followers: {followers}
-                </div>
-                <div>
-                    Following: {following}
-                </div>
-            </div>
-        </Container>
-    )
-}
+  return (
+    <Container>
+      <div className={styles.profileheadercontainer}>
+        <div>
+          {(profilePicUrl && (
+            <img
+              src={profilePicUrl}
+              alt="Profile pic"
+              className={styles.avatar}
+            />
+          )) || (
+            <span className={styles.profileIconStyle}>
+              <FaUserCircle />
+            </span>
+          )}
+        </div>
+        <div>{display_name}</div>
+        <div>Posts: {num_of_posts}</div>
+        <div>Followers: {followers}</div>
+        <div>Following: {following}</div>
+      </div>
+    </Container>
+  );
+};
 
 export default ProfileHeader

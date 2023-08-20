@@ -1,5 +1,5 @@
 import React, { ChangeEvent, useState } from "react";
-import { useNavigate, Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { handleAPIRequest } from "../../controllers/Api";
 import Container from "../Containers/Container";
 import Snackbar from "../feedback/Snackbar";

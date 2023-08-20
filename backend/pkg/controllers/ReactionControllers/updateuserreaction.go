@@ -7,14 +7,14 @@ import (
 	"strings"
 )
 
-func UpdateUserReaction(db *sql.DB, userID string, updateReactionData map[string]interface{}) error {
+func UpdateUserPostOrCommentReaction(db *sql.DB, userID string, updateReactionData map[string]interface{}) error {
 	var columns []string
 	var args []interface{}
 	var updateTable string
 	var updateValues string
 	var updateColumn string
 
-	if likes, ok := updateReactionData["likes"].(string); ok {
+	if likes, ok := updateReactionData["likes"].(int); ok {
 		columns = append(columns, "likes = ?")
 		args = append(args, likes)
 		updateValues = "likes = likes + 1"

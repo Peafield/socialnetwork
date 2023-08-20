@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import PostHeader from "./PostHeader";
 import PostContent from "./PostContent";
 import PostActions from "./PostActions";
+import PostImage from "./PostImage";
 import { ProfileProps } from "../Profile/Profile";
 import { handleAPIRequest } from "../../controllers/Api";
 import { getCookie } from "../../controllers/SetUserContextAndCookie";
@@ -86,7 +87,9 @@ const Post: React.FC<PostProps> = ({
             postPrivacyLevel={privacy_level}
           />
           <PostContent text={content} />
+          <PostImage imageString={image_path}/>
           <PostActions
+            postId={post_id}
             likes={likes}
             dislikes={dislikes}
             numOfComments={num_of_comments}

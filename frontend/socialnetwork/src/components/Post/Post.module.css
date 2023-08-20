@@ -19,7 +19,8 @@
   align-items: center;
   border-radius: 5px;
   width: 90%;
-  margin: 10px;
+  margin: 1.5%;
+  padding: 2%;
   z-index: 0;
   box-shadow: rgba(50, 50, 93, 0.25) 0px 2px 5px -1px,
     rgba(0, 0, 0, 0.3) 0px 1px 3px -1px;
@@ -30,9 +31,10 @@
   flex-direction: row;
   justify-content: flex-start;
   align-items: center;
-  width: 90%;
-  height: 100%;
-  margin: 5%;
+  width: 100%;
+  flex: 1;
+  margin: 2%;
+  margin-bottom: 1%;
 }
 
 .postHeaderInfoContainer {
@@ -59,24 +61,76 @@
   text-decoration: underline;
 }
 
-.postactionscontainer {
-  display: flex;
-  flex-direction: row;
-  justify-content: space-around;
-  align-items: center;
-  width: 90%;
-  height: 100%;
-  margin: 5%;
-}
-
 .postcontentcontainer {
   display: flex;
   flex-direction: column;
   justify-content: space-around;
   align-items: center;
-  width: 90%;
-  height: 100%;
-  margin: 5%;
+  width: 100%;
+  flex: 1;
+  margin-bottom: 2%;
+}
+
+.postimagecontainer {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  flex: 1;
+  margin-bottom: 2%;
+}
+
+.postactionscontainer {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+  align-items: center;
+  width: 100%;
+  flex: 1;
+  color: #606266;
+}
+
+.postactionsubcontainer,
+.postactionscontainer form {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-evenly;
+  align-items: center;
+  width: 100%;
+  flex: 1;
+  margin: 1%;
+}
+
+.postactionsubcontainerbottom {
+  border-top: 1px solid lightgray;
+  border-bottom: 1px solid lightgray;
+
+}
+
+.postactioninfo {
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+  justify-content: space-between;
+}
+
+.postactionspan {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-around;
+  width: 20%;
+}
+
+.postactionsubcontainer button {
+  background-color: white;
+  color: #606266;
+  font-size: 0.9rem;
+  margin: 0.5%;
+  padding: 1%;
+}
+.postactionsubcontainer button:hover {
+  background-color: #F2F2F2;
 }
 
 .profileIconStyle {

@@ -5,33 +5,37 @@ import (
 	"fmt"
 	crud "socialnetwork/pkg/db/CRUD"
 	"socialnetwork/pkg/db/dbstatements"
-	"socialnetwork/pkg/helpers"
-	"socialnetwork/pkg/models/dbmodels"
 )
 
 func InsertUserReaction(db *sql.DB, userID string, newReactionData map[string]interface{}) error {
-	reaction := &dbmodels.Reaction{}
+	args := make([]interface{}, 4)
 
-	reaction.UserId = userID
+	args[0] = userID
 
-	postID, ok := newReactionData["post_id"].(string)
+	rowIdType, ok := newReactionData["postORCommentId"].(string)
+	if !ok {
+		return fmt.Errorf("failed to assert whether post or comment")
+	}
+
+	reactionOn, ok := newReactionData["reactionOn"].(string)
 	if ok {
-		reaction.PostId = postID
+		if reactionOn == "post" {
+			args[1] = rowIdType
+		} else {
+			args[2] = rowIdType
+		}
+	} else {
+		return fmt.Errorf("reactionOn is not a string")
 	}
 
-	commentID, ok := newReactionData["commment_id"].(string)
+	reactionType, ok := newReactionData["type"].(string)
 	if ok {
-		reaction.CommentId = commentID
+		args[3] = reactionType
+	} else {
+		return fmt.Errorf("reactionType is not a string")
 	}
 
-	reaction.Reaction = newReactionData["reaction"].(int)
-
-	values, err := helpers.StructFieldValues(reaction)
-	if err != nil {
-		return fmt.Errorf("failed to get reaction struct values: %w", err)
-	}
-
-	err = crud.InteractWithDatabase(db, dbstatements.InsertReactionsStmt, values)
+	err := crud.InteractWithDatabase(db, dbstatements.InsertReactionsStmt, args)
 	if err != nil {
 		return fmt.Errorf("failed to insert reaction into database: %w", err)
 	}

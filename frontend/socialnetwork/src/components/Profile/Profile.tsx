@@ -3,7 +3,6 @@ import { useParams } from 'react-router-dom'
 import { handleAPIRequest } from '../../controllers/Api'
 import { getCookie } from '../../controllers/SetUserContextAndCookie'
 import Container from '../Containers/Container'
-import ProfileBio from './ProfileBio'
 import ProfileHeader from './ProfileHeader'
 import ProfilePostsGrid from './ProfilePostsGrid'
 import styles from './Profile.module.css'
@@ -73,14 +72,13 @@ const Profile: React.FC = () => {
     if (profileLoading) {return <p>Loading...</p>}
 
   return (
-    <Container>
+    <>
     {profile? <div className={styles.profilecontainer}>
-        <ProfileHeader display_name={profile.display_name} avatar={profile.avatar} num_of_posts={0} followers={0} following={0}/>
-        <ProfileBio bio={profile.about_me}/>  
+        <ProfileHeader first_name={profile.first_name} last_name={profile.last_name} display_name={profile.display_name} avatar={profile.avatar} num_of_posts={0} followers={0} following={0} about_me={profile.about_me}/>
         <ProfilePostsGrid user_id={profile.user_id}/>
         </div> : null}
           
-    </Container>
+    </>
   )
 }
 

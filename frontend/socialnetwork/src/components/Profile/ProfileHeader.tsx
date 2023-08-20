@@ -4,19 +4,25 @@ import Container from "../Containers/Container";
 import styles from "./Profile.module.css";
 
 interface ProfileHeaderProps {
+  first_name: string,
+  last_name: string,
   display_name: string;
   avatar: string;
   num_of_posts: number;
   followers: number;
   following: number;
+  about_me: string;
 }
 
 const ProfileHeader: React.FC<ProfileHeaderProps> = ({
+  first_name,
+  last_name,
   display_name,
   avatar,
   num_of_posts,
   followers,
   following,
+  about_me,
 }) => {
   const [profilePicUrl, setProfilePicUrl] = useState<string | null>(null);
 
@@ -45,7 +51,7 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
   return (
     <Container>
       <div className={styles.profileheadercontainer}>
-        <div>
+        <div className={styles.displaypicturecontainer}>
           {(profilePicUrl && (
             <img
               src={profilePicUrl}
@@ -53,15 +59,25 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
               className={styles.avatar}
             />
           )) || (
-            <span className={styles.profileIconStyle}>
-              <FaUserCircle />
-            </span>
-          )}
+              <span className={styles.profileIconStyle}>
+                <FaUserCircle />
+              </span>
+            )}
         </div>
-        <div>{display_name}</div>
-        <div>Posts: {num_of_posts}</div>
-        <div>Followers: {followers}</div>
-        <div>Following: {following}</div>
+        <div className={styles.nameinfocontainer}>
+          <div>{first_name} {last_name}</div>
+          <div style={{ color: "gray" }}>{display_name}</div>
+        </div>
+        <div className={styles.otherprofileinfocontainer}>
+          <div className={styles.profilestatscontainer}>
+          <div>{num_of_posts} Posts</div>
+          <div>{followers} Followers</div>
+          <div>Following {following}</div>
+          </div>
+          <div className={styles.aboutmecontainer}>
+            <div>{about_me}</div>
+          </div>
+        </div>
       </div>
     </Container>
   );

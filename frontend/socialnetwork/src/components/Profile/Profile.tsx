@@ -39,9 +39,6 @@ const Profile: React.FC = () => {
                     Authorization: "Bearer " + getCookie("sessionToken"),
                     "Content-Type": "application/json",
                 },
-                params: {
-                    displayName: username
-                }
             };
             try {
                 const response = await handleAPIRequest(url, options);

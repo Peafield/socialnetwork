@@ -1,0 +1,60 @@
+.commentcontainer {
+    background-color: white;
+    display: flex;
+    flex-direction: column;
+    border-radius: 5px;
+    width: 90%;
+    height: auto;
+    margin: 10px;
+    padding: 10px;
+    z-index: 0;
+    box-shadow: rgba(50, 50, 93, 0.25) 0px 2px 5px -1px,
+        rgba(0, 0, 0, 0.3) 0px 1px 3px -1px;
+}
+
+.commentheadercontainer {
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    align-items: center;
+    width: 90%;
+    height: 100%;
+    margin: 5%;
+}
+
+.commentHeaderInfoContainer {
+    display: flex;
+    flex-direction: row;
+    justify-content: left;
+    align-items: center;
+}
+
+.commentHeaderInfoContainer a {
+    text-decoration: none;
+    color: black;
+    font-size: 1rem;
+    font-weight: bold;
+}
+
+.commentHeaderInfoContainer p {
+    color: lightslategrey;
+    font-size: 0.8rem;
+    font-weight: bolder;
+}
+
+.commentHeaderInfoContainer a:hover {
+    text-decoration: underline;
+}
+
+.profileIconStyle {
+    margin-right: 8px;
+    vertical-align: middle;
+    font-size: 2rem;
+}
+
+.avatar {
+    vertical-align: "middle";
+    width: 2%;
+    height: 2%;
+    border-radius: 50%;
+}

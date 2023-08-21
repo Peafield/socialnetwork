@@ -49,6 +49,7 @@ func main() {
 		if err != nil {
 			log.Fatalf("Failed to create database: %s", err)
 		}
+		return
 	}
 
 	if *dbopen {
@@ -100,6 +101,7 @@ func main() {
 		if err != nil {
 			log.Fatalf("Failed to migrate changes up: %s", err)
 		}
+		return
 	}
 
 	if *dbdown {
@@ -115,6 +117,7 @@ func main() {
 		if err != nil {
 			log.Fatalf("Failed to migrate changes down: %s", err)
 		}
+		return
 	}
 
 	if *dbmock {
@@ -125,6 +128,10 @@ func main() {
 		err = db.CreateFakePosts(dbutils.DB)
 		if err != nil {
 			log.Fatalf("someting went wrong creating fakes: %s", err)
+		}
+		err = db.CreateFakeComments(dbutils.DB)
+		if err != nil {
+			log.Fatalf("something went wrong creating fakes: %s", err)
 		}
 	}
 

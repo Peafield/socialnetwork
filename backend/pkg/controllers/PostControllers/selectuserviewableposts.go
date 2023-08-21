@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"fmt"
 	crud "socialnetwork/pkg/db/CRUD"
+	"socialnetwork/pkg/db/dbstatements"
 	"socialnetwork/pkg/models/dbmodels"
 )
 
@@ -29,28 +30,13 @@ Returns:
   - error: if the database fails to return the posts or the post data fails to be asserted.
 */
 func SelectUserViewablePosts(db *sql.DB, userId string) (*dbmodels.Posts, error) {
-	query := `
-	SELECT * FROM Posts
-	WHERE privacy_level = 0
-	UNION
-	SELECT * FROM Posts 
-	WHERE creator_id = ?
-	UNION
-	SELECT P.* FROM Posts P
-	JOIN Followers F ON P.creator_id = F.followee_id
-	WHERE F.follower_id = ? AND P.privacy_level = 1
-	UNION
-	SELECT P.* FROM Posts P
-	JOIN Posts_Selected_Followers PSF ON P.post_id = PSF.post_id
-	WHERE PSF.allowed_follower_id = ?`
-
 	values := []interface{}{
 		userId,
 		userId,
 		userId,
 	}
 
-	postsData, err := crud.SelectFromDatabase(db, "Posts", query, values)
+	postsData, err := crud.SelectFromDatabase(db, "Posts", dbstatements.SelectUserViewablePosts, values)
 	if err != nil {
 		return nil, fmt.Errorf("failed to select user viewable posts from database: %w", err)
 	}

@@ -8,29 +8,16 @@ import (
 	"math/rand"
 	"net/http"
 	postcontrollers "socialnetwork/pkg/controllers/PostControllers"
-	crud "socialnetwork/pkg/db/CRUD"
-	"socialnetwork/pkg/models/dbmodels"
 	"strings"
 )
 
 func CreateFakePosts(db *sql.DB) error {
 	postAmount := 20
 	postData := map[string]interface{}{}
-	queryStatement := `
-	SELECT * FROM Users
-	`
-	userIDData, err := crud.SelectFromDatabase(db, "Users", queryStatement, []interface{}{})
-	if err != nil {
-		return fmt.Errorf("failed to get userId's from db: %w", err)
-	}
 
-	var userIds []string
-	for _, v := range userIDData {
-		if user, ok := v.(*dbmodels.User); ok {
-			userIds = append(userIds, user.UserId)
-		} else {
-			return fmt.Errorf("failed to assert user id data")
-		}
+	userIds, err := GetAllUserIDs(db)
+	if err != nil {
+		return fmt.Errorf("failed to get all user id's when faking comments: %w", err)
 	}
 
 	for i := 1; i <= postAmount; i++ {

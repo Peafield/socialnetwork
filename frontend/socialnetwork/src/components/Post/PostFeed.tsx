@@ -1,4 +1,6 @@
-import React, { useEffect, useState } from 'react'
+import React, { CSSProperties, useEffect, useState } from 'react'
+import { AiOutlineClose } from 'react-icons/ai';
+import { FaComment } from 'react-icons/fa';
 import { handleAPIRequest } from '../../controllers/Api';
 import { getCookie } from '../../controllers/SetUserContextAndCookie';
 import Container from '../Containers/Container'
@@ -45,32 +47,54 @@ const PostFeed: React.FC = () => {
         fetchData(); // Call the async function
     }, []);
 
+    const closeStyle: CSSProperties = {
+        margin: "10px",
+        verticalAlign: "middle",
+        color: "red",
+        borderRadius: "50%",
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+        height: "3%",
+        width: "3%",
+    };
+
     if (postsLoading) return <p>Loading...</p>
 
     return (
         <Container>
             <div className={styles.postfeedcontainer}>
                 <Modal open={isModalOpen} onClose={() => setIsModalOpen(false)}>
+                    <span style={closeStyle} onClick={() => setIsModalOpen(false)}>
+                        <AiOutlineClose />
+                    </span>
                     {modalPost ?
-                        <>
-                            <Post
-                                key={modalPost.post_id}
-                                post_id={modalPost.post_id}
-                                group_id={modalPost.group_id}
-                                creator_id={modalPost.creator_id}
-                                image_path={modalPost.image_path}
-                                content={modalPost.content}
-                                num_of_comments={modalPost.num_of_comments}
-                                privacy_level={modalPost.privacy_level}
-                                likes={modalPost.likes}
-                                dislikes={modalPost.dislikes}
-                                creation_date={modalPost.creation_date}
-                            />
-                            <PostComments post_id={modalPost.post_id}/>
-                        </> : null
+                        <div
+                            className={styles.postmodalcontainer}>
+                            <div
+                                className={styles.postcontainer}>
+                                <Post
+                                    key={modalPost.post_id}
+                                    post_id={modalPost.post_id}
+                                    group_id={modalPost.group_id}
+                                    creator_id={modalPost.creator_id}
+                                    image_path={modalPost.image_path}
+                                    content={modalPost.content}
+                                    num_of_comments={modalPost.num_of_comments}
+                                    privacy_level={modalPost.privacy_level}
+                                    likes={modalPost.likes}
+                                    dislikes={modalPost.dislikes}
+                                    creation_date={modalPost.creation_date}
+                                />
+                            </div>
+                            <div>Comments <FaComment/></div>
+                            <div
+                                className={styles.postcommentscontainer}>
+                                <PostComments post_id={modalPost.post_id} />
+                            </div>
+                        </div>
+                        : null
                     }
-
-                    <button onClick={() => setIsModalOpen(false)}>Close</button>
                 </Modal>
                 {userViewablePosts
                     ? userViewablePosts.map((postProps) => (

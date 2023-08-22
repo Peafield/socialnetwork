@@ -1,6 +1,8 @@
 package routehandlers
 
 import (
+	"encoding/json"
+	"fmt"
 	"net/http"
 	followercontrollers "socialnetwork/pkg/controllers/FollowerControllers"
 	"socialnetwork/pkg/db/dbutils"
@@ -40,8 +42,7 @@ func FollowerHandler(w http.ResponseWriter, r *http.Request) {
 		NewFollowerHandler(w, r)
 		return
 	case http.MethodGet:
-		//get one follower or get all followers?
-		//GetAllFollowers(w, r)
+		GetFollowerHandler(w, r)
 		return
 	case http.MethodPut:
 		UpdateFollowerHandler(w, r)
@@ -70,6 +71,8 @@ Specifically, it:
   - If all of the above steps are successful, it sends an HTTP 200 (OK) status to the client, indicating that the comment was successfully inserted.
 */
 func NewFollowerHandler(w http.ResponseWriter, r *http.Request) {
+	var data interface{}
+
 	userData, ok := r.Context().Value(middleware.UserDataKey).(readwritemodels.Payload)
 	if !ok {
 		http.Error(w, "failed to read user data from context", http.StatusInternalServerError)
@@ -82,12 +85,61 @@ func NewFollowerHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	fmt.Println(postFollowerData.Data)
+
 	err := followercontrollers.FollowUser(dbutils.DB, userData.UserId, postFollowerData.Data)
 	if err != nil {
+		fmt.Println(err)
 		http.Error(w, "failed to follow user", http.StatusInternalServerError)
 		return
 	}
+	response := readwritemodels.WriteData{
+		Status: "success",
+		Data:   data,
+	}
+	jsonReponse, err := json.Marshal(response)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
+	w.Write(jsonReponse)
+}
+
+/*
+GetFollowerHandler
+*/
+func GetFollowerHandler(w http.ResponseWriter, r *http.Request) {
+	userData, ok := r.Context().Value(middleware.UserDataKey).(readwritemodels.Payload)
+	if !ok {
+		http.Error(w, "failed to read user data from context", http.StatusInternalServerError)
+		return
+	}
+
+	specificFolloweeId := r.URL.Query().Get("followee_id")
+	var data interface{}
+
+	if specificFolloweeId != "" {
+		follower, err := followercontrollers.SelectFollowerInfo(dbutils.DB, userData.UserId, specificFolloweeId)
+		if err != nil {
+			http.Error(w, "failed to get follower", http.StatusInternalServerError)
+		}
+		data = follower
+	}
+
+	response := readwritemodels.WriteData{
+		Status: "success",
+		Data:   data,
+	}
+	jsonReponse, err := json.Marshal(response)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	w.Write(jsonReponse)
 }
 
 /*
@@ -132,6 +184,8 @@ Specifically, it:
   - If all of the above steps are successful, it sends an HTTP 200 (OK) status to the client, indicating that the comment was successfully deleted.
 */
 func DeleteFollowerHandler(w http.ResponseWriter, r *http.Request) {
+	var data interface{}
+
 	userData, ok := r.Context().Value(middleware.UserDataKey).(readwritemodels.Payload)
 	if !ok {
 		http.Error(w, "failed to read user data from context", http.StatusInternalServerError)
@@ -149,5 +203,17 @@ func DeleteFollowerHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "failed to delete follower", http.StatusInternalServerError)
 		return
 	}
+
+	response := readwritemodels.WriteData{
+		Status: "success",
+		Data:   data,
+	}
+	jsonReponse, err := json.Marshal(response)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
+	w.Write(jsonReponse)
 }

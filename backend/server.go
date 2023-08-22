@@ -140,7 +140,7 @@ func main() {
 
 	headersOk := handlers.AllowedHeaders([]string{"X-Requested-With", "Accept", "Content-Type", "Authorization"})
 	originsOk := handlers.AllowedOrigins([]string{"*"})
-	methodsOk := handlers.AllowedMethods([]string{"GET", "HEAD", "POST", "PUT", "OPTIONS"})
+	methodsOk := handlers.AllowedMethods([]string{"GET", "HEAD", "POST", "PUT", "DELETE", "OPTIONS"})
 
 	// Attach CORS middleware to your router
 	r.Use(handlers.CORS(originsOk, headersOk, methodsOk))
@@ -162,6 +162,7 @@ func main() {
 	r.Handle("/post", middleware.ValidateTokenMiddleware(middleware.ParseAndValidateData(http.HandlerFunc(routehandlers.PostHandler))))
 	r.Handle("/comment", middleware.ValidateTokenMiddleware(middleware.ParseAndValidateData(http.HandlerFunc(routehandlers.CommentHandler))))
 	r.Handle("/reaction", middleware.ValidateTokenMiddleware(middleware.ParseAndValidateData(http.HandlerFunc(routehandlers.ReactionHandler))))
+	r.Handle("/follow", middleware.ValidateTokenMiddleware(middleware.ParseAndValidateData(http.HandlerFunc(routehandlers.FollowerHandler))))
 
 	/*LISTEN AND SERVER*/
 	log.Fatal(srv.ListenAndServe())

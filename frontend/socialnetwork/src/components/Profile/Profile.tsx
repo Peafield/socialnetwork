@@ -7,6 +7,7 @@ import ProfileHeader from './ProfileHeader'
 import ProfilePostsGrid from './ProfilePostsGrid'
 import styles from './Profile.module.css'
 import { getUserByDisplayName } from '../../controllers/GetUser'
+import { GetFollowerData } from '../../controllers/Follower/GetFollower'
 
 export interface ProfileProps {
     user_id: string,
@@ -23,8 +24,6 @@ const Profile: React.FC = () => {
     const [profileLoading, setProfileLoading] = useState<boolean>(false);
     const [error, setError] = useState<string | null>(null);
     const { username } = useParams();
-    
-    
 
     useEffect(() => {
         const fetchData = async () => {
@@ -40,9 +39,9 @@ const Profile: React.FC = () => {
             } catch (error) {
                 if (error instanceof Error) {
                     setError(error.message);
-                  } else {
+                } else {
                     setError("An unexpected error occurred.");
-                  }
+                }
             }
             setProfileLoading(false);
         };
@@ -50,17 +49,28 @@ const Profile: React.FC = () => {
         fetchData(); // Call the async function
     }, [username]);
 
-    if (profileLoading) {return <p>Loading...</p>}
+    
 
-  return (
-    <>
-    {profile? <div className={styles.profilecontainer}>
-        <ProfileHeader first_name={profile.first_name} last_name={profile.last_name} display_name={profile.display_name} avatar={profile.avatar} num_of_posts={0} followers={0} following={0} about_me={profile.about_me}/>
-        <ProfilePostsGrid user_id={profile.user_id}/>
-        </div> : null}
-          
-    </>
-  )
+    if (profileLoading) { return <p>Loading...</p> }
+
+    return (
+        <>
+            {profile ? <div className={styles.profilecontainer}>
+                <ProfileHeader 
+                profile_id={profile.user_id}
+                first_name={profile.first_name} 
+                last_name={profile.last_name} 
+                display_name={profile.display_name} 
+                avatar={profile.avatar} 
+                num_of_posts={0} 
+                followers={0} 
+                following={0} 
+                about_me={profile.about_me} />
+                <ProfilePostsGrid user_id={profile.user_id} />
+            </div> : null}
+
+        </>
+    )
 }
 
 export default Profile

@@ -1,10 +1,17 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { FaUserCircle } from "react-icons/fa";
+import { UserContext } from "../../context/AuthContext";
+import { handleAPIRequest } from "../../controllers/Api";
+import { GetFollowerData } from "../../controllers/Follower/GetFollower";
+import { NewFollower } from "../../controllers/Follower/NewFollower";
+import { Unfollow } from "../../controllers/Follower/Unfollow";
 import { createImageURL } from "../../controllers/ImageURL";
+import { getCookie } from "../../controllers/SetUserContextAndCookie";
 import Container from "../Containers/Container";
 import styles from "./Profile.module.css";
 
 interface ProfileHeaderProps {
+  profile_id: string,
   first_name: string,
   last_name: string,
   display_name: string;
@@ -15,7 +22,16 @@ interface ProfileHeaderProps {
   about_me: string;
 }
 
+export interface FollowerProps {
+  follower_id: string,
+  followee_id: string,
+  following_status: number,
+  request_pending: number,
+  creation_date: string
+}
+
 const ProfileHeader: React.FC<ProfileHeaderProps> = ({
+  profile_id,
   first_name,
   last_name,
   display_name,
@@ -23,9 +39,19 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
   num_of_posts,
   followers,
   following,
-  about_me,
+  about_me
 }) => {
+  const userContext = useContext(UserContext)
   const [profilePicUrl, setProfilePicUrl] = useState<string | null>(null);
+  const [followerData, setFollowerData] = useState<FollowerProps>({
+    follower_id: "",
+    followee_id: "",
+    following_status: 0,
+    request_pending: 0,
+    creation_date: ""
+  });
+  const [updateTrigger, setUpdateTrigger] = useState<number>(0)
+  const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
     if (avatar) {
@@ -39,6 +65,55 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
       };
     }
   }, [avatar]);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const following = await GetFollowerData(profile_id)
+        setFollowerData(following)
+
+      } catch (error) {
+        if (error instanceof Error) {
+          setError(error.message);
+        } else {
+          setError("An unexpected error occurred.");
+        }
+      }
+    }
+    fetchData()
+  }, [updateTrigger])
+
+  const handleFollow = async () => {
+    try {
+      const response = await NewFollower(profile_id)
+      if (response && response.status === "success") {
+        console.log("follow submit success");
+        setUpdateTrigger(prevTrigger => prevTrigger + 1)
+      }
+    } catch (error) {
+      if (error instanceof Error) {
+        setError(error.message);
+      } else {
+        setError("An unexpected error occurred.");
+      }
+    }
+  }
+
+  const handleUnfollow = async () => {
+    try {
+      const response = await Unfollow(profile_id, userContext.user ? userContext.user.userId : "")
+      if (response && response.status === "success") {
+        console.log("unfollow success");
+        setUpdateTrigger(prevTrigger => prevTrigger + 1)
+      }
+    } catch (error) {
+      if (error instanceof Error) {
+        setError(error.message);
+      } else {
+        setError("An unexpected error occurred.");
+      }
+    }
+  }
 
   return (
     <Container>
@@ -59,12 +134,23 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
         <div className={styles.nameinfocontainer}>
           <div>{first_name} {last_name}</div>
           <div style={{ color: "gray" }}>{display_name}</div>
+          <div style={{
+            fontSize: "small",
+            fontStyle: "italic",
+            color: "gray"
+          }}>
+            {followerData.following_status == 1 ?
+              <button onClick={handleUnfollow}>Unfollow</button>
+              : followerData.request_pending == 1 ?
+                <button onClick={handleUnfollow}>Request Pending...</button>
+                : <button onClick={handleFollow}>Follow!</button>}
+          </div>
         </div>
         <div className={styles.otherprofileinfocontainer}>
           <div className={styles.profilestatscontainer}>
-          <div>{num_of_posts} Posts</div>
-          <div>{followers} Followers</div>
-          <div>Following {following}</div>
+            <div>{num_of_posts} Posts</div>
+            <div>{followers} Followers</div>
+            <div>Following {following}</div>
           </div>
           <div className={styles.aboutmecontainer}>
             <div>{about_me}</div>

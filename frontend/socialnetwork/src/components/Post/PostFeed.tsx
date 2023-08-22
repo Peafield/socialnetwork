@@ -43,7 +43,7 @@ const PostFeed: React.FC = () => {
         };
 
         fetchData(); // Call the async function
-    }, [postsLoading]);
+    }, []);
 
     
 

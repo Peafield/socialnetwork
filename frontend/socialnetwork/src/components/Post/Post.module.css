@@ -42,7 +42,13 @@
   overflow-y: auto;
   margin: 10px;
   height: 90%;
-  width: 50%;
+  width: 70%;
+}
+
+.commentformcontainer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 .postheadercontainer {

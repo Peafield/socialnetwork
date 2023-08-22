@@ -31,7 +31,7 @@ func InsertComment(db *sql.DB, userId string, commentData map[string]interface{}
 	}
 	args[3] = contentData
 
-	imgPathData, ok := commentData["image_path"].(string)
+	imgPathData, ok := commentData["image"].(string)
 	if ok {
 		args[4] = imgPathData
 	} else {

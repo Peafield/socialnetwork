@@ -1,6 +1,6 @@
 import React, { CSSProperties, useEffect, useState } from 'react'
 import { AiOutlineClose } from 'react-icons/ai';
-import { FaComment } from 'react-icons/fa';
+import { FaComment, FaCommentMedical } from 'react-icons/fa';
 import { handleAPIRequest } from '../../controllers/Api';
 import { getCookie } from '../../controllers/SetUserContextAndCookie';
 import Container from '../Containers/Container'
@@ -32,8 +32,6 @@ const PostFeed: React.FC = () => {
             try {
                 const response = await handleAPIRequest("/post", options);
                 setUserViewablePosts(response.data.Posts);
-                console.log(response.data.Posts);
-
             } catch (error) {
                 if (error instanceof Error) {
                     setError(error.message);
@@ -45,7 +43,9 @@ const PostFeed: React.FC = () => {
         };
 
         fetchData(); // Call the async function
-    }, []);
+    }, [postsLoading]);
+
+    
 
     const closeStyle: CSSProperties = {
         margin: "10px",
@@ -89,7 +89,6 @@ const PostFeed: React.FC = () => {
                             </div>
                             <div
                                 className={styles.postcommentscontainer}>
-                                <div>Comments <FaComment /></div>
                                 <PostComments post_id={modalPost.post_id} />
                             </div>
                         </div>

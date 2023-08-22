@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { FaUserCircle } from "react-icons/fa";
+import { createImageURL } from "../../controllers/ImageURL";
 import Container from "../Containers/Container";
 import styles from "./Profile.module.css";
 
@@ -28,16 +29,7 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
 
   useEffect(() => {
     if (avatar) {
-      const decodedAvatar = atob(avatar); // Decode base64-encoded avatar data
-      const avatarBuffer = new ArrayBuffer(decodedAvatar.length);
-      const avatarView = new Uint8Array(avatarBuffer);
-      for (let i = 0; i < decodedAvatar.length; i++) {
-        avatarView[i] = decodedAvatar.charCodeAt(i);
-      }
-
-      const blob = new Blob([avatarBuffer]);
-      const url = URL.createObjectURL(blob);
-      console.log(url);
+      const url = createImageURL(avatar)
 
       setProfilePicUrl(url);
 

@@ -27,12 +27,11 @@
 
 .postmodalcontainer {
   display: flex;
-  flex-direction: column;
-  justify-content: center;
+  flex-direction: row;
+  justify-content: space-between;
   align-items: center;
   width: 90%;
   height: 90%;
-  margin-left: 4.3%;
 }
 
 .postcommentscontainer {
@@ -41,8 +40,9 @@
   justify-content: flex-start;
   align-items: center;
   overflow-y: auto;
-  height: auto;
-  width: 80%;
+  margin: 10px;
+  height: 90%;
+  width: 50%;
 }
 
 .postheadercontainer {

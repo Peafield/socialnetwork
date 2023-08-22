@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react'
 import { IoPeopleCircle } from 'react-icons/io5';
 import { Link } from 'react-router-dom';
-import { handleAPIRequest } from '../../controllers/Api';
-import { getCookie } from '../../controllers/SetUserContextAndCookie';
+import { getUserByUserID } from '../../controllers/GetUser';
+import { createImageURL } from '../../controllers/ImageURL';
 import FormatDate from '../../helpers/DateConversion';
 import { ProfileProps } from '../Profile/Profile';
 import styles from './Comment.module.css'
@@ -25,29 +25,9 @@ const CommentHeader: React.FC<CommentHeaderProps> = ({
         const fetchData = async () => {
             setUserLoading(true);
 
-            let url;
-
-            {
-                user_id
-                    ? (url = `/user?user_id=${encodeURIComponent(user_id)}`)
-                    : (url = "/user");
-            }
-
-            const options = {
-                method: "GET",
-                headers: {
-                    Authorization: "Bearer " + getCookie("sessionToken"),
-                    "Content-Type": "application/json",
-                },
-            };
             try {
-                const response = await handleAPIRequest(url, options);
-                const newUserData = response.data.UserInfo;
-                newUserData.avatar = response.data.ProfilePic
-                    ? response.data.ProfilePic
-                    : null;
+                const newUserData = await getUserByUserID(user_id)
                 setUserData(newUserData);
-                console.log(newUserData);
             } catch (error) {
                 if (error instanceof Error) {
                     setError(error.message);
@@ -63,17 +43,7 @@ const CommentHeader: React.FC<CommentHeaderProps> = ({
 
     useEffect(() => {
         if (userData?.avatar) {
-          const decodedAvatar = atob(userData?.avatar); // Decode base64-encoded avatar data
-          const avatarBuffer = new ArrayBuffer(decodedAvatar.length);
-          const avatarView = new Uint8Array(avatarBuffer);
-          for (let i = 0; i < decodedAvatar.length; i++) {
-            avatarView[i] = decodedAvatar.charCodeAt(i);
-          }
-    
-          const blob = new Blob([avatarBuffer]);
-          const url = URL.createObjectURL(blob);
-          console.log(url);
-    
+          const url = createImageURL(userData.avatar)
           setProfilePicUrl(url);
     
           // Clean up the Blob URL when the component unmounts

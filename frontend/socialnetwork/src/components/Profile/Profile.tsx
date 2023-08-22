@@ -6,6 +6,7 @@ import Container from '../Containers/Container'
 import ProfileHeader from './ProfileHeader'
 import ProfilePostsGrid from './ProfilePostsGrid'
 import styles from './Profile.module.css'
+import { getUserByDisplayName } from '../../controllers/GetUser'
 
 export interface ProfileProps {
     user_id: string,
@@ -29,36 +30,19 @@ const Profile: React.FC = () => {
         const fetchData = async () => {
             setProfileLoading(true);
 
-            let url
-
-            {username ? url = `/user?display_name=${encodeURIComponent(username)}` : url = "/user"}
-            
-            const options = {
-                method: "GET",
-                headers: {
-                    Authorization: "Bearer " + getCookie("sessionToken"),
-                    "Content-Type": "application/json",
-                },
-            };
             try {
-                const response = await handleAPIRequest(url, options);
-                console.log(response.data);
-
-                const newprofile = response.data.UserInfo
-                const avatar = response.data.ProfilePic
-
-                newprofile.avatar = avatar
-                
-                console.log(newprofile);
-                
-                setProfile(newprofile);
-
+                if (username) {
+                    const newprofile = await getUserByDisplayName(username)
+                    setProfile(newprofile)
+                } else {
+                    setError("could not find profile username")
+                }
             } catch (error) {
                 if (error instanceof Error) {
                     setError(error.message);
-                } else {
+                  } else {
                     setError("An unexpected error occurred.");
-                }
+                  }
             }
             setProfileLoading(false);
         };

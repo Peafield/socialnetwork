@@ -87,9 +87,9 @@ const PostFeed: React.FC = () => {
                                     creation_date={modalPost.creation_date}
                                 />
                             </div>
-                            <div>Comments <FaComment/></div>
                             <div
                                 className={styles.postcommentscontainer}>
+                                <div>Comments <FaComment /></div>
                                 <PostComments post_id={modalPost.post_id} />
                             </div>
                         </div>

@@ -1,57 +1,73 @@
 import React from "react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import styles from "./Post.module.css";
 import { AiOutlineLike, AiOutlineDislike } from "react-icons/ai";
 import { GoComment } from "react-icons/go";
 import { HandleReaction } from "../../helpers/HandleReaction";
 
 interface PostActionsProps {
+  creatorId: string;
   postId: string;
   likes: number;
   dislikes: number;
-  numOfComments: number;
+  AmountOfComments: number;
 }
 
 const PostActions: React.FC<PostActionsProps> = ({
+  creatorId,
   postId,
   likes,
   dislikes,
-  numOfComments,
+  AmountOfComments,
 }) => {
+  const [numOfLikes, setNumOfLikes] = useState(likes);
+  const [numOfDislikes, setNumOfDisikes] = useState(dislikes);
+  const [numOfComments, setNumOfComments] = useState(AmountOfComments);
+
   const [hasLiked, setHasLiked] = useState(false);
   const [hasDisliked, setHasDisliked] = useState(false);
 
-  const handleLike = async () => {
+  useEffect(() => {
+    setNumOfLikes(likes);
+    setNumOfDisikes(dislikes);
+    setNumOfComments(AmountOfComments);
+  }, [likes, dislikes, AmountOfComments]);
+
+  const handleLike = async (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
     if (hasLiked) {
-      await HandleReaction("post", postId, "like", "remove");
+      await HandleReaction(creatorId, "post", postId, "like");
       setHasLiked(false);
-      likes--
+      setNumOfLikes(likes + 1);
     } else {
       if (hasDisliked) {
-        await HandleReaction("post", postId, "dislike", "remove");
+        await HandleReaction(creatorId, "post", postId, "dislike");
         setHasDisliked(false);
-        dislikes--
+        setNumOfDisikes(dislikes - 1);
       }
-      await HandleReaction("post", postId, "like", "add");
+      await HandleReaction(creatorId, "post", postId, "like");
       setHasLiked(true);
-      likes++
+      setNumOfLikes(likes + 1);
     }
   };
 
-  const handleDislike = async () => {
+  const handleDislike = async (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
     if (hasDisliked) {
-      await HandleReaction("post", postId, "dislike", "remove");
+      await HandleReaction(creatorId, "post", postId, "dislike");
       setHasDisliked(false);
-      dislikes--
+      setNumOfDisikes(dislikes - 1);
     } else {
       if (hasLiked) {
-        await HandleReaction("post", postId, "like", "remove");
+        await HandleReaction(creatorId, "post", postId, "like");
         setHasLiked(false);
-        likes--
+        setNumOfLikes(likes + 1);
       }
-      await HandleReaction("post", postId, "dislike", "add");
+      await HandleReaction(creatorId, "post", postId, "dislike");
       setHasDisliked(true);
-      dislikes++
+      setNumOfDisikes(dislikes - 1);
     }
   };
 
@@ -61,10 +77,10 @@ const PostActions: React.FC<PostActionsProps> = ({
         <div className={styles.postactioninfo}>
           <span className={styles.postactionspan}>
             <p>
-              {likes} <AiOutlineLike />
+              {numOfLikes} <AiOutlineLike />
             </p>
             <p>
-              {dislikes} <AiOutlineDislike />
+              {numOfDislikes} <AiOutlineDislike />
             </p>
           </span>
           <p>{numOfComments} comments</p>
@@ -74,10 +90,10 @@ const PostActions: React.FC<PostActionsProps> = ({
         <div
           className={`${styles.postactionsubcontainer} ${styles.postactionsubcontainerbottom}`}
         >
-          <button onClick={handleLike}>
+          <button onClick={(e) => handleLike(e)}>
             <AiOutlineLike /> Like
           </button>
-          <button onClick={handleDislike}>
+          <button onClick={(e) => handleDislike(e)}>
             <AiOutlineDislike /> Dislike
           </button>
           <button>

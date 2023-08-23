@@ -45,14 +45,12 @@ const Profile: React.FC = () => {
             };
             try {
                 const response = await handleAPIRequest(url, options);
-                console.log(response.data);
 
                 const newprofile = response.data.UserInfo
                 const avatar = response.data.ProfilePic
 
                 newprofile.avatar = avatar
                 
-                console.log(newprofile);
                 
                 setProfile(newprofile);
 

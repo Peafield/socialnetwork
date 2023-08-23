@@ -1,30 +1,39 @@
 import { handleAPIRequest } from "../controllers/Api";
+import { getCookie } from '../controllers/SetUserContextAndCookie';
 
-const REACTION_ENDPOINT = "/reaction"
+const REACTION_ENDPOINT = "/notification";
 
-export async function HandleReaction(reactionOn: string, postORCommentId: string, reactionType: 'like' | 'dislike', action: 'add' | 'remove') {
-    const payload = {
-      reactionOn,
-        postORCommentId,
-        type: reactionType,
-        action,
-    };
+export async function HandleReaction(
+  creatorId: string,
+  reactionOn: string,
+  notificationTypeId: string,
+  reactionType: "like" | "dislike",
+) {
+  const payload = {
+    creatorId,
+    reactionOn,
+    notificationTypeId,
+    reactionType,
+  };
 
-    const options = {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json",
-        },
-        body: JSON.stringify(payload),
-    }
+  const data = { data: payload };
+  const options = {
+    method: "POST",
+    headers: {
+      Authorization: "Bearer " + getCookie("sessionToken"),
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(data),
+  };
 
   try {
-    const response = await handleAPIRequest(REACTION_ENDPOINT, options)
-    if (response && response.status === "success") {
-        return "success"
+    const response = await handleAPIRequest(REACTION_ENDPOINT, options);
+    if (response.error) {
+      console.error("Error response:", response.error);
     }
+   
   } catch (error) {
-    console.log("Error in handleLike:", error)
-    throw error
+    console.log("Error in handleLike:", error);
+    throw error;
   }
 }

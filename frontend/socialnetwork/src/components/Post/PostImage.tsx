@@ -21,7 +21,7 @@ const PostImage: React.FC<PostImageProps> = ({imageString}) => {
 
       const blob = new Blob([avatarBuffer]);
       const url = URL.createObjectURL(blob);
-      console.log(url);
+
 
       setIamge(url);
 

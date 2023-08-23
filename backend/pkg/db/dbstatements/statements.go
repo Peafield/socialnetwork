@@ -211,10 +211,9 @@ func InitDBStatements(db *sql.DB) error {
 		event_id,
 		comment_id,
 		chat_id,
-		reaction_type,
-		read_status
+		reaction_type
 	) VALUES (
-		?, ?, ?, ?, ?, ?, ?, ?, ?, ?
+		?, ?, ?, ?, ?, ?, ?, ?, ?
 	)`)
 	if err != nil {
 		return fmt.Errorf("failed to prepare insert notifications statement: %w", err)

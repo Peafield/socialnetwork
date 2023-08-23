@@ -30,7 +30,6 @@ const PostFeed: React.FC = () => {
             try {
                 const response = await handleAPIRequest("/post", options);
                 setUserViewablePosts(response.data.Posts);
-                console.log(response.data.Posts);
 
             } catch (error) {
                 if (error instanceof Error) {

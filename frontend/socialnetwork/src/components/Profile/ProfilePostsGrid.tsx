@@ -39,7 +39,6 @@ const ProfilePostsGrid: React.FC<ProfilePostsGridProps> = ({
             try {
                 const response = await handleAPIRequest(url, options);
                 setProfilePosts(response.data.Posts);
-                console.log(response.data.Posts);
 
             } catch (error) {
                 if (error instanceof Error) {

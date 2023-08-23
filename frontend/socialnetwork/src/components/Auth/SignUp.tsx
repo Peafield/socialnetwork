@@ -60,7 +60,6 @@ export default function SignUp() {
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const data = { data: formData };
-    console.log(formData);
 
     const options = {
       method: "POST",

@@ -62,7 +62,6 @@ const Post: React.FC<PostProps> = ({
           ? response.data.ProfilePic
           : null;
         setUserData(newUserData);
-        console.log(newUserData);
       } catch (error) {
         if (error instanceof Error) {
           setError(error.message);
@@ -89,10 +88,11 @@ const Post: React.FC<PostProps> = ({
           <PostContent text={content} />
           <PostImage imageString={image_path}/>
           <PostActions
+          creatorId={creator_id}
             postId={post_id}
             likes={likes}
             dislikes={dislikes}
-            numOfComments={num_of_comments}
+            AmountOfComments={num_of_comments}
           />
         </>
       ) : null}

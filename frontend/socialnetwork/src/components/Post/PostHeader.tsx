@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { FaUserCircle, FaGlobeAfrica } from "react-icons/fa";
+import { FaGlobeAfrica } from "react-icons/fa";
 import {FaPeopleGroup } from "react-icons/fa6"
 import { IoPeopleCircle } from "react-icons/io5"
 import styles from "./Post.module.css";
@@ -35,7 +35,6 @@ const PostHeader: React.FC<PostHeaderProps> = ({
 
       const blob = new Blob([avatarBuffer]);
       const url = URL.createObjectURL(blob);
-      console.log(url);
 
       setProfilePicUrl(url);
 

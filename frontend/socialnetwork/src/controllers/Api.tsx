@@ -4,10 +4,14 @@ export async function handleAPIRequest(url: string, options: object) {
   try {
     const response = await fetch(API_URL + url, options);
     if (response.ok) {      
-      const data = await response.json();
-      console.log(data);
+      const contentType = response.headers.get("content-type");
       
-      return data;
+      if (contentType && contentType.indexOf("application/json") !== -1) {
+        return await response.json();
+      } else {
+        return {};
+      }
+      
     } else {
       throw new Error(
         response.status
@@ -20,3 +24,5 @@ export async function handleAPIRequest(url: string, options: object) {
     throw new Error("API request failed");
   }
 }
+
+

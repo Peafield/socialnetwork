@@ -64,7 +64,7 @@ func initPostSelectStatements() {
 	JOIN Posts_Selected_Followers PSF ON P.post_id = PSF.post_id
 	WHERE PSF.allowed_follower_id = ?`
 
-	SpecificUserPosts = `
+	SelectSpecificUserPosts = `
 	SELECT * FROM Posts 
 	WHERE creator_id = ? AND privacy_level = 0
 	UNION

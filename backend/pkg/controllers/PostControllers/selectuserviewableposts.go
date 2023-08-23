@@ -2,9 +2,11 @@ package postcontrollers
 
 import (
 	"database/sql"
+	"errors"
 	"fmt"
 	crud "socialnetwork/pkg/db/CRUD"
 	"socialnetwork/pkg/db/dbstatements"
+	errorhandling "socialnetwork/pkg/errorHandling"
 	"socialnetwork/pkg/models/dbmodels"
 )
 
@@ -37,7 +39,7 @@ func SelectUserViewablePosts(db *sql.DB, userId string) (*dbmodels.Posts, error)
 	}
 
 	postsData, err := crud.SelectFromDatabase(db, "Posts", dbstatements.SelectUserViewablePosts, values)
-	if err != nil {
+	if err != nil && !errors.Is(err, errorhandling.ErrNoRowsAffected) {
 		return nil, fmt.Errorf("failed to select user viewable posts from database: %w", err)
 	}
 

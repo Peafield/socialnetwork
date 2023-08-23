@@ -33,7 +33,7 @@ var (
 	SelectUserByID          string
 	SelectUserByDisplayName string
 	SelectUserViewablePosts string
-	SpecificUserPosts       string
+	SelectSpecificUserPosts string
 )
 
 func InitDBStatements(db *sql.DB) error {

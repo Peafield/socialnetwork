@@ -2,6 +2,7 @@ import React, { ReactNode, useContext, useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom';
 import { UserContext } from '../context/AuthContext';
 import { getCookie } from '../controllers/SetUserContextAndCookie';
+import {useSetUserContextAndCookie} from '../controllers/SetUserContextAndCookie'
 
 interface ProtectedRouteProps {
     element: ReactNode
@@ -10,15 +11,18 @@ interface ProtectedRouteProps {
 const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
     element
 }) => {
-    const userContext = useContext(UserContext);
     const navigate = useNavigate();
     const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+    const setUserContextAndCookie = useSetUserContextAndCookie();
+
     const checkUserToken = () => {
         const userToken = getCookie("sessionToken");
         if (!userToken || userToken === 'undefined') {
             setIsLoggedIn(false);
             return navigate('/auth/login');
         }
+        setUserContextAndCookie(userToken) 
         setIsLoggedIn(true);
     }
     useEffect(() => {

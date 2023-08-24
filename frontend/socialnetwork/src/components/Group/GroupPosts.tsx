@@ -1,55 +1,20 @@
-import React, { CSSProperties, useEffect, useState } from 'react'
+import React, { CSSProperties, useState } from 'react'
 import { AiOutlineClose } from 'react-icons/ai';
-import { useNavigate } from 'react-router-dom';
-import { handleAPIRequest } from '../../controllers/Api';
-import { getCookie } from '../../controllers/SetUserContextAndCookie';
-import Container from '../Containers/Container'
+import Container from '../Containers/Container';
 import Modal from '../Containers/Modal';
-import Post, { PostProps } from './Post'
-import styles from './Post.module.css'
-import PostComments from './PostComments';
+import Post, { PostProps } from '../Post/Post';
+import PostComments from '../Post/PostComments';
+import styles from './Group.module.css'
 
-const PostFeed: React.FC = () => {
-    const navigate = useNavigate();
-    const [userViewablePosts, setUserViewablePosts] = useState<
-        PostProps[] | null
-    >(null);
-    const [postsLoading, setPostsLoading] = useState<boolean>(false);
+interface GroupPostsProps {
+    posts: PostProps[]
+}
+
+const GroupPosts: React.FC<GroupPostsProps> = ({
+    posts
+}) => {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [modalPost, setModalPost] = useState<PostProps | null>(null)
-    const [error, setError] = useState<string | null>(null);
-
-    useEffect(() => {
-        const fetchData = async () => {
-            setPostsLoading(true);
-
-            const options = {
-                method: "GET",
-                headers: {
-                    Authorization: "Bearer " + getCookie("sessionToken"),
-                    "Content-Type": "application/json",
-                },
-            };
-            try {
-                const response = await handleAPIRequest("/post", options);
-                setUserViewablePosts(response.data.Posts);
-            } catch (error) {
-                if (error instanceof Error) {
-                    setError(error.message);
-                    if (error.cause == 401) {
-                        navigate("/signin")
-                    }
-                } else {
-                    setError("An unexpected error occurred.");
-                }
-            }
-            setPostsLoading(false);
-        };
-
-        fetchData(); // Call the async function
-    }, []);
-
-    
 
     const closeStyle: CSSProperties = {
         margin: "10px",
@@ -63,11 +28,9 @@ const PostFeed: React.FC = () => {
         width: "3%",
     };
 
-    if (postsLoading) return <p>Loading...</p>
-
     return (
         <Container>
-            <div className={styles.postfeedcontainer}>
+            <div className={styles.grouppostscontainer}>
                 <Modal open={isModalOpen} onClose={() => setIsModalOpen(false)}>
                     <span style={closeStyle} onClick={() => setIsModalOpen(false)}>
                         <AiOutlineClose />
@@ -99,8 +62,8 @@ const PostFeed: React.FC = () => {
                         : null
                     }
                 </Modal>
-                {userViewablePosts
-                    ? userViewablePosts.map((postProps) => (
+                {posts
+                    ? posts.map((postProps) => (
                         <div
                             className={styles.postcontainer}
                             key={postProps.post_id}
@@ -129,4 +92,4 @@ const PostFeed: React.FC = () => {
     )
 }
 
-export default PostFeed
+export default GroupPosts

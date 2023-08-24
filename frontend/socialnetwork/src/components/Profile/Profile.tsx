@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { useParams } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router-dom'
 import { handleAPIRequest } from '../../controllers/Api'
 import { getCookie } from '../../controllers/SetUserContextAndCookie'
 import ProfileHeader from './ProfileHeader'
@@ -19,6 +19,7 @@ export interface ProfileProps {
 }
 
 const Profile: React.FC = () => {
+    const navigate = useNavigate();
     const [profile, setProfile] = useState<ProfileProps | null>(null)
     const [profileLoading, setProfileLoading] = useState<boolean>(false);
     const [profilePosts, setProfilePosts] = useState<PostProps[]>([]);
@@ -40,6 +41,9 @@ const Profile: React.FC = () => {
             } catch (error) {
                 if (error instanceof Error) {
                     setError(error.message);
+                    if (error.cause == 401) {
+                        navigate("/signin")
+                    }
                 } else {
                     setError("An unexpected error occurred.");
                 }

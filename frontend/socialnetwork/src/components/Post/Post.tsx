@@ -3,8 +3,6 @@ import PostHeader from "./PostHeader";
 import PostContent from "./PostContent";
 import PostActions from "./PostActions";
 import { ProfileProps } from "../Profile/Profile";
-import { handleAPIRequest } from "../../controllers/Api";
-import { getCookie } from "../../controllers/SetUserContextAndCookie";
 import { getUserByUserID } from "../../controllers/GetUser";
 
 export interface PostProps {

@@ -2,9 +2,9 @@ import React, { useContext, useEffect, useState } from "react";
 import { FaUserCircle } from "react-icons/fa";
 import { UserContext } from "../../context/AuthContext";
 import { handleAPIRequest } from "../../controllers/Api";
-import { GetFollowerData } from "../../controllers/Follower/GetFollower";
-import { NewFollower } from "../../controllers/Follower/NewFollower";
-import { Unfollow } from "../../controllers/Follower/Unfollow";
+import { getFollowerData } from "../../controllers/Follower/GetFollower";
+import { newFollower } from "../../controllers/Follower/NewFollower";
+import { unfollow } from "../../controllers/Follower/Unfollow";
 import { createImageURL } from "../../controllers/ImageURL";
 import { getCookie } from "../../controllers/SetUserContextAndCookie";
 import Container from "../Containers/Container";
@@ -69,7 +69,7 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const following = await GetFollowerData(profile_id)
+        const following = await getFollowerData(profile_id)
         setFollowerData(following)
 
       } catch (error) {
@@ -85,7 +85,7 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
 
   const handleFollow = async () => {
     try {
-      const response = await NewFollower(profile_id)
+      const response = await newFollower(profile_id)
       if (response && response.status === "success") {
         console.log("follow submit success");
         setUpdateTrigger(prevTrigger => prevTrigger + 1)
@@ -101,7 +101,7 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
 
   const handleUnfollow = async () => {
     try {
-      const response = await Unfollow(profile_id, userContext.user ? userContext.user.userId : "")
+      const response = await unfollow(profile_id, userContext.user ? userContext.user.userId : "")
       if (response && response.status === "success") {
         console.log("unfollow success");
         setUpdateTrigger(prevTrigger => prevTrigger + 1)

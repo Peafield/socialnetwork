@@ -1,7 +1,7 @@
 import { handleAPIRequest } from "../Api";
 import { getCookie } from "../SetUserContextAndCookie";
 
-export const Unfollow = async (followee_id: string, follower_id: string) => {
+export const unfollow = async (followee_id: string, follower_id: string) => {
     const deleteFollower = {
         followee_id: followee_id,
         follower_id: follower_id

@@ -20,7 +20,7 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
         const userToken = getCookie("sessionToken");
         if (!userToken || userToken === 'undefined') {
             setIsLoggedIn(false);
-            return navigate('/auth/login');
+            return navigate('/signin');
         }
         setUserContextAndCookie(userToken) 
         setIsLoggedIn(true);

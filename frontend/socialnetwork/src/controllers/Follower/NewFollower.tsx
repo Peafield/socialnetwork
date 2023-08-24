@@ -1,7 +1,7 @@
 import { handleAPIRequest } from "../Api";
 import { getCookie } from "../SetUserContextAndCookie";
 
-export const NewFollower = async (followee_id: string) => {
+export const newFollower = async (followee_id: string) => {
     const newFollower = {
         followee_id: followee_id
       }

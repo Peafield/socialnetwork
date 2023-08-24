@@ -1,8 +1,8 @@
 import { handleAPIRequest } from "../Api";
 import { getCookie } from "../SetUserContextAndCookie";
 
-export const getFollowerData = async (followee_id: string) => {
-    const url = `/follow?followee_id=${encodeURIComponent(followee_id)}`
+export const getGroupByName = async (group_id: string) => {
+    const url = `/group?group_id=${encodeURIComponent(group_id)}`
 
     const options = {
         method: "GET",
@@ -14,11 +14,10 @@ export const getFollowerData = async (followee_id: string) => {
     try {
         const response = await handleAPIRequest(url, options);
         console.log(response);
-        
 
-        const follower = response.data
+        const group = response.data
 
-        return follower
+        return group
 
     } catch (error) {
         return error

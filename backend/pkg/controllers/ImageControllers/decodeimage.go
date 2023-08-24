@@ -15,8 +15,6 @@ func InsertImage(db *sql.DB) {
 }
 
 func DecodeImage(imageData string) (string, error) {
-	fmt.Println(strings.Split(imageData, ",")[0])
-
 	// Extract the Base64 encoded data - removing the data:image/png;base64, part
 	base64Data := imageData[strings.Index(imageData, ",")+1:]
 
@@ -29,7 +27,6 @@ func DecodeImage(imageData string) (string, error) {
 
 	// Generate a unique file name and save the file
 	filePath := "pkg/db/images/" + uuid.New().String()
-	fmt.Println(filePath)
 	err = os.WriteFile(filePath, fileData, 0666)
 	if err != nil {
 		fmt.Println(err)

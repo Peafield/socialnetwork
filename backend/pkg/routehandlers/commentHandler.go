@@ -2,10 +2,12 @@ package routehandlers
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 	commentcontrollers "socialnetwork/pkg/controllers/CommentControllers"
 	"socialnetwork/pkg/db/dbutils"
 	"socialnetwork/pkg/middleware"
+	"socialnetwork/pkg/models/dbmodels"
 	"socialnetwork/pkg/models/readwritemodels"
 )
 
@@ -41,7 +43,7 @@ func CommentHandler(w http.ResponseWriter, r *http.Request) {
 		NewComment(w, r)
 		return
 	case http.MethodGet:
-		PostComments(w, r)
+		GetComments(w, r)
 		return
 	case http.MethodPut:
 		UpdateComment(w, r)
@@ -87,7 +89,19 @@ func NewComment(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "failed to insert post data", http.StatusInternalServerError)
 		return
 	}
+	response := readwritemodels.WriteData{
+		Status: "success",
+		Data:   "",
+	}
+
+	jsonReponse, err := json.Marshal(response)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
+	w.Write(jsonReponse)
 }
 
 /*
@@ -103,22 +117,24 @@ Specifically, it:
   - Calls controllers.SelectPostComments to select all comments related to a post. If it fails, it sends an HTTP 500 (Internal Server Error) status to the client, with an error message indicating that it failed to insert the post data.
   - If all of the above steps are successful, it writes the posts to a response and sends an HTTP 200 (OK) status to the client, indicating that the comments were successfully selected.
 */
-func PostComments(w http.ResponseWriter, r *http.Request) {
-	postIDData, ok := r.Context().Value(middleware.DataKey).(readwritemodels.ReadData)
-	if !ok {
-		http.Error(w, "failed to read post id data from context", http.StatusInternalServerError)
-		return
-	}
+func GetComments(w http.ResponseWriter, r *http.Request) {
+	comments := &dbmodels.Comments{}
+	var err error
 
-	postComments, err := commentcontrollers.SelectPostComments(dbutils.DB, postIDData.Data["post_id"].(string))
-	if err != nil {
-		http.Error(w, "failed to select post's comments", http.StatusInternalServerError)
-		return
+	postId := r.URL.Query().Get("post_id")
+
+	if postId != "" {
+		comments, err = commentcontrollers.SelectPostComments(dbutils.DB, postId)
+		if err != nil {
+			fmt.Println(err)
+			http.Error(w, "failed to select post's comments", http.StatusInternalServerError)
+			return
+		}
 	}
 
 	response := readwritemodels.WriteData{
 		Status: "success",
-		Data:   postComments,
+		Data:   comments,
 	}
 	jsonReponse, err := json.Marshal(response)
 	if err != nil {

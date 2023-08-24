@@ -49,6 +49,7 @@ func main() {
 		if err != nil {
 			log.Fatalf("Failed to create database: %s", err)
 		}
+		return
 	}
 
 	if *dbopen {
@@ -100,6 +101,7 @@ func main() {
 		if err != nil {
 			log.Fatalf("Failed to migrate changes up: %s", err)
 		}
+		return
 	}
 
 	if *dbdown {
@@ -115,6 +117,7 @@ func main() {
 		if err != nil {
 			log.Fatalf("Failed to migrate changes down: %s", err)
 		}
+		return
 	}
 
 	if *dbmock {
@@ -126,6 +129,10 @@ func main() {
 		if err != nil {
 			log.Fatalf("someting went wrong creating fakes: %s", err)
 		}
+		err = db.CreateFakeComments(dbutils.DB)
+		if err != nil {
+			log.Fatalf("something went wrong creating fakes: %s", err)
+		}
 	}
 
 	/*SERVER SETTINGS*/
@@ -133,7 +140,7 @@ func main() {
 
 	headersOk := handlers.AllowedHeaders([]string{"X-Requested-With", "Accept", "Content-Type", "Authorization"})
 	originsOk := handlers.AllowedOrigins([]string{"*"})
-	methodsOk := handlers.AllowedMethods([]string{"GET", "HEAD", "POST", "PUT", "OPTIONS"})
+	methodsOk := handlers.AllowedMethods([]string{"GET", "HEAD", "POST", "PUT", "DELETE", "OPTIONS"})
 
 	// Attach CORS middleware to your router
 	r.Use(handlers.CORS(originsOk, headersOk, methodsOk))
@@ -154,7 +161,8 @@ func main() {
 	r.Handle("/user", middleware.ValidateTokenMiddleware(middleware.ParseAndValidateData(http.HandlerFunc(routehandlers.UserHandler))))
 	r.Handle("/post", middleware.ValidateTokenMiddleware(middleware.ParseAndValidateData(http.HandlerFunc(routehandlers.PostHandler))))
 	r.Handle("/comment", middleware.ValidateTokenMiddleware(middleware.ParseAndValidateData(http.HandlerFunc(routehandlers.CommentHandler))))
-	r.Handle("/notification", middleware.ValidateTokenMiddleware(middleware.ParseAndValidateData(http.HandlerFunc(routehandlers.NotificationHandler))))
+	r.Handle("/reaction", middleware.ValidateTokenMiddleware(middleware.ParseAndValidateData(http.HandlerFunc(routehandlers.ReactionHandler))))
+	r.Handle("/follow", middleware.ValidateTokenMiddleware(middleware.ParseAndValidateData(http.HandlerFunc(routehandlers.FollowerHandler))))
 
 	/*LISTEN AND SERVER*/
 	log.Printf("Server running on %s", srv.Addr)

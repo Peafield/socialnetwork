@@ -1,17 +1,14 @@
+import { useSetUserContextAndCookie } from "./SetUserContextAndCookie";
+
 const API_URL = "http://localhost:8080";
 
 export async function handleAPIRequest(url: string, options: object) {
   try {
     const response = await fetch(API_URL + url, options);
-    if (response.ok) {      
-      const contentType = response.headers.get("content-type");
-      
-      if (contentType && contentType.indexOf("application/json") !== -1) {
-        return await response.json();
-      } else {
-        return {};
-      }
-      
+
+    if (response.ok) {
+      const data = await response.json();
+      return data;
     } else {
       throw new Error(
         response.status
@@ -20,9 +17,13 @@ export async function handleAPIRequest(url: string, options: object) {
       );
     }
   } catch (error) {
-    console.error(error);
-    throw new Error("API request failed");
+    if (error instanceof Error) {
+      throw new Error("API request failed", {
+        cause: error.message
+      });
+    } else {
+      console.error(error);
+      throw new Error("API request failed");
+    }
   }
 }
-
-

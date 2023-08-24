@@ -1,23 +1,20 @@
-import React, { CSSProperties, useEffect, useState } from 'react'
+import React, { CSSProperties, useState } from 'react'
 import { AiOutlineClose } from 'react-icons/ai';
 import Container from '../Containers/Container';
 import Modal from '../Containers/Modal';
-import Post, { PostProps } from '../Post/Post'
+import Post, { PostProps } from '../Post/Post';
 import PostComments from '../Post/PostComments';
-import styles from './Profile.module.css'
+import styles from './Group.module.css'
 
-interface ProfilePostsGridProps {
-    user_id: string
+interface GroupPostsProps {
     posts: PostProps[]
 }
 
-const ProfilePostsGrid: React.FC<ProfilePostsGridProps> = ({
-    user_id,
+const GroupPosts: React.FC<GroupPostsProps> = ({
     posts
 }) => {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [modalPost, setModalPost] = useState<PostProps | null>(null)
-    const [error, setError] = useState<string | null>(null);    
 
     const closeStyle: CSSProperties = {
         margin: "10px",
@@ -33,7 +30,7 @@ const ProfilePostsGrid: React.FC<ProfilePostsGridProps> = ({
 
     return (
         <Container>
-            <div className={styles.profilepostsgridcontainer}>
+            <div className={styles.grouppostscontainer}>
                 <Modal open={isModalOpen} onClose={() => setIsModalOpen(false)}>
                     <span style={closeStyle} onClick={() => setIsModalOpen(false)}>
                         <AiOutlineClose />
@@ -95,4 +92,4 @@ const ProfilePostsGrid: React.FC<ProfilePostsGridProps> = ({
     )
 }
 
-export default ProfilePostsGrid
+export default GroupPosts

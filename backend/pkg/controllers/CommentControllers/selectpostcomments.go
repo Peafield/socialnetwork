@@ -2,8 +2,10 @@ package commentcontrollers
 
 import (
 	"database/sql"
+	"errors"
 	"fmt"
 	crud "socialnetwork/pkg/db/CRUD"
+	errorhandling "socialnetwork/pkg/errorHandling"
 	"socialnetwork/pkg/models/dbmodels"
 )
 
@@ -34,13 +36,14 @@ func SelectPostComments(db *sql.DB, postId string) (*dbmodels.Comments, error) {
 	}
 
 	commentsData, err := crud.SelectFromDatabase(db, "Comments", query, values)
-	if err != nil {
+	if err != nil && !errors.Is(err, errorhandling.ErrNoRowsAffected) {
 		return nil, fmt.Errorf("failed to select post comments from database: %w", err)
 	}
+
 	comments := &dbmodels.Comments{}
 	for _, v := range commentsData {
-		if comment, ok := v.(dbmodels.Comment); ok {
-			comments.Comments = append(comments.Comments, comment)
+		if comment, ok := v.(*dbmodels.Comment); ok {
+			comments.Comments = append(comments.Comments, *comment)
 		} else {
 			return nil, fmt.Errorf("failed to assert comment data")
 		}

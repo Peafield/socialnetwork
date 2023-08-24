@@ -12,17 +12,43 @@
 
 .postcontainer {
     background-color: white;
-    position: relative;
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
     border-radius: 5px;
     width: 90%;
+    height: auto;
     margin: 10px;
     z-index: 0;
     box-shadow: rgba(50, 50, 93, 0.25) 0px 2px 5px -1px,
         rgba(0, 0, 0, 0.3) 0px 1px 3px -1px;
+}
+
+.postmodalcontainer {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    width: 90%;
+    height: 90%;
+}
+
+.postcommentscontainer {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
+    overflow-y: auto;
+    margin: 10px;
+    height: 90%;
+    width: 70%;
+}
+
+.commentformcontainer {
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
 .profilecontainer {
@@ -43,8 +69,10 @@
     flex-direction: row;
     justify-content: safe;
     align-items: center;
-    width: 100%;
-    height: 99%;
+    border-radius: 5px;
+    margin: 10px;
+    width: 80%;
+    height: 70%;
     box-shadow: rgba(50, 50, 93, 0.25) 0px 2px 5px -1px,
         rgba(0, 0, 0, 0.3) 0px 1px 3px -1px;
 }

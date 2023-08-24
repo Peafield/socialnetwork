@@ -4,8 +4,7 @@ import PostContent from "./PostContent";
 import PostActions from "./PostActions";
 import PostImage from "./PostImage";
 import { ProfileProps } from "../Profile/Profile";
-import { handleAPIRequest } from "../../controllers/Api";
-import { getCookie } from "../../controllers/SetUserContextAndCookie";
+import { getUserByUserID } from "../../controllers/GetUser";
 
 export interface PostProps {
   post_id: string;
@@ -40,27 +39,8 @@ const Post: React.FC<PostProps> = ({
     const fetchData = async () => {
       setUserLoading(true);
 
-      let url;
-
-      {
-        creator_id
-          ? (url = `/user?user_id=${encodeURIComponent(creator_id)}`)
-          : (url = "/user");
-      }
-
-      const options = {
-        method: "GET",
-        headers: {
-          Authorization: "Bearer " + getCookie("sessionToken"),
-          "Content-Type": "application/json",
-        },
-      };
       try {
-        const response = await handleAPIRequest(url, options);
-        const newUserData = response.data.UserInfo;
-        newUserData.avatar = response.data.ProfilePic
-          ? response.data.ProfilePic
-          : null;
+        const newUserData = await getUserByUserID(creator_id)
         setUserData(newUserData);
       } catch (error) {
         if (error instanceof Error) {
@@ -74,6 +54,7 @@ const Post: React.FC<PostProps> = ({
 
     fetchData(); // Call the async function
   }, [creator_id]);
+  
   return (
     <>
       {userData ? (

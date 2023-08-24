@@ -62,6 +62,7 @@ func GetUserHandler(w http.ResponseWriter, r *http.Request) {
 
 	specificUserId := r.URL.Query().Get("user_id")
 	specificUserDisplayName := r.URL.Query().Get("display_name")
+	var data interface{}
 
 	if specificUserId == "" && specificUserDisplayName == "" {
 		//get all users?
@@ -82,19 +83,21 @@ func GetUserHandler(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, "failed to get specific user data", http.StatusInternalServerError)
 		}
 
-		response := readwritemodels.WriteData{
-			Status: "success",
-			Data:   user,
-		}
-		jsonReponse, err := json.Marshal(response)
-		if err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-			return
-		}
-		w.Header().Set("Content-Type", "application/json")
-		w.WriteHeader(http.StatusOK)
-		w.Write(jsonReponse)
+		data = user
 	}
+
+	response := readwritemodels.WriteData{
+		Status: "success",
+		Data:   data,
+	}
+	jsonReponse, err := json.Marshal(response)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	w.Write(jsonReponse)
 }
 
 /*

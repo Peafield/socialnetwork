@@ -22,6 +22,11 @@
     color: lightgray;
 }
 
+.sidebarbuttoncontainer {
+    position: absolute;
+    right: 0px;
+}
+
 .mainelementcontainer {
     display: flex;
     justify-content: center;

@@ -3,6 +3,7 @@ package routehandlers
 import (
 	"encoding/json"
 	"fmt"
+	"log"
 	"net/http"
 	followercontrollers "socialnetwork/pkg/controllers/FollowerControllers"
 	"socialnetwork/pkg/db/dbutils"
@@ -160,7 +161,11 @@ func UpdateFollowerHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err := followercontrollers.UpdateFollowStatus(dbutils.DB, userData.UserId, updateFollowerData.Data)
+	log.Println(updateFollowerData)
+
+	//Break down updateFollowerData.Data for the updatefollowingstatus function
+
+	err := followercontrollers.UpdateFollowingStatus(dbutils.DB, userData.UserId, "", true)
 	if err != nil {
 		http.Error(w, "failed to update follower status", http.StatusInternalServerError)
 		return

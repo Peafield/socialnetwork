@@ -5,16 +5,13 @@ import (
 	"errors"
 	"fmt"
 	crud "socialnetwork/pkg/db/CRUD"
+	"socialnetwork/pkg/db/dbstatements"
 	errorhandling "socialnetwork/pkg/errorHandling"
 	"socialnetwork/pkg/models/dbmodels"
 )
 
 func SelectFollowerInfo(db *sql.DB, userId string, followeeId string) (*dbmodels.Follower, error) {
-	query := `SELECT * FROM Followers
-	WHERE follower_id = ?
-	AND followee_id = ?`
-
-	followerData, err := crud.SelectFromDatabase(db, "Followers", query, []interface{}{userId, followeeId})
+	followerData, err := crud.SelectFromDatabase(db, "Followers", dbstatements.SelectFollower, []interface{}{userId, followeeId})
 	if err != nil && errors.Is(err, errorhandling.ErrNoRowsAffected) {
 		return nil, fmt.Errorf("failed to select follower from database: %w", err)
 	}

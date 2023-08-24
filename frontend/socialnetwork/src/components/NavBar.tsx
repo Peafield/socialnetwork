@@ -32,8 +32,6 @@ const logoStyles: CSSProperties = {
 export const NavBar: React.FC = () => {
 
     const userContext = useContext(UserContext)
-    console.log(userContext);
-
 
     return (
         <nav style={navbarStyles}>

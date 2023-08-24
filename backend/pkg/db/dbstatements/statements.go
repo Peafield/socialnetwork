@@ -28,12 +28,15 @@ var (
 	UpdateAllUsersToSignedOut *sql.Stmt
 	UpdateUserLoggedIn        *sql.Stmt
 	UpdateUserLoggedOut       *sql.Stmt
+	UpdateFollowerStatus      *sql.Stmt
 
 	/*Select Statements*/
 	SelectUserByID          string
 	SelectUserByDisplayName string
 	SelectUserViewablePosts string
 	SelectSpecificUserPosts string
+	SelectFollower          string
+	SelectFolloweesOfUser   string
 )
 
 func InitDBStatements(db *sql.DB) error {
@@ -52,6 +55,11 @@ func InitDBStatements(db *sql.DB) error {
 	err = initCommentDBStatements(db)
 	if err != nil {
 		return fmt.Errorf("failed to prepare comment statements: %w", err)
+	}
+
+	err = initFollowerDBStatements(db)
+	if err != nil {
+		return fmt.Errorf("failed to prepare follower statements: %w", err)
 	}
 
 	InsertSessionsStmt, err = db.Prepare(`
@@ -112,19 +120,6 @@ func InitDBStatements(db *sql.DB) error {
 	)`)
 	if err != nil {
 		return fmt.Errorf("failed to prepare insert chats messages statement: %w", err)
-	}
-
-	InsertFollowersStmt, err = db.Prepare(`
-	INSERT INTO Followers (
-		follower_id,
-		followee_id,
-		following_status,
-		request_pending
-	) VALUES (
-		?, ?, ?, ?
-	)`)
-	if err != nil {
-		return fmt.Errorf("failed to prepare insert followers statement: %w", err)
 	}
 
 	InsertGroupsStmt, err = db.Prepare(`
@@ -226,4 +221,5 @@ func CloseDBStatements() {
 	UpdateAllUsersToSignedOut.Close()
 	UpdateUserLoggedIn.Close()
 	UpdateUserLoggedOut.Close()
+	UpdateFollowerStatus.Close()
 }

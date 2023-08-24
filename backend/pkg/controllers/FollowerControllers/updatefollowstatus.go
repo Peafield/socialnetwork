@@ -4,7 +4,7 @@ import (
 	"database/sql"
 	"fmt"
 	crud "socialnetwork/pkg/db/CRUD"
-	"strings"
+	"socialnetwork/pkg/db/dbstatements"
 )
 
 /*
@@ -28,35 +28,21 @@ Example:
     If the receiving user accepts, you would change the request pending status from 1 back to 0,
     and the following status from 0 to 1.
 */
-func UpdateFollowStatus(db *sql.DB, userId string, updateFollowerData map[string]interface{}) error {
-	var columns []string
-	var args []interface{}
+func UpdateFollowingStatus(db *sql.DB, userId string, followerId string, acceptRequest bool) error {
+	args := make([]interface{}, 3)
 
-	if followingStatus, ok := updateFollowerData["following_status"].(string); ok {
-		columns = append(columns, "following_status = ?")
-		args = append(args, followingStatus)
-	}
-	if requestPendingStatus, ok := updateFollowerData["request_pending"].(string); ok {
-		columns = append(columns, "request_pending = ?")
-		args = append(args, requestPendingStatus)
-	}
-	if followeeId, ok := updateFollowerData["followee_id"].(string); ok {
-		args = append(args, followeeId)
-	}
-	if followerId, ok := updateFollowerData["follower_id"].(string); ok {
-		args = append(args, followerId)
+	args[1] = followerId
+	args[2] = userId
+
+	if acceptRequest {
+		args[0] = 1
+	} else {
+		args[0] = 0
 	}
 
-	query := fmt.Sprintf("UPDATE Followers SET %s WHERE followee_id = ? AND follower_id = ?", strings.Join(columns, ", "))
-	updateFollowStatusStatment, err := db.Prepare(query)
+	err := crud.InteractWithDatabase(db, dbstatements.UpdateFollowerStatus, args)
 	if err != nil {
-		return fmt.Errorf("failed to prepare update follow status: %w", err)
-	}
-	defer updateFollowStatusStatment.Close()
-
-	err = crud.InteractWithDatabase(db, updateFollowStatusStatment, args)
-	if err != nil {
-		return fmt.Errorf("failed to update post data: %w", err)
+		return fmt.Errorf("failed to update follower data: %w", err)
 	}
 	return nil
 }

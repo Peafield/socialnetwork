@@ -7,8 +7,20 @@ import PostFeed from "./Post/PostFeed";
 import Profile from "./Profile/Profile";
 import styles from "./Dashboard.module.css"
 import Group from "./Group/Group";
+import SideModal from "./Containers/SideModal";
+import FriendsMessagingList from "./Chat/FriendsMessagingList";
+import { useWebSocket } from "../Socket";
+import { getCookie } from "../controllers/SetUserContextAndCookie";
 
 export default function Dashboard() {
+  const { message, sendMessage } = useWebSocket("ws://localhost:8080/ws", {
+    headers: {
+      Authorization: `Bearer ${getCookie("sessionToken")}`
+    }
+  });
+
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
   return (
     <Container>
       <div className={styles.dashboardcontainer}>
@@ -23,6 +35,14 @@ export default function Dashboard() {
             <Route path="/group/:groupname" element={<Group />} />
           </Routes>
         </div>
+        <div className={styles.sidebarbuttoncontainer}>
+          <button onClick={() => { setIsModalOpen(true) }}>
+            -
+          </button>
+        </div>
+        <SideModal open={isModalOpen} onClose={() => setIsModalOpen(false)}>
+          <FriendsMessagingList message={message} sendMessage={sendMessage} />
+        </SideModal>
       </div>
 
     </Container>

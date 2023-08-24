@@ -1,7 +1,7 @@
 .sidemodal {
   position: fixed;
-  top: 5%;
-  right: 1%;
+  top: 15%;
+  right: 0%;
   transform: translate(-5%, -1%);
   width: 30%;
   height: 80%;

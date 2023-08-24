@@ -12,6 +12,7 @@ import (
 	"socialnetwork/pkg/models/dbmodels"
 	"socialnetwork/pkg/models/helpermodels"
 	"socialnetwork/pkg/routehandlers"
+	"socialnetwork/pkg/websocket"
 	"time"
 
 	"github.com/gorilla/handlers"
@@ -133,10 +134,16 @@ func main() {
 		if err != nil {
 			log.Fatalf("something went wrong creating fakes: %s", err)
 		}
+		err = db.CreateFakeFollowers(dbutils.DB)
+		if err != nil {
+			log.Fatalf("something went wrong creating fakes: %s", err)
+		}
 	}
 
 	/*SERVER SETTINGS*/
 	r := mux.NewRouter()
+	hub := websocket.NewHub()
+	go hub.Run()
 
 	headersOk := handlers.AllowedHeaders([]string{"X-Requested-With", "Accept", "Content-Type", "Authorization"})
 	originsOk := handlers.AllowedOrigins([]string{"*"})
@@ -163,6 +170,11 @@ func main() {
 	r.Handle("/comment", middleware.ValidateTokenMiddleware(middleware.ParseAndValidateData(http.HandlerFunc(routehandlers.CommentHandler))))
 	r.Handle("/reaction", middleware.ValidateTokenMiddleware(middleware.ParseAndValidateData(http.HandlerFunc(routehandlers.ReactionHandler))))
 	r.Handle("/follow", middleware.ValidateTokenMiddleware(middleware.ParseAndValidateData(http.HandlerFunc(routehandlers.FollowerHandler))))
+
+	/*WEBSOCKET*/
+	r.Handle("/ws", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		websocket.ServeWs(hub, w, r)
+	}))
 
 	/*LISTEN AND SERVER*/
 	log.Fatal(srv.ListenAndServe())

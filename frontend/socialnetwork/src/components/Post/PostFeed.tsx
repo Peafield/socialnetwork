@@ -3,6 +3,7 @@ import { AiOutlineClose } from 'react-icons/ai';
 import { useNavigate } from 'react-router-dom';
 import { handleAPIRequest } from '../../controllers/Api';
 import { getCookie } from '../../controllers/SetUserContextAndCookie';
+import { useWebSocket } from '../../Socket';
 import Container from '../Containers/Container'
 import Modal from '../Containers/Modal';
 import Post, { PostProps } from './Post'
@@ -49,7 +50,7 @@ const PostFeed: React.FC = () => {
         fetchData(); // Call the async function
     }, []);
 
-    
+
 
     const closeStyle: CSSProperties = {
         margin: "10px",

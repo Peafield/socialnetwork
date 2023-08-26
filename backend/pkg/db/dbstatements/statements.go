@@ -24,24 +24,46 @@ var (
 	InsertNotificationsStmt         *sql.Stmt
 
 	/*Update Statments*/
-	UpdatePostNumOfComments   *sql.Stmt
-	UpdateAllUsersToSignedOut *sql.Stmt
-	UpdateUserLoggedIn        *sql.Stmt
-	UpdateUserLoggedOut       *sql.Stmt
-	UpdatePostReaction        *sql.Stmt
-	UpdateCommentReaction     *sql.Stmt
+	UpdatePostImagePathStmt         *sql.Stmt
+	UpdatePostContentStmt           *sql.Stmt
+	UpdatePostPrivacyLevelStmt      *sql.Stmt
+	UpdatePostIncreaseNumOfComments *sql.Stmt
+	UpdatePostDecreaseNumOfComments *sql.Stmt
+	UpdateAllUsersToSignedOut       *sql.Stmt
+	UpdateUserLoggedIn              *sql.Stmt
+	UpdateUserLoggedOut             *sql.Stmt
+	UpdatePostReaction              *sql.Stmt
+	UpdateCommentReaction           *sql.Stmt
+	UpdateCommentContent            *sql.Stmt
+	UpdateCommentImagePath          *sql.Stmt
+	UpdateCommentLikes              *sql.Stmt
+	UpdateCommentDislikes           *sql.Stmt
+	UpdateFollowingStatusStmt       *sql.Stmt
+	UpdateRequestPendingStmt        *sql.Stmt
 
 	/*Select Statements*/
-	SelectUserByID            string
-	SelectUserByDisplayName   string
-	SelectUserViewablePosts   string
-	SelectSpecificUserPosts   string
-	SelectPostReactionStmt    *sql.Stmt
-	SelectCommentReactionStmt *sql.Stmt
+	SelectAllUsersStmt                           *sql.Stmt
+	SelectUserByIDStmt                           *sql.Stmt
+	SelectUserByDisplayNameStmt                  *sql.Stmt
+	SelectUserByEmailAndDisplayNameAndUserIdStmt *sql.Stmt
+	SelectUserByEmailOrDisplayNameStmt           *sql.Stmt
+	SelectUserByIDOrDisplayNameStmt              *sql.Stmt
+	SelectAllPostsStmt                           *sql.Stmt
+	SelectUserViewablePostsStmt                  *sql.Stmt
+	SelectSpecificUserPostsStmt                  *sql.Stmt
+	SelectPostCommentsStmt                       *sql.Stmt
+	SelectPostReactionStmt                       *sql.Stmt
+	SelectCommentReactionStmt                    *sql.Stmt
+	SelectFollowerInfoStmt                       *sql.Stmt
 
 	/*Delete Statements*/
-	DeletePostReaction    *sql.Stmt
-	DeleteCommentReaction *sql.Stmt
+	DeleteUserAccountStmt           *sql.Stmt
+	DeletePostStmt                  *sql.Stmt
+	DeleteUserComment               *sql.Stmt
+	DeletePostReaction              *sql.Stmt
+	DeleteCommentReaction           *sql.Stmt
+	DeleteFollowerStmt              *sql.Stmt
+	DeletePostsSelectedFollowerStmt *sql.Stmt
 )
 
 func InitDBStatements(db *sql.DB) error {
@@ -67,6 +89,11 @@ func InitDBStatements(db *sql.DB) error {
 		return fmt.Errorf("failed to prepare reaction statements: %w", err)
 	}
 
+	err = initFollowerDBStatements(db)
+	if err != nil {
+		return fmt.Errorf("failed to prepare follower statements: %w", err)
+	}
+
 	InsertSessionsStmt, err = db.Prepare(`
 	INSERT INTO Sessions (
 		session_id,
@@ -76,17 +103,6 @@ func InitDBStatements(db *sql.DB) error {
 	)`)
 	if err != nil {
 		return fmt.Errorf("failed to prepare insert sessions statement: %w", err)
-	}
-
-	InsertPostsSelectedFollowerStmt, err = db.Prepare(`
-	INSERT INTO Posts_Selected_Followers  (
-		post_id,
-		allowed_follower_id
-	) VALUES (
-		?, ?
-	)`)
-	if err != nil {
-		return fmt.Errorf("failed to prepare insert post follower statement: %w", err)
 	}
 
 	InsertChatsStmt, err = db.Prepare(`
@@ -112,19 +128,6 @@ func InitDBStatements(db *sql.DB) error {
 	)`)
 	if err != nil {
 		return fmt.Errorf("failed to prepare insert chats messages statement: %w", err)
-	}
-
-	InsertFollowersStmt, err = db.Prepare(`
-	INSERT INTO Followers (
-		follower_id,
-		followee_id,
-		following_status,
-		request_pending
-	) VALUES (
-		?, ?, ?, ?
-	)`)
-	if err != nil {
-		return fmt.Errorf("failed to prepare insert followers statement: %w", err)
 	}
 
 	InsertGroupsStmt, err = db.Prepare(`
@@ -221,17 +224,43 @@ func CloseDBStatements() {
 	InsertNotificationsStmt.Close()
 
 	/*Select Statment Closure*/
+	SelectAllUsersStmt.Close()
+	SelectUserByIDStmt.Close()
+	SelectUserByDisplayNameStmt.Close()
+	SelectUserByEmailAndDisplayNameAndUserIdStmt.Close()
+	SelectUserByIDOrDisplayNameStmt.Close()
+	SelectUserByEmailOrDisplayNameStmt.Close()
+	SelectAllPostsStmt.Close()
+	SelectUserViewablePostsStmt.Close()
+	SelectSpecificUserPostsStmt.Close()
 	SelectPostReactionStmt.Close()
+	SelectPostCommentsStmt.Close()
+	SelectFollowerInfoStmt.Close()
 
 	/*Update Statement Closure*/
-	UpdatePostNumOfComments.Close()
+	UpdatePostImagePathStmt.Close()
+	UpdatePostContentStmt.Close()
+	UpdatePostPrivacyLevelStmt.Close()
+	UpdatePostIncreaseNumOfComments.Close()
+	UpdatePostDecreaseNumOfComments.Close()
 	UpdateAllUsersToSignedOut.Close()
 	UpdateUserLoggedIn.Close()
 	UpdateUserLoggedOut.Close()
 	UpdatePostReaction.Close()
 	UpdateCommentReaction.Close()
+	UpdateCommentContent.Close()
+	UpdateCommentImagePath.Close()
+	UpdateCommentLikes.Close()
+	UpdateCommentDislikes.Close()
+	UpdateFollowingStatusStmt.Close()
+	UpdateRequestPendingStmt.Close()
 
 	/*Delete Statement Closure*/
+	DeleteUserAccountStmt.Close()
+	DeletePostStmt.Close()
+	DeleteUserComment.Close()
 	DeletePostReaction.Close()
 	DeleteCommentReaction.Close()
+	DeleteFollowerStmt.Close()
+	DeletePostsSelectedFollowerStmt.Close()
 }

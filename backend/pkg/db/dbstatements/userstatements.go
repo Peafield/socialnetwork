@@ -8,6 +8,7 @@ import (
 func initUserDBStatements(db *sql.DB) error {
 	var err error
 
+	/*INSERT*/
 	InsertUserStmt, err = db.Prepare(`
 	INSERT INTO Users (
 		user_id,
@@ -27,24 +28,58 @@ func initUserDBStatements(db *sql.DB) error {
 		return fmt.Errorf("failed to prepare insert users statement: %w", err)
 	}
 
-	err = initUserUpdateStatements(db)
+	/*SELECT*/
+	SelectAllUsersStmt, err = db.Prepare(`
+	SELECT * FROM Users
+	`)
 	if err != nil {
-		return fmt.Errorf("failed to prepare update users statement: %w", err)
+		return fmt.Errorf("failed to prepare select all users statement")
+	}
+	SelectUserByIDStmt, err = db.Prepare(`
+	SELECT * FROM 
+	Users WHERE user_id = ?
+	`)
+	if err != nil {
+		return fmt.Errorf("failed to prepare select user by id statement: %w", err)
+	}
+	SelectUserByDisplayNameStmt, err = db.Prepare(`
+	SELECT * FROM 
+	Users WHERE
+	display_name = ?
+	`)
+	if err != nil {
+		return fmt.Errorf("failed to prepare select user by displayname statement: %w", err)
 	}
 
-	initUserSelectStatements()
+	SelectUserByEmailAndDisplayNameAndUserIdStmt, err = db.Prepare(`
+	SELECT * FROM Users 
+	WHERE email = ?
+	AND display_name = ?
+	AND user_id = ?
+	`)
+	if err != nil {
+		return fmt.Errorf("failed to prepare select user by id AND display name and email statement: %w", err)
+	}
 
-	return nil
-}
+	SelectUserByIDOrDisplayNameStmt, err = db.Prepare(`
+	SELECT * FROM Users
+	WHERE user_id = ?
+	OR display_name = ?
+	`)
+	if err != nil {
+		return fmt.Errorf("failed to prepare select user by id OR display name statement: %w", err)
+	}
 
-func initUserSelectStatements() {
-	SelectUserByID = `SELECT * FROM Users WHERE user_id = ?`
-	SelectUserByDisplayName = `SELECT * FROM Users WHERE display_name = ?`
-}
+	SelectUserByEmailOrDisplayNameStmt, err = db.Prepare(`
+	SELECT * FROM Users
+	WHERE email = ?
+	OR display_name = ?
+	`)
+	if err != nil {
+		return fmt.Errorf("failed to prepare select user by id OR display name statement: %w", err)
+	}
 
-func initUserUpdateStatements(db *sql.DB) error {
-	var err error
-
+	/*UPDATE*/
 	UpdateUserLoggedIn, err = db.Prepare(`
 	UPDATE Users
 	SET is_logged_in = 1
@@ -70,6 +105,15 @@ func initUserUpdateStatements(db *sql.DB) error {
 	`)
 	if err != nil {
 		return fmt.Errorf("failed to prepare update all users to signed out statement: %w", err)
+	}
+
+	/*DELETE*/
+	DeleteUserAccountStmt, err = db.Prepare(`
+	DELETE FROM Users 
+	WHERE user_id = ?
+	`)
+	if err != nil {
+		return fmt.Errorf("failed to prepare delete user account statement")
 	}
 
 	return nil

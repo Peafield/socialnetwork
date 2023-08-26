@@ -44,7 +44,7 @@ Errors:
   - Returns an error if there is an issue extracting the User struct fields
   - Returns an error if there is an issue inserting the User struct into the database
 */
-func RegisterUser(formData map[string]interface{}, db *sql.DB, statement *sql.Stmt) (*dbmodels.User, error) {
+func RegisterUser(db *sql.DB, formData map[string]interface{}) (*dbmodels.User, error) {
 	var args []interface{}
 
 	// UUID
@@ -64,7 +64,7 @@ func RegisterUser(formData map[string]interface{}, db *sql.DB, statement *sql.St
 	args = append(args, formDataValues...)
 
 	//insert into db
-	err = crud.InteractWithDatabase(db, statement, args)
+	err = crud.InteractWithDatabase(db, dbstatements.InsertUserStmt, args)
 	if err != nil {
 		return nil, fmt.Errorf("failed to insert user into database: %s", err)
 	}
@@ -118,14 +118,8 @@ func validateEmailAndDisplayName(formData map[string]interface{}, db *sql.DB) ([
 		return nil, fmt.Errorf("display name is not a string, or is not in a valid format, or doesn't exist when it should")
 	}
 
-	queryStatement := `
-	SELECT * FROM Users
-	WHERE email = ?
-	OR display_name = ?
-	`
-
 	//get user data as interface
-	users, err := crud.SelectFromDatabase(db, "Users", queryStatement, args)
+	users, err := crud.SelectFromDatabase(db, "Users", dbstatements.SelectUserByIDOrDisplayNameStmt, args)
 	if err == nil && len(users) > 0 {
 		return nil, fmt.Errorf("user display name or email already in use")
 	}
@@ -203,7 +197,7 @@ func selectRegisteredUser(db *sql.DB, userId string) (*dbmodels.User, error) {
 	queryValues := []interface{}{
 		userId,
 	}
-	userData, err := crud.SelectFromDatabase(db, "Users", dbstatements.SelectUserByID, queryValues)
+	userData, err := crud.SelectFromDatabase(db, "Users", dbstatements.SelectUserByIDStmt, queryValues)
 	if err != nil {
 		return nil, fmt.Errorf("error selecting user from database: %s", err)
 	}

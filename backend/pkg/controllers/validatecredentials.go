@@ -4,9 +4,9 @@ import (
 	"database/sql"
 	"fmt"
 	crud "socialnetwork/pkg/db/CRUD"
+	"socialnetwork/pkg/db/dbstatements"
 	"socialnetwork/pkg/helpers"
 	"socialnetwork/pkg/models/dbmodels"
-	"strings"
 )
 
 /*
@@ -45,24 +45,8 @@ func ValidateCredentials(formData map[string]interface{}, db *sql.DB) (*dbmodels
 		return nil, fmt.Errorf("password is not a string")
 	}
 
-	//set query statements
-	queryStatement := ""
-	queryValues := make([]interface{}, 0)
-	if strings.Contains(username_email, "@") {
-		queryStatement = `
-			SELECT * FROM Users 
-			WHERE email = ?
-			`
-	} else {
-		queryStatement = `
-			SELECT * FROM Users 
-			WHERE display_name = ?
-			`
-	}
-	queryValues = append(queryValues, username_email)
-
 	//get user data as interface
-	userData, err := crud.SelectFromDatabase(db, "Users", queryStatement, queryValues)
+	userData, err := crud.SelectFromDatabase(db, "Users", dbstatements.SelectUserByEmailOrDisplayNameStmt, []interface{}{username_email, username_email})
 	if err != nil {
 		return nil, fmt.Errorf("error selecting user from database: %s", err)
 	}

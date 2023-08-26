@@ -8,7 +8,7 @@ import (
 	"socialnetwork/pkg/models/dbmodels"
 )
 
-func GetUser(db *sql.DB, userId string, statement string, specificUserDetails string) (*dbmodels.UserProfileData, error) {
+func GetUser(db *sql.DB, userId string, statement *sql.Stmt, specificUserDetails string) (*dbmodels.UserProfileData, error) {
 	//should add a way of only displaying certain information based on follow status or privacy level?
 
 	specificUserData, err := crud.SelectFromDatabase(db, "Users", statement, []interface{}{specificUserDetails})

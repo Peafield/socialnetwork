@@ -7,7 +7,6 @@ import (
 	"log"
 	"net/http"
 	usercontrollers "socialnetwork/pkg/controllers/UserControllers"
-	"socialnetwork/pkg/db/dbstatements"
 	"strings"
 )
 
@@ -36,7 +35,7 @@ func CreateFakeUsers(db *sql.DB) error {
 		formData["dob"] = fakeNameData.BirthData
 		formData["about_me"] = fmt.Sprintf("Hi my name is %s! I'm excited to meet you", fakeNameData.Name)
 
-		_, err := usercontrollers.RegisterUser(formData, db, dbstatements.InsertUserStmt)
+		_, err := usercontrollers.RegisterUser(db, formData)
 		if err != nil {
 			return fmt.Errorf("failed to insert fake users: %w", err)
 		}

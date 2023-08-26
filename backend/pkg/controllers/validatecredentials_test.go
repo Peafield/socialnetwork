@@ -128,7 +128,7 @@ func TestValidateCredentials(t *testing.T) {
 			tc.SignInData["username_email"] = fmt.Sprintf("%v%v", tc.SignInData["username_email"], testingTime)
 			tc.SignInData["password"] = fmt.Sprintf("%v%v", tc.SignInData["password"], testingTime)
 
-			_, err := usercontrollers.RegisterUser(tc.RegisterData, db, dbstatements.InsertUserStmt)
+			_, err := usercontrollers.RegisterUser(db, tc.RegisterData)
 			if err != nil {
 				t.Logf("validating credentials testing register user error: %s", err)
 			}

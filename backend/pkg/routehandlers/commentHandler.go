@@ -211,7 +211,7 @@ func DeleteComment(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err := commentcontrollers.DeleteUserComment(dbutils.DB, userData.UserId, deleteCommentData.Data["comment_id"].(string))
+	err := commentcontrollers.DeleteUserComment(dbutils.DB, userData.UserId, deleteCommentData.Data)
 	if err != nil {
 		http.Error(w, "failed to delete user comment", http.StatusInternalServerError)
 		return

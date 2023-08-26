@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	crud "socialnetwork/pkg/db/CRUD"
+	"socialnetwork/pkg/db/dbstatements"
 	errorhandling "socialnetwork/pkg/errorHandling"
 	"socialnetwork/pkg/models/dbmodels"
 )
@@ -26,16 +27,11 @@ Returns:
   - error: if the database fails to return the comments or the comment data fails to be asserted.
 */
 func SelectPostComments(db *sql.DB, postId string) (*dbmodels.Comments, error) {
-	query := `
-	SELECT * FROM Comments
-	WHERE post_id = ?
-	`
-
 	values := []interface{}{
 		postId,
 	}
 
-	commentsData, err := crud.SelectFromDatabase(db, "Comments", query, values)
+	commentsData, err := crud.SelectFromDatabase(db, "Comments", dbstatements.SelectPostCommentsStmt, values)
 	if err != nil && !errors.Is(err, errorhandling.ErrNoRowsAffected) {
 		return nil, fmt.Errorf("failed to select post comments from database: %w", err)
 	}

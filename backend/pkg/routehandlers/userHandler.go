@@ -1,6 +1,7 @@
 package routehandlers
 
 import (
+	"database/sql"
 	"encoding/json"
 	"net/http"
 	usercontrollers "socialnetwork/pkg/controllers/UserControllers"
@@ -67,15 +68,15 @@ func GetUserHandler(w http.ResponseWriter, r *http.Request) {
 	if specificUserId == "" && specificUserDisplayName == "" {
 		//get all users?
 	} else {
-		statement := ""
+		var statement *sql.Stmt
 		userDetails := ""
 
 		if specificUserId != "" {
-			statement = dbstatements.SelectUserByID
+			statement = dbstatements.SelectUserByIDStmt
 			userDetails = specificUserId
 		} else {
 			userDetails = specificUserDisplayName
-			statement = dbstatements.SelectUserByDisplayName
+			statement = dbstatements.SelectUserByDisplayNameStmt
 		}
 
 		user, err := usercontrollers.GetUser(dbutils.DB, userData.UserId, statement, userDetails)

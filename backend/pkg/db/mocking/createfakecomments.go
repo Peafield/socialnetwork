@@ -6,6 +6,7 @@ import (
 	"math/rand"
 	commentcontrollers "socialnetwork/pkg/controllers/CommentControllers"
 	crud "socialnetwork/pkg/db/CRUD"
+	"socialnetwork/pkg/db/dbstatements"
 	"socialnetwork/pkg/models/dbmodels"
 )
 
@@ -41,10 +42,7 @@ func CreateFakeComments(db *sql.DB) error {
 }
 
 func GetAllUserIDs(db *sql.DB) ([]string, error) {
-	queryStatement := `
-	SELECT * FROM Users
-	`
-	userIDData, err := crud.SelectFromDatabase(db, "Users", queryStatement, []interface{}{})
+	userIDData, err := crud.SelectFromDatabase(db, "Users", dbstatements.SelectAllUsersStmt, []interface{}{})
 	if err != nil {
 		return nil, fmt.Errorf("failed to get userId's from db: %w", err)
 	}
@@ -62,10 +60,7 @@ func GetAllUserIDs(db *sql.DB) ([]string, error) {
 }
 
 func GetAllPostIDs(db *sql.DB) ([]string, error) {
-	queryStatement := `
-	SELECT * FROM Posts
-	`
-	postIDData, err := crud.SelectFromDatabase(db, "Posts", queryStatement, []interface{}{})
+	postIDData, err := crud.SelectFromDatabase(db, "Posts", dbstatements.SelectAllPostsStmt, []interface{}{})
 	if err != nil {
 		return nil, fmt.Errorf("failed to get postId's from db: %w", err)
 	}

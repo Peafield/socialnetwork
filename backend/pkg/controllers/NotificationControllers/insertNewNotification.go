@@ -26,9 +26,9 @@ func InsertNewNotification(db *sql.DB, userId string, newNotificationData map[st
 		args[2] = creatorId
 	}
 
-	notificationTypeId, ok := newNotificationData["notificationTypeId"].(string)
+	notificationTypeId, ok := newNotificationData["reactionOnId"].(string)
 	if !ok {
-		return fmt.Errorf("notificationTypeId is not a string")
+		return fmt.Errorf("reactionOnId is not a string")
 	}
 
 	reactionOn, ok := newNotificationData["reactionOn"].(string)

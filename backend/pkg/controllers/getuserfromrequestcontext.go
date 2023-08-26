@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/http"
 	crud "socialnetwork/pkg/db/CRUD"
+	"socialnetwork/pkg/db/dbstatements"
 	"socialnetwork/pkg/db/dbutils"
 	"socialnetwork/pkg/middleware"
 	"socialnetwork/pkg/models/dbmodels"
@@ -35,18 +36,10 @@ func GetUserFromRequestContext(r *http.Request) (*dbmodels.User, error) {
 		return nil, fmt.Errorf("failed to read user ID from context")
 	}
 
-	//set query statement
-	queryStatement := ""
 	queryValues := make([]interface{}, 0)
-
-	queryStatement = `
-	SELECT * FROM Users
-	WHERE user_id = ?
-	`
-
 	queryValues = append(queryValues, payloadData.UserId)
 
-	userData, err := crud.SelectFromDatabase(dbutils.DB, "Users", queryStatement, queryValues)
+	userData, err := crud.SelectFromDatabase(dbutils.DB, "Users", dbstatements.SelectUserByIDStmt, queryValues)
 	if err != nil {
 		return nil, fmt.Errorf("error selecting user from database: %s", err)
 	}

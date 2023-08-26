@@ -5,7 +5,6 @@ import (
 	"fmt"
 	crud "socialnetwork/pkg/db/CRUD"
 	"socialnetwork/pkg/db/dbstatements"
-	"strings"
 )
 
 /*
@@ -31,36 +30,24 @@ Returns:
   - error: An error object which will be nil if the operation was successful, or containing an error message if the operation was unsuccessful.
 */
 func UpdateUserComment(db *sql.DB, userId string, updateCommentData map[string]interface{}) error {
-	var columns []string
 	var args []interface{}
+	var query *sql.Stmt
 
 	if content, ok := updateCommentData["content"].(string); ok {
-		columns = append(columns, "content = ?")
+		query = dbstatements.UpdateCommentContent
 		args = append(args, content)
 	}
 	if imagePath, ok := updateCommentData["image_path"].(string); ok {
-		columns = append(columns, "image_path = ?")
+		query = dbstatements.UpdateCommentImagePath
 		args = append(args, imagePath)
 	}
 	if commentID, ok := updateCommentData["comment_id"].(string); ok {
 		args = append(args, commentID)
 	}
 
-	query := fmt.Sprintf("UPDATE Comments SET %s WHERE comment_id = ?", strings.Join(columns, ", "))
-	updateCommentStatement, err := db.Prepare(query)
-	if err != nil {
-		return fmt.Errorf("failed to prepare update comment statement: %w", err)
-	}
-	defer updateCommentStatement.Close()
-
-	err = crud.InteractWithDatabase(db, updateCommentStatement, args)
+	err := crud.InteractWithDatabase(db, query, args)
 	if err != nil {
 		return fmt.Errorf("failed to update comment data: %w", err)
-	}
-
-	err = crud.InteractWithDatabase(db, dbstatements.UpdatePostNumOfComments, args)
-	if err != nil {
-		return fmt.Errorf("failed to update post comment count: %w", err)
 	}
 
 	return nil

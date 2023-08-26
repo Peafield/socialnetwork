@@ -32,7 +32,7 @@ Example:
 - SelectFromDatabase(db, "Users",  "WHERE user_id = 3 AND email = "example@gmail.com"") will return a user
 - SelectFromDatabase(db, "Posts",  "WHERE post_id = 25 AND group_id = 4") will return a post
 */
-func SelectFromDatabase(db *sql.DB, table string, queryStatement string, queryValues []interface{}) ([]interface{}, error) {
+func SelectFromDatabase(db *sql.DB, table string, queryStatement *sql.Stmt, queryValues []interface{}) ([]interface{}, error) {
 	object, err := helpers.DecideStructType(table)
 	if err != nil {
 		return nil, fmt.Errorf("no valid struct with table, or not a valid table, when selecting from database. err: %w", err)
@@ -40,7 +40,7 @@ func SelectFromDatabase(db *sql.DB, table string, queryStatement string, queryVa
 
 	objectArray := make([]interface{}, 0)
 
-	result, err := db.Query(queryStatement, queryValues...)
+	result, err := queryStatement.Query(queryValues...)
 	if err != nil {
 		return objectArray, fmt.Errorf("failed to execute select query: %w", err)
 	}

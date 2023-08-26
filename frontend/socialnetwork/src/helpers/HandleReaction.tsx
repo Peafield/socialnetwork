@@ -7,13 +7,13 @@ const REACTION_ENDPOINT = "/reaction";
 export async function HandleReaction(
   creatorId: string,
   reactionOn: string,
-  postOrCommentId: string,
+  reactionOnId: string,
   reactionType: "like" | "dislike",
 ) {
   const payload = {
     creatorId,
     reactionOn,
-    postOrCommentId,
+    reactionOnId,
     reactionType,
   };
 

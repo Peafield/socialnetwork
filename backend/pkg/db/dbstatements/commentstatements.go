@@ -8,6 +8,7 @@ import (
 func initCommentDBStatements(db *sql.DB) error {
 	var err error
 
+	/*INESRT*/
 	InsertCommentsStmt, err = db.Prepare(`
 	INSERT INTO Comments (
 		comment_id,
@@ -20,6 +21,54 @@ func initCommentDBStatements(db *sql.DB) error {
 	)`)
 	if err != nil {
 		return fmt.Errorf("failed to prepare insert comments statement: %w", err)
+	}
+
+	/*SELECT*/
+	SelectPostCommentsStmt, err = db.Prepare(`
+	SELECT * FROM Comments
+	WHERE post_id = ?
+	`)
+	if err != nil {
+		return fmt.Errorf("failed to prepare select post comments statement: %w", err)
+	}
+
+	/*UPDATE*/
+	UpdateCommentContent, err = db.Prepare(`
+	UPDATE Comments SET content = ?
+	WHERE comment_id = ?
+	`)
+	if err != nil {
+		return fmt.Errorf("failed to prepare update comment content statement: %w", err)
+	}
+	UpdateCommentImagePath, err = db.Prepare(`
+	UPDATE Comments SET image_path = ?
+	WHERE comment_id = ?
+	`)
+	if err != nil {
+		return fmt.Errorf("failed to prepare update comment image statement: %w", err)
+	}
+	UpdateCommentLikes, err = db.Prepare(`
+	UPDATE Comments SET likes = ?
+	WHERE comment_id = ?
+	`)
+	if err != nil {
+		return fmt.Errorf("failed to prepare update comment likes statement: %w", err)
+	}
+	UpdateCommentDislikes, err = db.Prepare(`
+	UPDATE Comments SET dislikes = ?
+	WHERE comment_id = ?
+	`)
+	if err != nil {
+		return fmt.Errorf("failed to prepare update comment likes statement: %w", err)
+	}
+
+	/*DELETE*/
+	DeleteUserComment, err = db.Prepare(`
+	DELETE FROM Comments
+	WHERE comment_id = ?
+	`)
+	if err != nil {
+		return fmt.Errorf("failed to prepare delete user comment statement: %w", err)
 	}
 
 	return nil

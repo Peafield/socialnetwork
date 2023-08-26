@@ -38,7 +38,7 @@ func SelectUserViewablePosts(db *sql.DB, userId string) (*dbmodels.Posts, error)
 		userId,
 	}
 
-	postsData, err := crud.SelectFromDatabase(db, "Posts", dbstatements.SelectUserViewablePosts, values)
+	postsData, err := crud.SelectFromDatabase(db, "Posts", dbstatements.SelectUserViewablePostsStmt, values)
 	if err != nil && !errors.Is(err, errorhandling.ErrNoRowsAffected) {
 		return nil, fmt.Errorf("failed to select user viewable posts from database: %w", err)
 	}

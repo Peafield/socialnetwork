@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"fmt"
 	crud "socialnetwork/pkg/db/CRUD"
+	"socialnetwork/pkg/db/dbstatements"
 )
 
 /*
@@ -29,15 +30,7 @@ func UnfollowUser(db *sql.DB, userId string, deleteFollowerData map[string]inter
 		args = append(args, followerId)
 	}
 
-	query := fmt.Sprintf("DELETE FROM Followers WHERE followee_id = ? AND follower_id = ?")
-	deleteFollowerStatment, err := db.Prepare(query)
-	if err != nil {
-		return fmt.Errorf("failed to prepare delete follower statement: %w", err)
-	}
-	defer deleteFollowerStatment.Close()
-
-	//delete
-	err = crud.InteractWithDatabase(db, deleteFollowerStatment, args)
+	err := crud.InteractWithDatabase(db, dbstatements.DeleteFollowerStmt, args)
 	if err != nil {
 		return fmt.Errorf("failed to delete follower data: %w", err)
 	}

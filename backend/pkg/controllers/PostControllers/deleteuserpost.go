@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"fmt"
 	crud "socialnetwork/pkg/db/CRUD"
+	"socialnetwork/pkg/db/dbstatements"
 )
 
 /*
@@ -21,15 +22,7 @@ func DeleteUserPost(db *sql.DB, userId string, postId string) error {
 	args := []interface{}{}
 	args = append(args, postId)
 
-	query := fmt.Sprintf("DELETE FROM Posts WHERE post_id = ?")
-	deleteUserPostStatment, err := db.Prepare(query)
-	if err != nil {
-		return fmt.Errorf("failed to prepare delete User Post statement: %w", err)
-	}
-	defer deleteUserPostStatment.Close()
-
-	//delete
-	err = crud.InteractWithDatabase(db, deleteUserPostStatment, args)
+	err := crud.InteractWithDatabase(db, dbstatements.DeletePostStmt, args)
 	if err != nil {
 		return fmt.Errorf("failed to delete post from database: %w", err)
 	}

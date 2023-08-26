@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"fmt"
 	crud "socialnetwork/pkg/db/CRUD"
+	"socialnetwork/pkg/db/dbstatements"
 	"socialnetwork/pkg/helpers"
 	"socialnetwork/pkg/models/dbmodels"
 )
@@ -43,20 +44,13 @@ func DeleteUserAccount(db *sql.DB, userId string, deleteUserData map[string]inte
 	}
 
 	//set query statements
-	queryStatement := ""
 	queryValues := make([]interface{}, 0)
-	queryStatement = `
-	SELECT * FROM Users 
-	WHERE email = ?
-	AND display_name = ?
-	AND user_id = ?
-	`
 	queryValues = append(queryValues, email)
 	queryValues = append(queryValues, username)
 	queryValues = append(queryValues, userId)
 
 	//select user from inputted information
-	userData, err := crud.SelectFromDatabase(db, "Users", queryStatement, queryValues)
+	userData, err := crud.SelectFromDatabase(db, "Users", dbstatements.SelectUserByEmailAndDisplayNameAndUserIdStmt, queryValues)
 	if err != nil {
 		return fmt.Errorf("error selecting user when trying to delete account, err: %s", err)
 	}
@@ -81,15 +75,7 @@ func DeleteUserAccount(db *sql.DB, userId string, deleteUserData map[string]inte
 	args := []interface{}{}
 	args = append(args, userId)
 
-	query := fmt.Sprintf("DELETE FROM Users WHERE user_id = ?")
-	deleteUserStatment, err := db.Prepare(query)
-	if err != nil {
-		return fmt.Errorf("failed to prepare delete User statement: %w", err)
-	}
-	defer deleteUserStatment.Close()
-
-	//delete
-	err = crud.InteractWithDatabase(db, deleteUserStatment, args)
+	err = crud.InteractWithDatabase(db, dbstatements.DeleteUserAccountStmt, args)
 	if err != nil {
 		return fmt.Errorf("failed to delete user from database: %w", err)
 	}

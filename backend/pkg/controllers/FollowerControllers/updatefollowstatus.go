@@ -4,7 +4,7 @@ import (
 	"database/sql"
 	"fmt"
 	crud "socialnetwork/pkg/db/CRUD"
-	"strings"
+	"socialnetwork/pkg/db/dbstatements"
 )
 
 /*
@@ -29,15 +29,15 @@ Example:
     and the following status from 0 to 1.
 */
 func UpdateFollowStatus(db *sql.DB, userId string, updateFollowerData map[string]interface{}) error {
-	var columns []string
 	var args []interface{}
+	var query *sql.Stmt
 
 	if followingStatus, ok := updateFollowerData["following_status"].(string); ok {
-		columns = append(columns, "following_status = ?")
+		query = dbstatements.UpdateFollowingStatusStmt
 		args = append(args, followingStatus)
 	}
 	if requestPendingStatus, ok := updateFollowerData["request_pending"].(string); ok {
-		columns = append(columns, "request_pending = ?")
+		query = dbstatements.UpdateRequestPendingStmt
 		args = append(args, requestPendingStatus)
 	}
 	if followeeId, ok := updateFollowerData["followee_id"].(string); ok {
@@ -47,14 +47,7 @@ func UpdateFollowStatus(db *sql.DB, userId string, updateFollowerData map[string
 		args = append(args, followerId)
 	}
 
-	query := fmt.Sprintf("UPDATE Followers SET %s WHERE followee_id = ? AND follower_id = ?", strings.Join(columns, ", "))
-	updateFollowStatusStatment, err := db.Prepare(query)
-	if err != nil {
-		return fmt.Errorf("failed to prepare update follow status: %w", err)
-	}
-	defer updateFollowStatusStatment.Close()
-
-	err = crud.InteractWithDatabase(db, updateFollowStatusStatment, args)
+	err := crud.InteractWithDatabase(db, query, args)
 	if err != nil {
 		return fmt.Errorf("failed to update post data: %w", err)
 	}

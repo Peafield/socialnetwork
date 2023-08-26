@@ -125,7 +125,7 @@ func ValidateLoggedInStatus(payload readwritemodels.Payload) error {
 		payload.UserId,
 	}
 
-	userData, err := crud.SelectFromDatabase(dbutils.DB, "Users", dbstatements.SelectUserByID, queryValues)
+	userData, err := crud.SelectFromDatabase(dbutils.DB, "Users", dbstatements.SelectUserByIDStmt, queryValues)
 	if err != nil {
 		return fmt.Errorf("failed to select user in validate logged in status: %w", err)
 	}

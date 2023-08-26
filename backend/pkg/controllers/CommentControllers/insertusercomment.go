@@ -43,8 +43,7 @@ func InsertComment(db *sql.DB, userId string, commentData map[string]interface{}
 		return fmt.Errorf("failed to insert comment into database: %s", err)
 	}
 
-	args = []interface{}{postIdData}
-	err = crud.InteractWithDatabase(db, dbstatements.UpdatePostNumOfComments, args)
+	err = crud.InteractWithDatabase(db, dbstatements.UpdatePostIncreaseNumOfComments, []interface{}{postIdData})
 	if err != nil {
 		return fmt.Errorf("failed to update post comment number: %s", err)
 	}

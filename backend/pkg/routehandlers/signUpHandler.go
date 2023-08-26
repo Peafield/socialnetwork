@@ -7,7 +7,6 @@ import (
 	"net/http"
 	"socialnetwork/pkg/controllers"
 	usercontrollers "socialnetwork/pkg/controllers/UserControllers"
-	"socialnetwork/pkg/db/dbstatements"
 	"socialnetwork/pkg/db/dbutils"
 	"socialnetwork/pkg/middleware"
 	"socialnetwork/pkg/models/readwritemodels"
@@ -79,7 +78,7 @@ func SignUpHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	user, err := usercontrollers.RegisterUser(formData.Data, dbutils.DB, dbstatements.InsertUserStmt)
+	user, err := usercontrollers.RegisterUser(dbutils.DB, formData.Data)
 	if err != nil {
 		if errors.Is(err, ErrUserExists) {
 			http.Error(w, "user display name or email already in use", http.StatusBadRequest)

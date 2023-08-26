@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"fmt"
 	crud "socialnetwork/pkg/db/CRUD"
+	"socialnetwork/pkg/db/dbstatements"
 )
 
 /*
@@ -17,21 +18,25 @@ Parmeters:
 Returns:
   - error: if the comment fails to be deleted from the database
 */
-func DeleteUserComment(db *sql.DB, userId string, commentId string) error {
-	args := []interface{}{}
-	args = append(args, commentId)
-
-	query := fmt.Sprintf("DELETE FROM Comments WHERE comment_id = ?")
-	deleteUserCommentStatment, err := db.Prepare(query)
-	if err != nil {
-		return fmt.Errorf("failed to prepare delete User Comment statement: %w", err)
+func DeleteUserComment(db *sql.DB, userId string, deleteCommentData map[string]interface{}) error {
+	commentId, ok := deleteCommentData["comment_id"].(string)
+	if !ok {
+		return fmt.Errorf("comment id missing or not a string")
 	}
-	defer deleteUserCommentStatment.Close()
+	postId, ok := deleteCommentData["post_id"].(string)
+	if !ok {
+		return fmt.Errorf("post id missing or not a string")
+	}
 
-	//delete
-	err = crud.InteractWithDatabase(db, deleteUserCommentStatment, args)
+	err := crud.InteractWithDatabase(db, dbstatements.DeleteUserComment, []interface{}{commentId})
 	if err != nil {
 		return fmt.Errorf("failed to delete comment from database: %w", err)
 	}
+
+	err = crud.InteractWithDatabase(db, dbstatements.UpdatePostDecreaseNumOfComments, []interface{}{postId})
+	if err != nil {
+		return fmt.Errorf("failed to update num of comments for a post in database: %w", err)
+	}
+
 	return nil
 }

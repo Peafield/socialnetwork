@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"fmt"
 	crud "socialnetwork/pkg/db/CRUD"
+	"socialnetwork/pkg/db/dbstatements"
 )
 
 /*
@@ -33,15 +34,7 @@ func DeletePostSelectedFollower(db *sql.DB, userId string, deletePostSelectedFol
 	args = append(args, postId)
 	args = append(args, allowedFollowerId)
 
-	query := fmt.Sprintf("DELETE FROM Posts_Selected_Followers WHERE post_id = ? AND allowed_follower_id = ?")
-	deletePostSelectedFollowerStatment, err := db.Prepare(query)
-	if err != nil {
-		return fmt.Errorf("failed to prepare delete Post selected follower statement: %w", err)
-	}
-	defer deletePostSelectedFollowerStatment.Close()
-
-	//delete
-	err = crud.InteractWithDatabase(db, deletePostSelectedFollowerStatment, args)
+	err := crud.InteractWithDatabase(db, dbstatements.DeletePostsSelectedFollowerStmt, args)
 	if err != nil {
 		return fmt.Errorf("failed to delete post selected follower from database: %w", err)
 	}

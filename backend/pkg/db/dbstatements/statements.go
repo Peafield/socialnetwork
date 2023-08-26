@@ -24,22 +24,28 @@ var (
 	InsertNotificationsStmt         *sql.Stmt
 
 	/*Update Statments*/
-	UpdatePostImagePathStmt         *sql.Stmt
-	UpdatePostContentStmt           *sql.Stmt
-	UpdatePostPrivacyLevelStmt      *sql.Stmt
-	UpdatePostIncreaseNumOfComments *sql.Stmt
-	UpdatePostDecreaseNumOfComments *sql.Stmt
-	UpdateAllUsersToSignedOut       *sql.Stmt
-	UpdateUserLoggedIn              *sql.Stmt
-	UpdateUserLoggedOut             *sql.Stmt
-	UpdatePostReaction              *sql.Stmt
-	UpdateCommentReaction           *sql.Stmt
-	UpdateCommentContent            *sql.Stmt
-	UpdateCommentImagePath          *sql.Stmt
-	UpdateCommentLikes              *sql.Stmt
-	UpdateCommentDislikes           *sql.Stmt
-	UpdateFollowingStatusStmt       *sql.Stmt
-	UpdateRequestPendingStmt        *sql.Stmt
+	UpdatePostImagePathStmt           *sql.Stmt
+	UpdatePostContentStmt             *sql.Stmt
+	UpdatePostPrivacyLevelStmt        *sql.Stmt
+	UpdatePostIncreaseNumOfComments   *sql.Stmt
+	UpdatePostDecreaseNumOfComments   *sql.Stmt
+	UpdateAllUsersToSignedOut         *sql.Stmt
+	UpdateUserLoggedIn                *sql.Stmt
+	UpdateUserLoggedOut               *sql.Stmt
+	UpdatePostReaction                *sql.Stmt
+	UpdateCommentReaction             *sql.Stmt
+	UpdateCommentContent              *sql.Stmt
+	UpdateCommentImagePath            *sql.Stmt
+	UpdatePostIncreaseLikeStmt        *sql.Stmt
+	UpdatePostDecreaseLikesStmt       *sql.Stmt
+	UpdatePostIncreaseDislikeStmt     *sql.Stmt
+	UpdatePostDecreaseDislikesStmt    *sql.Stmt
+	UpdateCommentIncreaseLikeStmt     *sql.Stmt
+	UpdateCommentDecreaseLikesStmt    *sql.Stmt
+	UpdateCommentIncreaseDislikeStmt  *sql.Stmt
+	UpdateCommentDecreaseDislikesStmt *sql.Stmt
+	UpdateFollowingStatusStmt         *sql.Stmt
+	UpdateRequestPendingStmt          *sql.Stmt
 
 	/*Select Statements*/
 	SelectAllUsersStmt                           *sql.Stmt
@@ -234,6 +240,7 @@ func CloseDBStatements() {
 	SelectUserViewablePostsStmt.Close()
 	SelectSpecificUserPostsStmt.Close()
 	SelectPostReactionStmt.Close()
+	SelectCommentReactionStmt.Close()
 	SelectPostCommentsStmt.Close()
 	SelectFollowerInfoStmt.Close()
 
@@ -250,8 +257,14 @@ func CloseDBStatements() {
 	UpdateCommentReaction.Close()
 	UpdateCommentContent.Close()
 	UpdateCommentImagePath.Close()
-	UpdateCommentLikes.Close()
-	UpdateCommentDislikes.Close()
+	UpdatePostIncreaseLikeStmt.Close()
+	UpdatePostDecreaseLikesStmt.Close()
+	UpdatePostIncreaseDislikeStmt.Close()
+	UpdatePostDecreaseDislikesStmt.Close()
+	UpdateCommentIncreaseLikeStmt.Close()
+	UpdateCommentDecreaseLikesStmt.Close()
+	UpdateCommentIncreaseDislikeStmt.Close()
+	UpdateCommentDecreaseDislikesStmt.Close()
 	UpdateFollowingStatusStmt.Close()
 	UpdateRequestPendingStmt.Close()
 

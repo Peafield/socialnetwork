@@ -47,20 +47,6 @@ func initCommentDBStatements(db *sql.DB) error {
 	if err != nil {
 		return fmt.Errorf("failed to prepare update comment image statement: %w", err)
 	}
-	UpdateCommentLikes, err = db.Prepare(`
-	UPDATE Comments SET likes = ?
-	WHERE comment_id = ?
-	`)
-	if err != nil {
-		return fmt.Errorf("failed to prepare update comment likes statement: %w", err)
-	}
-	UpdateCommentDislikes, err = db.Prepare(`
-	UPDATE Comments SET dislikes = ?
-	WHERE comment_id = ?
-	`)
-	if err != nil {
-		return fmt.Errorf("failed to prepare update comment likes statement: %w", err)
-	}
 
 	/*DELETE*/
 	DeleteUserComment, err = db.Prepare(`

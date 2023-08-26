@@ -55,6 +55,75 @@ func initReactionDBStatements(db *sql.DB) error {
 		return fmt.Errorf("failed to prepare update comment reaction statement: %w", err)
 	}
 
+	UpdatePostIncreaseLikeStmt, err = db.Prepare(`
+		UPDATE Posts 
+		SET likes = likes + 1
+		WHERE post_id = ?
+		`)
+	if err != nil {
+		return fmt.Errorf("failed to prepare update increase post likes statement: %w", err)
+	}
+
+	UpdatePostDecreaseLikesStmt, err = db.Prepare(`
+		UPDATE Posts 
+		SET likes = likes - 1
+		WHERE post_id = ?
+		`)
+	if err != nil {
+		return fmt.Errorf("failed to prepare update decrease post likes statement: %w", err)
+	}
+	UpdatePostIncreaseDislikeStmt, err = db.Prepare(`
+		UPDATE Posts 
+		SET dislikes = dislikes + 1
+		WHERE post_id = ?
+		`)
+	if err != nil {
+		return fmt.Errorf("failed to prepare update increase post dislikes statement: %w", err)
+	}
+
+	UpdatePostDecreaseDislikesStmt, err = db.Prepare(`
+		UPDATE Posts 
+		SET dislikes = dislikes - 1
+		WHERE post_id = ?
+		`)
+	if err != nil {
+		return fmt.Errorf("failed to prepare update decrease post dislikes statement: %w", err)
+	}
+	UpdateCommentIncreaseLikeStmt, err = db.Prepare(`
+		UPDATE Comments 
+		SET likes = likes + 1
+		WHERE comment_id = ?
+		`)
+	if err != nil {
+		return fmt.Errorf("failed to prepare update increase comment likes statement: %w", err)
+	}
+
+	UpdateCommentDecreaseLikesStmt, err = db.Prepare(`
+		UPDATE Comments 
+		SET likes = likes - 1
+		WHERE comment_id = ?
+		`)
+	if err != nil {
+		return fmt.Errorf("failed to prepare update decrease comment likes statement: %w", err)
+	}
+	UpdateCommentIncreaseDislikeStmt, err = db.Prepare(`
+		UPDATE Comments 
+		SET dislikes = dislikes + 1
+		WHERE comment_id = ?
+		`)
+	if err != nil {
+		return fmt.Errorf("failed to prepare update increase comment dislikes statement: %w", err)
+	}
+
+	UpdateCommentDecreaseDislikesStmt, err = db.Prepare(`
+		UPDATE Comments 
+		SET dislikes = dislikes - 1
+		WHERE comment_id = ?
+		`)
+	if err != nil {
+		return fmt.Errorf("failed to prepare update decrease comment dislikes statement: %w", err)
+	}
+
 	/*DELETE*/
 	DeletePostReaction, err = db.Prepare(`
 	DELETE FROM Reactions

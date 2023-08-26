@@ -132,7 +132,10 @@ func main() {
 		err = db.CreateFakeComments(dbutils.DB)
 		if err != nil {
 			log.Fatalf("something went wrong creating fakes: %s", err)
+		} else {
+			log.Println("Mocking successfully")
 		}
+		return
 	}
 
 	/*SERVER SETTINGS*/
@@ -161,7 +164,7 @@ func main() {
 	r.Handle("/user", middleware.ValidateTokenMiddleware(middleware.ParseAndValidateData(http.HandlerFunc(routehandlers.UserHandler))))
 	r.Handle("/post", middleware.ValidateTokenMiddleware(middleware.ParseAndValidateData(http.HandlerFunc(routehandlers.PostHandler))))
 	r.Handle("/comment", middleware.ValidateTokenMiddleware(middleware.ParseAndValidateData(http.HandlerFunc(routehandlers.CommentHandler))))
-	// r.Handle("/reaction", middleware.ValidateTokenMiddleware(middleware.ParseAndValidateData(http.HandlerFunc(routehandlers.ReactionHandler))))
+	r.Handle("/reaction", middleware.ValidateTokenMiddleware(middleware.ParseAndValidateData(http.HandlerFunc(routehandlers.ReactionHandler))))
 	r.Handle("/follow", middleware.ValidateTokenMiddleware(middleware.ParseAndValidateData(http.HandlerFunc(routehandlers.FollowerHandler))))
 
 	/*LISTEN AND SERVER*/

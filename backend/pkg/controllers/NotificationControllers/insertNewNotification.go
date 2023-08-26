@@ -3,14 +3,12 @@ package notificationcontrollers
 import (
 	"database/sql"
 	"fmt"
-	"log"
 	crud "socialnetwork/pkg/db/CRUD"
 	"socialnetwork/pkg/db/dbstatements"
 	"socialnetwork/pkg/helpers"
 )
 
 func InsertNewNotification(db *sql.DB, userId string, newNotificationData map[string]interface{}) error {
-	log.Println(newNotificationData)
 	args := make([]interface{}, 9)
 
 	notificationId, err := helpers.CreateUUID()
@@ -54,7 +52,6 @@ func InsertNewNotification(db *sql.DB, userId string, newNotificationData map[st
 
 	err = crud.InteractWithDatabase(db, dbstatements.InsertNotificationsStmt, args)
 	if err != nil {
-		log.Printf("IWD error: %v", err)
 		return fmt.Errorf("failed to insert notification into database: %w", err)
 	}
 	return nil

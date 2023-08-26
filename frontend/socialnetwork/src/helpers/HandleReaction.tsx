@@ -8,7 +8,7 @@ export async function HandleReaction(
   creatorId: string,
   reactionOn: string,
   reactionOnId: string,
-  reactionType: "like" | "dislike",
+  reactionType: string,
 ) {
   const payload = {
     creatorId,

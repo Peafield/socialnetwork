@@ -1,18 +1,19 @@
 import { handleAPIRequest } from "../controllers/Api";
 import { getCookie } from '../controllers/SetUserContextAndCookie';
 
-const REACTION_ENDPOINT = "/notification";
+const REACTION_ENDPOINT = "/reaction";
 
+// HandleReaction handles a reaction for a post or comment
 export async function HandleReaction(
   creatorId: string,
   reactionOn: string,
-  notificationTypeId: string,
+  postOrCommentId: string,
   reactionType: "like" | "dislike",
 ) {
   const payload = {
     creatorId,
     reactionOn,
-    notificationTypeId,
+    postOrCommentId,
     reactionType,
   };
 

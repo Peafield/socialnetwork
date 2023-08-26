@@ -1,5 +1,5 @@
 import React from "react";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import styles from "./Post.module.css";
 import { AiOutlineLike, AiOutlineDislike } from "react-icons/ai";
 import { GoComment } from "react-icons/go";
@@ -33,42 +33,49 @@ const PostActions: React.FC<PostActionsProps> = ({
     setNumOfComments(AmountOfComments);
   }, [likes, dislikes, AmountOfComments]);
 
-  const handleLike = async (e: React.MouseEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    if (hasLiked) {
-      await HandleReaction(creatorId, "post", postId, "like");
-      setHasLiked(false);
-      setNumOfLikes(likes + 1);
-    } else {
-      if (hasDisliked) {
-        await HandleReaction(creatorId, "post", postId, "dislike");
-        setHasDisliked(false);
-        setNumOfDisikes(dislikes - 1);
-      }
-      await HandleReaction(creatorId, "post", postId, "like");
-      setHasLiked(true);
-      setNumOfLikes(likes + 1);
-    }
-  };
+  const currentTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  const handleDislike = async (e: React.MouseEvent) => {
+  // handleLikeDislike delays the sending of reaction for 5 seconds to make sure user decision is final.
+  const handleLikeDislike = (reactionType: "like" | "dislike", e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    if (hasDisliked) {
-      await HandleReaction(creatorId, "post", postId, "dislike");
-      setHasDisliked(false);
-      setNumOfDisikes(dislikes - 1);
-    } else {
-      if (hasLiked) {
-        await HandleReaction(creatorId, "post", postId, "like");
-        setHasLiked(false);
-        setNumOfLikes(likes + 1);
-      }
-      await HandleReaction(creatorId, "post", postId, "dislike");
-      setHasDisliked(true);
-      setNumOfDisikes(dislikes - 1);
+
+    if (currentTimeout.current) {
+      clearTimeout(currentTimeout.current);
     }
+
+
+    if (reactionType === "like") {
+      if (hasLiked) {
+        setNumOfLikes((prev) => prev - 1);
+        setHasLiked(false);
+      } else {
+        if (hasDisliked) {
+          setNumOfDisikes((prev) => prev - 1);
+          setHasDisliked(false);
+        }
+        setNumOfLikes((prev) => prev + 1);
+        setHasLiked(true);
+      }
+    }
+
+    if (reactionType === "dislike") {
+      if (hasDisliked) {
+        setNumOfDisikes((prev) => prev - 1);
+        setHasDisliked(false);
+      } else {
+        if (hasLiked) {
+          setNumOfLikes((prev) => prev - 1);
+          setHasLiked(false);
+        }
+        setNumOfDisikes((prev) => prev + 1);
+        setHasDisliked(true);
+      }
+    }
+
+    currentTimeout.current = setTimeout(async () => {
+      await HandleReaction(creatorId, "post", postId, reactionType);
+    }, 5000);
   };
 
   return (
@@ -90,10 +97,10 @@ const PostActions: React.FC<PostActionsProps> = ({
         <div
           className={`${styles.postactionsubcontainer} ${styles.postactionsubcontainerbottom}`}
         >
-          <button onClick={(e) => handleLike(e)}>
+          <button onClick={(e) => handleLikeDislike("like", e)}>
             <AiOutlineLike /> Like
           </button>
-          <button onClick={(e) => handleDislike(e)}>
+          <button onClick={(e) => handleLikeDislike("dislike", e)}>
             <AiOutlineDislike /> Dislike
           </button>
           <button>

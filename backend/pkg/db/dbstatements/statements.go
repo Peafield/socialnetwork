@@ -28,12 +28,20 @@ var (
 	UpdateAllUsersToSignedOut *sql.Stmt
 	UpdateUserLoggedIn        *sql.Stmt
 	UpdateUserLoggedOut       *sql.Stmt
+	UpdatePostReaction        *sql.Stmt
+	UpdateCommentReaction     *sql.Stmt
 
 	/*Select Statements*/
-	SelectUserByID          string
-	SelectUserByDisplayName string
-	SelectUserViewablePosts string
-	SelectSpecificUserPosts string
+	SelectUserByID            string
+	SelectUserByDisplayName   string
+	SelectUserViewablePosts   string
+	SelectSpecificUserPosts   string
+	SelectPostReactionStmt    *sql.Stmt
+	SelectCommentReactionStmt *sql.Stmt
+
+	/*Delete Statements*/
+	DeletePostReaction    *sql.Stmt
+	DeleteCommentReaction *sql.Stmt
 )
 
 func InitDBStatements(db *sql.DB) error {
@@ -52,6 +60,11 @@ func InitDBStatements(db *sql.DB) error {
 	err = initCommentDBStatements(db)
 	if err != nil {
 		return fmt.Errorf("failed to prepare comment statements: %w", err)
+	}
+
+	err = initReactionDBStatements(db)
+	if err != nil {
+		return fmt.Errorf("failed to prepare reaction statements: %w", err)
 	}
 
 	InsertSessionsStmt, err = db.Prepare(`
@@ -74,19 +87,6 @@ func InitDBStatements(db *sql.DB) error {
 	)`)
 	if err != nil {
 		return fmt.Errorf("failed to prepare insert post follower statement: %w", err)
-	}
-
-	InsertReactionsStmt, err = db.Prepare(`
-	INSERT INTO Reactions (
-		user_id,
-		post_id,
-		comment_id,
-		reaction
-	) VALUES (
-		?, ?, ?, ?
-	)`)
-	if err != nil {
-		return fmt.Errorf("failed to prepare insert reactions statement: %w", err)
 	}
 
 	InsertChatsStmt, err = db.Prepare(`
@@ -220,9 +220,18 @@ func CloseDBStatements() {
 	InsertGroupsEventsAttendees.Close()
 	InsertNotificationsStmt.Close()
 
+	/*Select Statment Closure*/
+	SelectPostReactionStmt.Close()
+
 	/*Update Statement Closure*/
 	UpdatePostNumOfComments.Close()
 	UpdateAllUsersToSignedOut.Close()
 	UpdateUserLoggedIn.Close()
 	UpdateUserLoggedOut.Close()
+	UpdatePostReaction.Close()
+	UpdateCommentReaction.Close()
+
+	/*Delete Statement Closure*/
+	DeletePostReaction.Close()
+	DeleteCommentReaction.Close()
 }

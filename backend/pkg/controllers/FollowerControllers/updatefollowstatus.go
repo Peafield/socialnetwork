@@ -28,17 +28,22 @@ Example:
     If the receiving user accepts, you would change the request pending status from 1 back to 0,
     and the following status from 0 to 1.
 */
-func UpdateFollowingStatus(db *sql.DB, userId string, followerId string, acceptRequest bool) error {
+func UpdateFollowingStatus(db *sql.DB, userId string, updateFollowData map[string]interface{}) error {
 	args := make([]interface{}, 3)
 
+	followerId, ok := updateFollowData["follower_id"].(string)
+	if !ok {
+		return fmt.Errorf("follower_id is not a string or doesn't exist")
+	}
+
+	followingStatus, ok := updateFollowData["following_status"].(int)
+	if !ok {
+		return fmt.Errorf("following_status is not an int or doesn't exist")
+	}
+
+	args[0] = followingStatus
 	args[1] = followerId
 	args[2] = userId
-
-	if acceptRequest {
-		args[0] = 1
-	} else {
-		args[0] = 0
-	}
 
 	err := crud.InteractWithDatabase(db, dbstatements.UpdateFollowerStatus, args)
 	if err != nil {

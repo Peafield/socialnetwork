@@ -65,3 +65,13 @@ func (h *Hub) GetClientByUsername(username string) *Client {
 	}
 	return nil
 }
+
+// getClientByUsername retrieves the client object based on the userID
+func (h *Hub) GetClientByID(userID string) *Client {
+	for client := range h.clients {
+		if client.UserID == userID {
+			return client
+		}
+	}
+	return nil
+}

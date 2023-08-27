@@ -62,6 +62,11 @@ func InitDBStatements(db *sql.DB) error {
 		return fmt.Errorf("failed to prepare follower statements: %w", err)
 	}
 
+	err = initChatDBStatements(db)
+	if err != nil {
+		return fmt.Errorf("failed to prepare chat statements: %w", err)
+	}
+
 	InsertSessionsStmt, err = db.Prepare(`
 	INSERT INTO Sessions (
 		session_id,
@@ -95,31 +100,6 @@ func InitDBStatements(db *sql.DB) error {
 	)`)
 	if err != nil {
 		return fmt.Errorf("failed to prepare insert reactions statement: %w", err)
-	}
-
-	InsertChatsStmt, err = db.Prepare(`
-	INSERT INTO Chats (
-		chat_id,
-		sender_id,
-		receiver_id
-	) VALUES (
-		?, ?, ?
-	)`)
-	if err != nil {
-		return fmt.Errorf("failed to prepare insert chats statement: %w", err)
-	}
-
-	InsertChatsMessagesStmt, err = db.Prepare(`
-	INSERT INTO Chats_Messages (
-		message_id,
-		chat_id,
-		sender_id,
-		message
-	) VALUES (
-		?, ?, ?, ?
-	)`)
-	if err != nil {
-		return fmt.Errorf("failed to prepare insert chats messages statement: %w", err)
 	}
 
 	InsertGroupsStmt, err = db.Prepare(`

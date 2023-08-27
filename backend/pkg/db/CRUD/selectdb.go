@@ -3,6 +3,7 @@ package crud
 import (
 	"database/sql"
 	"fmt"
+	errorhandling "socialnetwork/pkg/errorHandling"
 	"socialnetwork/pkg/helpers"
 )
 
@@ -65,7 +66,7 @@ func SelectFromDatabase(db *sql.DB, table string, queryStatement string, queryVa
 		}
 	}
 	if !found {
-		err = fmt.Errorf("no results found")
+		err = errorhandling.ErrNoResultsFound
 	}
 	return objectArray, err
 }

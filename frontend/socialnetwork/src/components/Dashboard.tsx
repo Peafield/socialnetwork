@@ -11,6 +11,7 @@ import SideModal from "./Containers/SideModal";
 import FriendsMessagingList from "./Chat/FriendsMessagingList";
 import { useWebSocket } from "../Socket";
 import { getCookie } from "../controllers/SetUserContextAndCookie";
+import { LuMessagesSquare } from 'react-icons/lu'
 
 export default function Dashboard() {
   const { message, sendMessage } = useWebSocket("ws://localhost:8080/ws", {
@@ -36,8 +37,8 @@ export default function Dashboard() {
           </Routes>
         </div>
         <div className={styles.sidebarbuttoncontainer}>
-          <button onClick={() => { setIsModalOpen(true) }}>
-            -
+          <button onClick={() => { setIsModalOpen(true) }} style={{padding: "5px"}}>
+            <LuMessagesSquare />
           </button>
         </div>
         <SideModal open={isModalOpen} onClose={() => setIsModalOpen(false)}>

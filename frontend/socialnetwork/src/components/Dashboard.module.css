@@ -23,8 +23,13 @@
 }
 
 .sidebarbuttoncontainer {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: auto;
+    width: auto;
     position: absolute;
-    right: 0px;
+    right: 5px;
 }
 
 .mainelementcontainer {

@@ -165,7 +165,7 @@ func UpdateFollowerHandler(w http.ResponseWriter, r *http.Request) {
 
 	//Break down updateFollowerData.Data for the updatefollowingstatus function
 
-	err := followercontrollers.UpdateFollowingStatus(dbutils.DB, userData.UserId, "", true)
+	err := followercontrollers.UpdateFollowingStatus(dbutils.DB, userData.UserId, updateFollowerData.Data)
 	if err != nil {
 		http.Error(w, "failed to update follower status", http.StatusInternalServerError)
 		return

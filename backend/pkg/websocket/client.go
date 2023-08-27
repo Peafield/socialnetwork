@@ -10,13 +10,14 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	chatcontrollers "socialnetwork/pkg/controllers/ChatControllers"
 	followercontrollers "socialnetwork/pkg/controllers/FollowerControllers"
 	usercontrollers "socialnetwork/pkg/controllers/UserControllers"
 	"socialnetwork/pkg/db/dbstatements"
 	"socialnetwork/pkg/db/dbutils"
 	"socialnetwork/pkg/middleware"
+	"socialnetwork/pkg/models/dbmodels"
 	"socialnetwork/pkg/models/readwritemodels"
-	"strings"
 	"time"
 
 	"github.com/gorilla/websocket"
@@ -108,8 +109,17 @@ func (c *Client) readPump() {
 		}
 
 		switch msg.Type {
-		case "online":
+		case "open_chat":
+			err := handleOpenChat(msg, c)
+			if err != nil {
+				log.Printf("error: %v", err)
+			}
 			break
+		case "private_message":
+			err := handlePrivateMessage(msg, c)
+			if err != nil {
+				log.Printf("error: %v", err)
+			}
 		default:
 			log.Println(msg)
 			break
@@ -147,8 +157,8 @@ func (c *Client) writePump() {
 			if err != nil {
 				return
 			}
-			msg2 := []byte(strings.ToUpper(string(message)))
-			w.Write(msg2)
+
+			w.Write(message)
 
 			// Add queued chat messages to the current websocket message.
 			n := len(c.send)
@@ -248,11 +258,17 @@ func ServeWs(hub *Hub, w http.ResponseWriter, r *http.Request) {
 	go client.readPump()
 }
 
-func getMessagableUsers(follower_id string) ([]BasicUserInfo, error) {
+func getMessagableUsers(userId string) ([]BasicUserInfo, error) {
 	var messagableUsers []BasicUserInfo
-	followees, err := followercontrollers.SelectFolloweesOfSpecificUser(dbutils.DB, follower_id)
+
+	followees, err := followercontrollers.SelectFolloweesOfSpecificUser(dbutils.DB, userId)
 	if err != nil {
-		return nil, fmt.Errorf("error retrieving online users: %w", err)
+		return nil, fmt.Errorf("error retrieving followee's of users: %w", err)
+	}
+
+	chats, err := chatcontrollers.SelectAllChatsByUser(dbutils.DB, userId)
+	if err != nil {
+		return nil, fmt.Errorf("error retrieving chats by user: %w", err)
 	}
 
 	for _, f := range followees.Followers {
@@ -268,5 +284,50 @@ func getMessagableUsers(follower_id string) ([]BasicUserInfo, error) {
 		})
 	}
 
+	for _, c := range chats.Chats {
+		cUser := &dbmodels.UserProfileData{}
+
+		if userId == c.SenderId {
+			cUser, err = usercontrollers.GetUser(dbutils.DB, "", dbstatements.SelectUserByID, c.ReceiverId)
+		} else if userId == c.ReceiverId {
+			cUser, err = usercontrollers.GetUser(dbutils.DB, "", dbstatements.SelectUserByID, c.SenderId)
+		}
+
+		if err != nil {
+			return nil, fmt.Errorf("error getting user: %w", err)
+		}
+
+		if !containsUser(messagableUsers, cUser.UserInfo.UserId) {
+			messagableUsers = append(messagableUsers, BasicUserInfo{
+				UUID:            cUser.UserInfo.UserId,
+				Name:            cUser.UserInfo.DisplayName,
+				LoggedInStatus:  cUser.UserInfo.IsLoggedIn,
+				LastMessageTime: time.Now(),
+			})
+		}
+
+	}
+
 	return messagableUsers, nil
+}
+
+func createMarshalledWriteMessage(typ string, data interface{}) []byte {
+	var writeMessage WriteMessage
+	writeMessage.Type = typ
+	writeMessage.Data = data
+	marshalledData, err := json.Marshal(writeMessage)
+	if err != nil {
+		log.Printf("error: %v", err)
+	}
+	return marshalledData
+}
+
+func containsUser(s []BasicUserInfo, userId string) bool {
+	for _, v := range s {
+		if v.UUID == userId {
+			return true
+		}
+	}
+
+	return false
 }

@@ -138,6 +138,10 @@ func main() {
 		if err != nil {
 			log.Fatalf("something went wrong creating fakes: %s", err)
 		}
+		err = db.CreateFakeChats(dbutils.DB)
+		if err != nil {
+			log.Fatalf("something went wrong creating fakes: %s", err)
+		}
 	}
 
 	/*SERVER SETTINGS*/

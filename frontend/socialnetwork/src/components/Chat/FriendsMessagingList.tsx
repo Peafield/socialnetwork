@@ -1,22 +1,40 @@
-import React, { useState } from 'react'
-import { WebSocketMessage } from '../../Socket';
+import React, { CSSProperties, useContext, useEffect, useState } from 'react'
+import { AiOutlineClose } from 'react-icons/ai';
+import { UserContext } from '../../context/AuthContext';
+import { WebSocketReadMessage, WebSocketWriteMessage } from '../../Socket';
+import styles from './Chat.module.css'
+import Conversation from './Conversation';
+import UserChatDisplay from './UserChatDisplay';
 
 interface FriendsMessagingListProps {
-    message: WebSocketMessage | null,
-    sendMessage: (messegeToSend: string) => void
+    message: WebSocketWriteMessage | null,
+    sendMessage: (messegeToSend: WebSocketReadMessage) => void
 }
 
 const FriendsMessagingList: React.FC<FriendsMessagingListProps> = ({
     message,
     sendMessage
 }) => {
-    const [messageToSend, setMessageToSend] = useState<string>("");
+    const userContext = useContext(UserContext)
+    const [messageToSend, setMessageToSend] = useState<WebSocketReadMessage>({
+        type: "",
+        info: ""
+    });
+    const [currentUserChat, setCurrentUserChat] = useState<string | null>(null)
+    const [currentUserChatDisplayName, setCurrentUserChatDisplayName] = useState<string | null>(null)
 
     const handleSendMessage = () => {
         if (messageToSend) {
+            console.log(messageToSend);
             sendMessage(messageToSend);
         }
     };
+
+    useEffect(() => {
+        if (currentUserChat) {
+            handleSendMessage();
+        }
+    }, [currentUserChat]);
 
     // Parse the received data if it's not undefined
     let messagableUsers = [];
@@ -24,15 +42,61 @@ const FriendsMessagingList: React.FC<FriendsMessagingListProps> = ({
         messagableUsers = message.data.messagableUsers;
     }
 
+    const closeStyle: CSSProperties = {
+        margin: "10px",
+        verticalAlign: "middle",
+        color: "red",
+        borderRadius: "50%",
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+        height: "3%",
+        width: "3%",
+    };
+
     return (
         <>
-            {messagableUsers ? (
-                <div>
-                    {messagableUsers.map((user: any) => (
-                        <div key={user.UUID}>{user.Name}</div>
-                    ))}
-                </div>
-            ) : null}
+            <div
+            className={styles.messagingcontainer}>
+                {currentUserChat && currentUserChatDisplayName ?
+                    <div>
+                        <span style={closeStyle} onClick={() => {
+                            setCurrentUserChat(null)
+                        }}>
+                            <AiOutlineClose />
+                        </span>
+                        <div>
+                            <Conversation 
+                            message={message} 
+                            sendMessage={sendMessage} 
+                            receiverName={currentUserChatDisplayName}
+                            receiverID={currentUserChat} />
+                        </div>
+                    </div>
+                    : messagableUsers ? (
+                        <div
+                            className={styles.messagableUsersContainer}>
+                            {messagableUsers.map((user: any) => (
+                                <div
+                                    key={user.UUID}
+                                    onClick={() => {
+                                        console.log("clicked");
+                                        setCurrentUserChatDisplayName(user.Name)
+                                        setCurrentUserChat(user.UUID)
+                                        setMessageToSend({
+                                            type: "open_chat",
+                                            info: {
+                                                receiver: user.UUID,
+                                            },
+                                        });
+                                    }}
+                                    className={styles.userChatContainer}>
+                                    <UserChatDisplay follower_id={userContext.user ? userContext.user.userId : ""} followee_id={user.UUID} />
+                                </div>
+                            ))}
+                        </div>
+                    ) : null}
+            </div>
         </>
     )
 }

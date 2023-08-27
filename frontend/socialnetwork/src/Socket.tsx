@@ -1,12 +1,17 @@
 import { useState, useRef, useEffect } from "react";
 
-export interface WebSocketMessage {
+export interface WebSocketReadMessage {
+    type: string
+    info: any
+}
+
+export interface WebSocketWriteMessage {
     type: string
     data: any
 }
 
 export const useWebSocket = (url: string, options: { headers?: Record<string, string> } = {}) => {
-    const [message, setMessage] = useState<WebSocketMessage | null>(null);
+    const [message, setMessage] = useState<WebSocketWriteMessage | null>(null);
     const ws = useRef<WebSocket | null>(null);
 
     useEffect(() => {
@@ -28,7 +33,6 @@ export const useWebSocket = (url: string, options: { headers?: Record<string, st
 
         socket.onmessage = (event) => {
             let message = JSON.parse(event.data);
-            console.log(message);
             setMessage(message);
         };
 
@@ -41,9 +45,9 @@ export const useWebSocket = (url: string, options: { headers?: Record<string, st
         };
     }, [url]);
 
-    const sendMessage = (messageToSend: string) => {
+    const sendMessage = (messageToSend: WebSocketReadMessage) => {
         if (ws.current) {
-            ws.current.send(messageToSend);
+            ws.current.send(JSON.stringify(messageToSend));
         }
     };
 

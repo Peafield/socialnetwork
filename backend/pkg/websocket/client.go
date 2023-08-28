@@ -7,16 +7,9 @@ package websocket
 import (
 	"bytes"
 	"encoding/json"
-	"fmt"
 	"log"
 	"net/http"
-	chatcontrollers "socialnetwork/pkg/controllers/ChatControllers"
-	followercontrollers "socialnetwork/pkg/controllers/FollowerControllers"
-	usercontrollers "socialnetwork/pkg/controllers/UserControllers"
-	"socialnetwork/pkg/db/dbstatements"
-	"socialnetwork/pkg/db/dbutils"
 	"socialnetwork/pkg/middleware"
-	"socialnetwork/pkg/models/dbmodels"
 	"socialnetwork/pkg/models/readwritemodels"
 	"time"
 
@@ -61,6 +54,7 @@ type BasicUserInfo struct {
 	UUID            string
 	Name            string
 	LoggedInStatus  int
+	LastMessage     string
 	LastMessageTime time.Time
 }
 
@@ -184,7 +178,7 @@ func (c *Client) writePump() {
 				return
 			}
 			message := WriteMessage{
-				Type: "messagableUsers",
+				Type: "messagable_users",
 				Data: map[string][]BasicUserInfo{
 					"messagableUsers": messagableUsers,
 				},
@@ -258,59 +252,6 @@ func ServeWs(hub *Hub, w http.ResponseWriter, r *http.Request) {
 	go client.readPump()
 }
 
-func getMessagableUsers(userId string) ([]BasicUserInfo, error) {
-	var messagableUsers []BasicUserInfo
-
-	followees, err := followercontrollers.SelectFolloweesOfSpecificUser(dbutils.DB, userId)
-	if err != nil {
-		return nil, fmt.Errorf("error retrieving followee's of users: %w", err)
-	}
-
-	chats, err := chatcontrollers.SelectAllChatsByUser(dbutils.DB, userId)
-	if err != nil {
-		return nil, fmt.Errorf("error retrieving chats by user: %w", err)
-	}
-
-	for _, f := range followees.Followers {
-		fUser, err := usercontrollers.GetUser(dbutils.DB, "", dbstatements.SelectUserByID, f.FolloweeId)
-		if err != nil {
-			return nil, fmt.Errorf("error getting user from followee id: %w", err)
-		}
-		messagableUsers = append(messagableUsers, BasicUserInfo{
-			UUID:            f.FolloweeId,
-			Name:            fUser.UserInfo.DisplayName,
-			LoggedInStatus:  fUser.UserInfo.IsLoggedIn,
-			LastMessageTime: time.Now(),
-		})
-	}
-
-	for _, c := range chats.Chats {
-		cUser := &dbmodels.UserProfileData{}
-
-		if userId == c.SenderId {
-			cUser, err = usercontrollers.GetUser(dbutils.DB, "", dbstatements.SelectUserByID, c.ReceiverId)
-		} else if userId == c.ReceiverId {
-			cUser, err = usercontrollers.GetUser(dbutils.DB, "", dbstatements.SelectUserByID, c.SenderId)
-		}
-
-		if err != nil {
-			return nil, fmt.Errorf("error getting user: %w", err)
-		}
-
-		if !containsUser(messagableUsers, cUser.UserInfo.UserId) {
-			messagableUsers = append(messagableUsers, BasicUserInfo{
-				UUID:            cUser.UserInfo.UserId,
-				Name:            cUser.UserInfo.DisplayName,
-				LoggedInStatus:  cUser.UserInfo.IsLoggedIn,
-				LastMessageTime: time.Now(),
-			})
-		}
-
-	}
-
-	return messagableUsers, nil
-}
-
 func createMarshalledWriteMessage(typ string, data interface{}) []byte {
 	var writeMessage WriteMessage
 	writeMessage.Type = typ
@@ -320,14 +261,4 @@ func createMarshalledWriteMessage(typ string, data interface{}) []byte {
 		log.Printf("error: %v", err)
 	}
 	return marshalledData
-}
-
-func containsUser(s []BasicUserInfo, userId string) bool {
-	for _, v := range s {
-		if v.UUID == userId {
-			return true
-		}
-	}
-
-	return false
 }

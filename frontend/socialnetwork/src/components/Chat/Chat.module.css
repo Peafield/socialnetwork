@@ -92,6 +92,7 @@
     align-items: center;
     overflow-y: auto;
     width: 100%;
+    transition: max-height 0.3s ease-in-out;
 }
 
 .receiverchatmessagecontainer {

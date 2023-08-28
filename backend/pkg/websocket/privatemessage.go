@@ -1,9 +1,11 @@
 package websocket
 
 import (
+	"errors"
 	"fmt"
 	chatcontrollers "socialnetwork/pkg/controllers/ChatControllers"
 	"socialnetwork/pkg/db/dbutils"
+	errorhandling "socialnetwork/pkg/errorHandling"
 )
 
 func handlePrivateMessage(msg ReadMessage, c *Client) error {
@@ -20,8 +22,18 @@ func handlePrivateMessage(msg ReadMessage, c *Client) error {
 	}
 
 	chat, err := chatcontrollers.SelectChat(dbutils.DB, c.UserID, receiverId)
-	if err != nil {
+	if err != nil && !errors.Is(err, errorhandling.ErrNoResultsFound) {
 		return fmt.Errorf("error selecting chat: %w", err)
+	} else {
+		err = chatcontrollers.InsertChat(dbutils.DB, c.UserID, map[string]interface{}{"receiver_id": receiverId})
+		if err != nil {
+			return fmt.Errorf("error inserting chat: %w", err)
+		}
+
+		chat, err = chatcontrollers.SelectChat(dbutils.DB, c.UserID, receiverId)
+		if err != nil {
+			return fmt.Errorf("error selecting chat: %w", err)
+		}
 	}
 
 	insertChatMessageData["chat_id"] = chat.ChatId

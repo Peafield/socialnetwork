@@ -22,6 +22,7 @@ const FriendsMessagingList: React.FC<FriendsMessagingListProps> = ({
     });
     const [currentUserChat, setCurrentUserChat] = useState<string | null>(null)
     const [currentUserChatDisplayName, setCurrentUserChatDisplayName] = useState<string | null>(null)
+    const [messagableUsers, setMessagableUsers] = useState<any[]>([])
 
     const handleSendMessage = () => {
         if (messageToSend) {
@@ -36,11 +37,11 @@ const FriendsMessagingList: React.FC<FriendsMessagingListProps> = ({
         }
     }, [currentUserChat]);
 
-    // Parse the received data if it's not undefined
-    let messagableUsers = [];
-    if (message && message.data) {
-        messagableUsers = message.data.messagableUsers;
-    }
+    useEffect(() => {
+        if (message?.type == "messagable_users" && message.data) {
+            setMessagableUsers(message.data.messagableUsers)
+        }
+    }, [message])
 
     const closeStyle: CSSProperties = {
         margin: "10px",
@@ -57,7 +58,7 @@ const FriendsMessagingList: React.FC<FriendsMessagingListProps> = ({
     return (
         <>
             <div
-            className={styles.messagingcontainer}>
+                className={styles.messagingcontainer}>
                 {currentUserChat && currentUserChatDisplayName ?
                     <div>
                         <span style={closeStyle} onClick={() => {
@@ -66,11 +67,11 @@ const FriendsMessagingList: React.FC<FriendsMessagingListProps> = ({
                             <AiOutlineClose />
                         </span>
                         <div>
-                            <Conversation 
-                            message={message} 
-                            sendMessage={sendMessage} 
-                            receiverName={currentUserChatDisplayName}
-                            receiverID={currentUserChat} />
+                            <Conversation
+                                message={message}
+                                sendMessage={sendMessage}
+                                receiverName={currentUserChatDisplayName}
+                                receiverID={currentUserChat} />
                         </div>
                     </div>
                     : messagableUsers ? (
@@ -91,7 +92,7 @@ const FriendsMessagingList: React.FC<FriendsMessagingListProps> = ({
                                         });
                                     }}
                                     className={styles.userChatContainer}>
-                                    <UserChatDisplay follower_id={userContext.user ? userContext.user.userId : ""} followee_id={user.UUID} />
+                                    <UserChatDisplay follower_id={userContext.user ? userContext.user.userId : ""} followee_id={user.UUID} last_message={user.LastMessage} />
                                 </div>
                             ))}
                         </div>

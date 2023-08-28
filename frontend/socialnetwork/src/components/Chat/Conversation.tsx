@@ -26,6 +26,7 @@ const Conversation: React.FC<ConversationProps> = ({
 }) => {
   const userContext = useContext(UserContext)
   const [chats, setChats] = useState<ChatProps[] | null>(null)
+  const [chatID, setChatID] = useState<string | null>(null)
   const [messageToSend, setMessageToSend] = useState<WebSocketReadMessage>({
     type: "",
     info: "",
@@ -46,9 +47,21 @@ const Conversation: React.FC<ConversationProps> = ({
     }
   }
 
+  const reloadChat = () => {
+    sendMessage({
+      type: "open_chat",
+      info: {
+        receiver: receiverID
+      }
+    })
+  }
+
   useEffect(() => {
-    if (message?.type == "open_chat" || message?.type == "private_message") {
+    if (message?.type == "open_chat") {
       let newChats: ChatProps[] = [];
+
+      setChatID(message.data[0].chat_id)
+
       message.data.map((chat: any) => {
         let sender = ""
         if (userContext.user && chat.sender_id == userContext.user?.userId) {
@@ -63,8 +76,13 @@ const Conversation: React.FC<ConversationProps> = ({
           message: chat.message
         })
       })
-      console.log(message.data);
       setChats(newChats)
+    } else if (message?.type == "private_message") {
+      if (message.data.every((chat: any) => {
+        return chat.chat_id == chatID
+      })) {
+        reloadChat()
+      }
     }
   }, [message])
 

@@ -31,9 +31,9 @@ export const useWebSocket = (url: string, options: { headers?: Record<string, st
             console.log("WebSocket closed");
         };
 
-        socket.onmessage = (event) => {
+        socket.onmessage = (event) => {            
             let message = JSON.parse(event.data);
-            setMessage(message);
+            setMessage(message);            
         };
 
         ws.current = socket;

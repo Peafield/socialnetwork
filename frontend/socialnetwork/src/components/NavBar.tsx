@@ -3,6 +3,8 @@ import { Link } from 'react-router-dom';
 import { UserContext } from '../context/AuthContext';
 import { BiUserCircle } from 'react-icons/bi'
 import { IoShareSocial } from 'react-icons/io5';
+import { MdOutlineLogout } from 'react-icons/md'
+import LogoutButton from './Auth/SignOut';
 
 //style properties for the navbar
 const navbarStyles: CSSProperties = {
@@ -43,6 +45,9 @@ export const NavBar: React.FC = () => {
                 <Link to={userContext.user ? "/dashboard/user/" + userContext.user.displayName : ""}>
                     <BiUserCircle />
                 </Link>
+            </div>
+            <div>
+                <LogoutButton/>
             </div>
         </nav>
     );

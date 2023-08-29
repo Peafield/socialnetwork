@@ -92,7 +92,11 @@ const FriendsMessagingList: React.FC<FriendsMessagingListProps> = ({
                                         });
                                     }}
                                     className={styles.userChatContainer}>
-                                    <UserChatDisplay follower_id={userContext.user ? userContext.user.userId : ""} followee_id={user.UUID} last_message={user.LastMessage} />
+                                    <UserChatDisplay 
+                                    follower_id={userContext.user ? userContext.user.userId : ""} 
+                                    followee_id={user.UUID} 
+                                    last_message={user.LastMessage} 
+                                    is_logged_in={user.LoggedInStatus}/>
                                 </div>
                             ))}
                         </div>

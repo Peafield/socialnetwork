@@ -8,16 +8,19 @@ import styles from './Chat.module.css'
 
 interface ChatHeaderProps {
     user_id: string
+    is_logged_in: number
 }
 
 const ChatHeader: React.FC<ChatHeaderProps> = ({
-    user_id
+    user_id,
+    is_logged_in
 }) => {
     const navigate = useNavigate()
     const [user, setUser] = useState<ProfileProps | null>(null)
     const [userAvatarURL, setUserAvatarURL] = useState<string | null>(null)
     const [userLoading, setUserLoading] = useState(false)
     const [error, setError] = useState<string | null>(null)
+    
     useEffect(() => {
         const fetchData = async () => {
             setUserLoading(true);
@@ -58,7 +61,9 @@ const ChatHeader: React.FC<ChatHeaderProps> = ({
     return (
         <div
             className={styles.chatheadercontainer}>
-            <div className={styles.displaypicturecontainer}>
+            <div 
+            className={styles.displaypicturecontainer}
+            style={is_logged_in ? {borderColor: "lightgreen"} : undefined}>
                 {(userAvatarURL && (
                     <img
                         src={userAvatarURL}

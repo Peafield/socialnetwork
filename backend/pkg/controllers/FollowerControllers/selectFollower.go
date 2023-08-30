@@ -12,7 +12,7 @@ import (
 
 func SelectFollowerInfo(db *sql.DB, userId string, followeeId string) (*dbmodels.Follower, error) {
 	followerData, err := crud.SelectFromDatabase(db, "Followers", dbstatements.SelectFollower, []interface{}{userId, followeeId})
-	if err != nil && errors.Is(err, errorhandling.ErrNoRowsAffected) {
+	if err != nil && errors.Is(err, errorhandling.ErrNoResultsFound) {
 		return nil, fmt.Errorf("failed to select follower from database: %w", err)
 	}
 

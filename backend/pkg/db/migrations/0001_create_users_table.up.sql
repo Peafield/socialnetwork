@@ -1,6 +1,7 @@
 CREATE TABLE Users (
   user_id TEXT UNIQUE NOT NULL PRIMARY KEY,
   is_logged_in INTEGER NOT NULL DEFAULT 0,
+  is_private INTEGER NOT NULL DEFAULT 0,
   email TEXT UNIQUE NOT NULL,
   display_name TEXT UNIQUE,
   hashed_password TEXT NOT NULL,

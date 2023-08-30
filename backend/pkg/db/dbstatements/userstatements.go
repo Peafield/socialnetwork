@@ -45,6 +45,22 @@ func initUserSelectStatements() {
 func initUserUpdateStatements(db *sql.DB) error {
 	var err error
 
+	UpdateUserAccount, err = db.Prepare(`
+	UPDATE Users
+	SET email = ?,
+	display_name = ?,
+	hashed_password = ?,
+	first_name = ?,
+	last_name = ?,
+	date_of_birth = ?,
+	avatar_path = ?,
+	about_me = ?
+	WHERE user_id = ?
+	`)
+	if err != nil {
+		return fmt.Errorf("failed to prepare update user account statement: %w", err)
+	}
+
 	UpdateUserLoggedIn, err = db.Prepare(`
 	UPDATE Users
 	SET is_logged_in = 1

@@ -47,6 +47,11 @@ func initFollowerUpdateStatements(db *sql.DB) error {
 }
 
 func initFollowerSelectStatements() {
+	SelectFollowersOfUser = `
+	SELECT * FROM Followers
+	WHERE followee_id = ? AND following_status = 1
+	`
+
 	SelectFolloweesOfUser = `
 	SELECT * FROM Followers
 	WHERE follower_id = ? AND following_status = 1`

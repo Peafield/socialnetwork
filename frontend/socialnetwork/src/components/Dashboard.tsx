@@ -12,6 +12,7 @@ import FriendsMessagingList from "./Chat/FriendsMessagingList";
 import { useWebSocket } from "../Socket";
 import { getCookie } from "../controllers/SetUserContextAndCookie";
 import { LuMessagesSquare } from 'react-icons/lu'
+import EditProfile from "./Profile/EditProfile";
 
 export default function Dashboard() {
   const { message, sendMessage } = useWebSocket("ws://localhost:8080/ws", {
@@ -33,6 +34,7 @@ export default function Dashboard() {
             <Route path="/" element={<PostFeed />} />
             <Route path="/createpost" element={<CreatePost />} />
             <Route path="/user/:username" element={<Profile />} />
+            <Route path="/user/edit/:username" element={<EditProfile />} />
             <Route path="/group/:groupname" element={<Group />} />
           </Routes>
         </div>

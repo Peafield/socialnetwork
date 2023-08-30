@@ -62,6 +62,11 @@ export default function SignUp() {
     const data = { data: formData };
     console.log(formData);
 
+    if (formData.password != formData.confirmPassword) {
+      setError("passwords do not match")
+      return
+    }
+
     const options = {
       method: "POST",
       headers: {

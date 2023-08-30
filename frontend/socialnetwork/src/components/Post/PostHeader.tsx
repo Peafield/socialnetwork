@@ -35,7 +35,6 @@ const PostHeader: React.FC<PostHeaderProps> = ({
 
       const blob = new Blob([avatarBuffer]);
       const url = URL.createObjectURL(blob);
-      console.log(url);
 
       setProfilePicUrl(url);
 

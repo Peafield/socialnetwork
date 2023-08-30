@@ -26,6 +26,7 @@ var (
 	/*Update Statments*/
 	UpdatePostNumOfComments   *sql.Stmt
 	UpdateAllUsersToSignedOut *sql.Stmt
+	UpdateUserAccount         *sql.Stmt
 	UpdateUserLoggedIn        *sql.Stmt
 	UpdateUserLoggedOut       *sql.Stmt
 	UpdateFollowerStatus      *sql.Stmt
@@ -36,6 +37,7 @@ var (
 	SelectUserViewablePosts string
 	SelectSpecificUserPosts string
 	SelectFollower          string
+	SelectFollowersOfUser   string
 	SelectFolloweesOfUser   string
 )
 
@@ -199,6 +201,7 @@ func CloseDBStatements() {
 	/*Update Statement Closure*/
 	UpdatePostNumOfComments.Close()
 	UpdateAllUsersToSignedOut.Close()
+	UpdateUserAccount.Close()
 	UpdateUserLoggedIn.Close()
 	UpdateUserLoggedOut.Close()
 	UpdateFollowerStatus.Close()

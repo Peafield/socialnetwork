@@ -13,7 +13,7 @@ export const getUserByDisplayName = async (display_name: string) => {
     };
     try {
         const response = await handleAPIRequest(url, options);
-
+        
         const newprofile = response.data.UserInfo
         const avatar = response.data.ProfilePic
 

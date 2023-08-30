@@ -5,19 +5,22 @@ import Modal from '../Containers/Modal';
 import Post, { PostProps } from '../Post/Post'
 import PostComments from '../Post/PostComments';
 import styles from './Profile.module.css'
+import { PiMaskSadDuotone } from 'react-icons/pi'
 
 interface ProfilePostsGridProps {
     user_id: string
     posts: PostProps[]
+    is_private: boolean
 }
 
 const ProfilePostsGrid: React.FC<ProfilePostsGridProps> = ({
     user_id,
-    posts
+    posts,
+    is_private
 }) => {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [modalPost, setModalPost] = useState<PostProps | null>(null)
-    const [error, setError] = useState<string | null>(null);    
+    const [error, setError] = useState<string | null>(null);
 
     const closeStyle: CSSProperties = {
         margin: "10px",
@@ -32,66 +35,85 @@ const ProfilePostsGrid: React.FC<ProfilePostsGridProps> = ({
     };
 
     return (
-        <Container>
+        <>
             <div className={styles.profilepostsgridcontainer}>
-                <Modal open={isModalOpen} onClose={() => setIsModalOpen(false)}>
-                    <span style={closeStyle} onClick={() => setIsModalOpen(false)}>
-                        <AiOutlineClose />
-                    </span>
-                    {modalPost ?
-                        <div
-                            className={styles.postmodalcontainer}>
-                            <div
-                                className={styles.postcontainer}>
-                                <Post
-                                    key={modalPost.post_id}
-                                    post_id={modalPost.post_id}
-                                    group_id={modalPost.group_id}
-                                    creator_id={modalPost.creator_id}
-                                    image_path={modalPost.image_path}
-                                    content={modalPost.content}
-                                    num_of_comments={modalPost.num_of_comments}
-                                    privacy_level={modalPost.privacy_level}
-                                    likes={modalPost.likes}
-                                    dislikes={modalPost.dislikes}
-                                    creation_date={modalPost.creation_date}
-                                />
-                            </div>
-                            <div
-                                className={styles.postcommentscontainer}>
-                                <PostComments post_id={modalPost.post_id} />
-                            </div>
+                {!is_private ?
+                    <>
+                        <Modal open={isModalOpen} onClose={() => setIsModalOpen(false)}>
+                            <span style={closeStyle} onClick={() => setIsModalOpen(false)}>
+                                <AiOutlineClose />
+                            </span>
+                            {modalPost ?
+                                <div
+                                    className={styles.postmodalcontainer}>
+                                    <div
+                                        className={styles.postcontainer}>
+                                        <Post
+                                            key={modalPost.post_id}
+                                            post_id={modalPost.post_id}
+                                            group_id={modalPost.group_id}
+                                            creator_id={modalPost.creator_id}
+                                            image_path={modalPost.image_path}
+                                            content={modalPost.content}
+                                            num_of_comments={modalPost.num_of_comments}
+                                            privacy_level={modalPost.privacy_level}
+                                            likes={modalPost.likes}
+                                            dislikes={modalPost.dislikes}
+                                            creation_date={modalPost.creation_date}
+                                        />
+                                    </div>
+                                    <div
+                                        className={styles.postcommentscontainer}>
+                                        <PostComments post_id={modalPost.post_id} />
+                                    </div>
+                                </div>
+                                : null
+                            }
+                        </Modal>
+                        {posts
+                            ? posts.map((postProps) => (
+                                <div
+                                    className={styles.postcontainer}
+                                    key={postProps.post_id}
+                                    onClick={() => {
+                                        setIsModalOpen(true)
+                                        setModalPost(postProps)
+                                    }}>
+                                    <Post
+                                        key={postProps.post_id}
+                                        post_id={postProps.post_id}
+                                        group_id={postProps.group_id}
+                                        creator_id={postProps.creator_id}
+                                        image_path={postProps.image_path}
+                                        content={postProps.content}
+                                        num_of_comments={postProps.num_of_comments}
+                                        privacy_level={postProps.privacy_level}
+                                        likes={postProps.likes}
+                                        dislikes={postProps.dislikes}
+                                        creation_date={postProps.creation_date}
+                                    />
+                                </div>
+                            ))
+                            : null}
+                    </>
+                    : <div
+                    style={{
+                        display: "flex",
+                        flexDirection: "column",
+                        justifyContent: "center",
+                        alignItems: "center",
+                        margin: "10px",
+                        padding: "10px"
+                        }}>
+                        <span style={{fontSize: "300%"}}>
+                            <PiMaskSadDuotone />
+                        </span>
+                        <div>
+                            Nothing to see here
                         </div>
-                        : null
-                    }
-                </Modal>
-                {posts
-                    ? posts.map((postProps) => (
-                        <div
-                            className={styles.postcontainer}
-                            key={postProps.post_id}
-                            onClick={() => {
-                                setIsModalOpen(true)
-                                setModalPost(postProps)
-                            }}>
-                            <Post
-                                key={postProps.post_id}
-                                post_id={postProps.post_id}
-                                group_id={postProps.group_id}
-                                creator_id={postProps.creator_id}
-                                image_path={postProps.image_path}
-                                content={postProps.content}
-                                num_of_comments={postProps.num_of_comments}
-                                privacy_level={postProps.privacy_level}
-                                likes={postProps.likes}
-                                dislikes={postProps.dislikes}
-                                creation_date={postProps.creation_date}
-                            />
-                        </div>
-                    ))
-                    : null}
+                    </div>}
             </div>
-        </Container>
+        </>
     )
 }
 

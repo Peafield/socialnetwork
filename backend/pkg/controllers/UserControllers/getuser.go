@@ -30,3 +30,23 @@ func GetUser(db *sql.DB, userId string, statement string, specificUserDetails st
 
 	return user, nil
 }
+
+func getUserPrivate(db *sql.DB, userId string, statement string, specificUserDetails string) (*dbmodels.UserProfileData, error) {
+	//should add a way of only displaying certain information based on follow status or privacy level?
+
+	specificUserData, err := crud.SelectFromDatabase(db, "Users", statement, []interface{}{specificUserDetails})
+	if err != nil {
+		return nil, fmt.Errorf("failed to select user from database: %w", err)
+	}
+
+	userData, ok := specificUserData[0].(*dbmodels.User)
+	if !ok {
+		return nil, fmt.Errorf("cannot assert user type")
+	}
+
+	user := &dbmodels.UserProfileData{}
+	user.UserInfo = *userData
+	user.ProfilePic, err = os.ReadFile(userData.AvatarPath)
+
+	return user, nil
+}

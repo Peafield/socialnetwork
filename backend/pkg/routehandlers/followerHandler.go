@@ -119,6 +119,8 @@ func GetFollowerHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	specificFolloweeId := r.URL.Query().Get("followee_id")
+	getFollowersId := r.URL.Query().Get("followers_id")
+	getFolloweesId := r.URL.Query().Get("followees_id")
 	var data interface{}
 
 	if specificFolloweeId != "" {
@@ -127,6 +129,18 @@ func GetFollowerHandler(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, "failed to get follower", http.StatusInternalServerError)
 		}
 		data = follower
+	} else if getFollowersId != "" {
+		followers, err := followercontrollers.SelectFollowersOfSpecificUser(dbutils.DB, getFollowersId)
+		if err != nil {
+			http.Error(w, "failed to get followers", http.StatusInternalServerError)
+		}
+		data = followers
+	} else if getFolloweesId != "" {
+		followees, err := followercontrollers.SelectFolloweesOfSpecificUser(dbutils.DB, getFolloweesId)
+		if err != nil {
+			http.Error(w, "failed to get followees", http.StatusInternalServerError)
+		}
+		data = followees
 	}
 
 	response := readwritemodels.WriteData{

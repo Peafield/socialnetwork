@@ -1,5 +1,6 @@
 import React, { useContext, useEffect, useState } from "react";
-import { FaUserCircle } from "react-icons/fa";
+import { FaUserCircle, FaUserEdit } from "react-icons/fa";
+import { Link } from "react-router-dom";
 import { UserContext } from "../../context/AuthContext";
 import { handleAPIRequest } from "../../controllers/Api";
 import { getFollowerData } from "../../controllers/Follower/GetFollower";
@@ -20,6 +21,8 @@ interface ProfileHeaderProps {
   followers: number;
   following: number;
   about_me: string;
+  is_private: boolean;
+  is_own_profile: boolean;
 }
 
 export interface FollowerProps {
@@ -39,7 +42,9 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
   num_of_posts,
   followers,
   following,
-  about_me
+  about_me,
+  is_private,
+  is_own_profile
 }) => {
   const userContext = useContext(UserContext)
   const [profilePicUrl, setProfilePicUrl] = useState<string | null>(null);
@@ -51,7 +56,7 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
     creation_date: ""
   });
   const [updateTrigger, setUpdateTrigger] = useState<number>(0)
-  const [error, setError] = useState<string | null>(null)
+  const [error, setError] = useState<string | null>(null)  
 
   useEffect(() => {
     if (avatar) {
@@ -80,7 +85,9 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
         }
       }
     }
-    fetchData()
+    if (!is_own_profile) {
+      fetchData()
+    }
   }, [updateTrigger])
 
   const handleFollow = async () => {
@@ -116,10 +123,10 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
   }
 
   return (
-    <Container>
+    <>
       <div className={styles.profileheadercontainer}>
         <div className={styles.displaypicturecontainer}>
-          {(profilePicUrl && (
+          {(profilePicUrl && (!is_private || is_own_profile) && (
             <img
               src={profilePicUrl}
               alt="Profile pic"
@@ -132,18 +139,33 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
             )}
         </div>
         <div className={styles.nameinfocontainer}>
-          <div>{first_name} {last_name}</div>
+          {is_private && !is_own_profile ?
+            <div>This profile is private</div>
+            : <div>{first_name} {last_name}</div>}
           <div style={{ color: "gray" }}>{display_name}</div>
           <div style={{
             fontSize: "small",
             fontStyle: "italic",
             color: "gray"
           }}>
-            {followerData.following_status == 1 ?
-              <button onClick={handleUnfollow}>Unfollow</button>
-              : followerData.request_pending == 1 ?
-                <button onClick={handleUnfollow}>Request Pending...</button>
-                : <button onClick={handleFollow}>Follow!</button>}
+            {!is_own_profile ?
+              followerData.following_status == 1 ?
+                <button onClick={handleUnfollow}>Unfollow</button>
+                : followerData.request_pending == 1 ?
+                  <button onClick={handleUnfollow}>Request Pending...</button>
+                  : <button onClick={handleFollow}>Follow!</button>
+              : <div>
+                <span
+                  style={{
+                    fontSize: "300%",
+                    color: "black"
+                  }}>
+
+                  <Link to={userContext.user ? "/dashboard/user/edit/" + userContext.user.displayName : ""}>
+                    <FaUserEdit />
+                  </Link>
+                </span>
+              </div>}
           </div>
         </div>
         <div className={styles.otherprofileinfocontainer}>
@@ -153,11 +175,11 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
             <div>Following {following}</div>
           </div>
           <div className={styles.aboutmecontainer}>
-            <div>{about_me}</div>
+            <div>{!is_private ? about_me : null}</div>
           </div>
         </div>
       </div>
-    </Container>
+    </>
   );
 };
 

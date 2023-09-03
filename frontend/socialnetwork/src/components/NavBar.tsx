@@ -5,49 +5,32 @@ import { BiUserCircle } from 'react-icons/bi'
 import { IoShareSocial } from 'react-icons/io5';
 import { MdOutlineLogout } from 'react-icons/md'
 import LogoutButton from './Auth/SignOut';
-
-//style properties for the navbar
-const navbarStyles: CSSProperties = {
-    position: 'sticky',
-    display: 'flex',
-    top: 0,
-    height: '100%',
-    width: '100%',
-    backgroundColor: '#fa4d6a',
-    alignItems: 'center',
-    justifyContent: 'space-around'
-}
-
-const logoStyles: CSSProperties = {
-    position: 'absolute',
-    display: 'flex',
-    height: '80%',
-    alignItems: 'center',
-    justifyContent: 'center',
-    fontSize: '300%',
-    color: 'white',
-    border: '2px black solid',
-    borderRadius: '20%'
-}
-
+import { AiOutlinePlus } from 'react-icons/ai';
+import styles from './Dashboard.module.css'
 
 export const NavBar: React.FC = () => {
 
     const userContext = useContext(UserContext)
 
     return (
-        <nav style={navbarStyles}>
-            <span style={logoStyles}>
+        <nav className={styles.navbar}>
+            <span className={styles.logo}>
                 <IoShareSocial />
             </span>
-            <h1>Social Network</h1>
-            <div>
-                <Link to={userContext.user ? "/dashboard/user/" + userContext.user.displayName : ""}>
-                    <BiUserCircle />
-                </Link>
-            </div>
-            <div>
-                <LogoutButton/>
+            <div className={styles.navbarActions}>
+                <div>
+                    <Link to={userContext.user ? "/dashboard/user/" + userContext.user.displayName : ""}>
+                        <BiUserCircle />
+                    </Link>
+                </div>
+                <div>
+                    <Link to={"/dashboard/createpost"}>
+                        <AiOutlinePlus />
+                    </Link>
+                </div>
+                <div>
+                    <LogoutButton />
+                </div>
             </div>
         </nav>
     );

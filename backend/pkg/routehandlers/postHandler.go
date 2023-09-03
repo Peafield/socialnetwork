@@ -3,12 +3,14 @@ package routehandlers
 import (
 	"encoding/json"
 	"fmt"
+	"log"
 	"net/http"
 	postcontrollers "socialnetwork/pkg/controllers/PostControllers"
 	"socialnetwork/pkg/db/dbutils"
 	"socialnetwork/pkg/middleware"
 	"socialnetwork/pkg/models/dbmodels"
 	"socialnetwork/pkg/models/readwritemodels"
+	"sort"
 )
 
 /*
@@ -87,10 +89,23 @@ func NewPost(w http.ResponseWriter, r *http.Request) {
 
 	err := postcontrollers.InsertPost(dbutils.DB, userData.UserId, newPostData.Data)
 	if err != nil {
+		log.Println(err)
 		http.Error(w, "failed to insert post data", http.StatusInternalServerError)
 		return
 	}
+
+	response := readwritemodels.WriteData{
+		Status: "success",
+		Data:   newPostData,
+	}
+	jsonReponse, err := json.Marshal(response)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
+	w.Write(jsonReponse)
 }
 
 /*
@@ -126,9 +141,14 @@ func UserPosts(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, "failed to select user viewable posts", http.StatusInternalServerError)
 			return
 		}
+		sort.Slice(userPosts.Posts, func(i, j int) bool {
+			return userPosts.Posts[i].PostInfo.CreationDate.After(userPosts.Posts[j].PostInfo.CreationDate)
+		})
 	} else {
 		userPosts, err = postcontrollers.SelectSpecificUserPosts(dbutils.DB, userInfo.UserId, specificUserId)
+		log.Println(len(userPosts.Posts))
 		if err != nil {
+			log.Println(err)
 			http.Error(w, "failed to select specific user posts", http.StatusInternalServerError)
 			return
 		}

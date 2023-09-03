@@ -33,7 +33,14 @@ const PostFeed: React.FC = () => {
             };
             try {
                 const response = await handleAPIRequest("/post", options);
-                setUserViewablePosts(response.data.Posts);
+
+                const postData = response.data.Posts.map((post: any) => {
+                    const newpost = post.PostInfo
+                    newpost.image_path = post.PostPicture
+                    return newpost
+                })
+                
+                setUserViewablePosts(postData);
             } catch (error) {
                 if (error instanceof Error) {
                     setError(error.message);
@@ -69,7 +76,9 @@ const PostFeed: React.FC = () => {
     return (
         <Container>
             <div className={styles.postfeedcontainer}>
-                <Modal open={isModalOpen} onClose={() => setIsModalOpen(false)}>
+                <Modal 
+                open={isModalOpen}
+                onClose={() => setIsModalOpen(false)}>
                     <span style={closeStyle} onClick={() => setIsModalOpen(false)}>
                         <AiOutlineClose />
                     </span>
@@ -100,6 +109,7 @@ const PostFeed: React.FC = () => {
                         : null
                     }
                 </Modal>
+        
                 {userViewablePosts
                     ? userViewablePosts.map((postProps) => (
                         <div

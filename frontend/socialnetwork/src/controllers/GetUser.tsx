@@ -13,7 +13,11 @@ export const getUserByDisplayName = async (display_name: string) => {
     };
     try {
         const response = await handleAPIRequest(url, options);
-        
+
+        if (response.status !== "success") {
+            throw new Error(response.message);
+        }
+
         const newprofile = response.data.UserInfo
         const avatar = response.data.ProfilePic
 
@@ -22,7 +26,11 @@ export const getUserByDisplayName = async (display_name: string) => {
         return newprofile
 
     } catch (error) {
-        return error
+        if (error instanceof Error) {
+            throw new Error("Failed to fetch user by display name: " + error.message);
+        } else {
+            throw new Error("An unexpected error occurred while fetching user by display name.");
+        }
     }
 }
 
@@ -39,6 +47,10 @@ export const getUserByUserID = async (user_id: string) => {
     try {
         const response = await handleAPIRequest(url, options);
 
+        if (response.status !== "success") {
+            throw new Error(response.message);
+        }
+
         const newprofile = response.data.UserInfo
         const avatar = response.data.ProfilePic
 
@@ -47,6 +59,10 @@ export const getUserByUserID = async (user_id: string) => {
         return newprofile
 
     } catch (error) {
-        return error
+        if (error instanceof Error) {
+            throw new Error("Failed to fetch user by id: " + error.message);
+        } else {
+            throw new Error("An unexpected error occurred while fetching user by id.");
+        }
     }
 }

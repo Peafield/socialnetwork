@@ -142,7 +142,7 @@ const PostComments: React.FC<PostCommentsProps> = ({
               />
             </div>
             <div>
-              <button type="submit">
+              <button type="submit" style={{width: 'auto'}}>
                 <FaCommentMedical />
               </button>
             </div>

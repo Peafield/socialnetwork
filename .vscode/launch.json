@@ -10,7 +10,7 @@
             "request": "launch",
             "mode": "auto",
             "program": "backend/server.go",
-            "args": ["--dbopen", "-dbmock", "socialNetwork"]
+            "args": ["--dbopen", "socialNetwork"]
         }
     ]
 }

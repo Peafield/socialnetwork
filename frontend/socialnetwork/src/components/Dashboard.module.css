@@ -10,16 +10,43 @@
 .navbarcontainer {
     width: 100%;
     height: 10%;
+
+}
+
+.navbar {
+    position: sticky;
+    display: flex;
+    top: 0;
+    height: 100%;
+    width: 100%;
+    background-color: white;
+    align-items: center;
+    justify-content: space-around;
+    box-shadow: rgba(50, 50, 93, 0.25) 0px 2px 5px -1px,
+        rgba(0, 0, 0, 0.3) 0px 1px 3px -1px;
+}
+
+.navbarActions {
+    display: flex;
+    margin-left: 50%;
+    width: 50%;
+    height: 100%;
+    align-items: center;
+    justify-content: right;
+}
+
+.navbarActions>* {
+    margin: 10px;
 }
 
 .navbarcontainer a {
-    color: black;
+    color: #fa4d6a;
     font-size: 2rem;
     font-weight: bold;
 }
 
 .navbarcontainer a:hover {
-    color: lightgray;
+    color: #fa8fa1;
 }
 
 .sidebarbuttoncontainer {
@@ -29,13 +56,27 @@
     height: auto;
     width: auto;
     position: absolute;
-    right: 5px;
+    right: 15px;
 }
 
 .mainelementcontainer {
     display: flex;
     justify-content: center;
+    margin: 5px;
     height: 90%;
     width: 90%;
     overflow: hidden;
+}
+
+.logo {
+    position: absolute;
+    display: flex;
+    flex-direction: column;
+    height: 80%;
+    align-items: center;
+    justify-content: center;
+    font-size: 300%;
+    color: #fa4d6a;
+    border-radius: 20%;
+    padding: 2px;
 }

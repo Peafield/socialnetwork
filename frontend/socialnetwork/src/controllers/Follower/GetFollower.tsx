@@ -12,14 +12,22 @@ export const getFollowerData = async (followee_id: string) => {
         },
     };
     try {
-        const response = await handleAPIRequest(url, options);        
+        const response = await handleAPIRequest(url, options);
+
+        if (response.status !== "success") {
+            throw new Error(response.message);
+        }
 
         const follower = response.data
 
         return follower
 
     } catch (error) {
-        return error
+        if (error instanceof Error) {
+            throw new Error("Failed to fetch follower data: " + error.message);
+        } else {
+            throw new Error("An unexpected error occurred while fetching follower data.");
+        }
     }
 }
 
@@ -34,14 +42,22 @@ export const getFollowers = async (followee_id: string) => {
         },
     };
     try {
-        const response = await handleAPIRequest(url, options);        
+        const response = await handleAPIRequest(url, options);
+
+        if (response.status !== "success") {
+            throw new Error(response.message);
+        }
 
         const followers = response.data
 
         return followers
 
     } catch (error) {
-        return error
+        if (error instanceof Error) {
+            throw new Error("Failed to fetch followers: " + error.message);
+        } else {
+            throw new Error("An unexpected error occurred while fetching followers.");
+        }
     }
 }
 
@@ -58,11 +74,19 @@ export const getFollowees = async (follower_id: string) => {
     try {
         const response = await handleAPIRequest(url, options);
 
+        if (response.status !== "success") {
+            throw new Error(response.message);
+        }
+
         const followees = response.data
 
         return followees
 
     } catch (error) {
-        return error
+        if (error instanceof Error) {
+            throw new Error("Failed to fetch followees: " + error.message);
+        } else {
+            throw new Error("An unexpected error occurred while fetching followees.");
+        }
     }
 }

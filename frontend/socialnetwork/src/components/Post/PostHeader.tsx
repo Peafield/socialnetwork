@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { FaUserCircle, FaGlobeAfrica } from "react-icons/fa";
-import {FaPeopleGroup } from "react-icons/fa6"
+import { FaPeopleGroup } from "react-icons/fa6"
 import { IoPeopleCircle } from "react-icons/io5"
 import styles from "./Post.module.css";
 import FormatDate from "../../helpers/DateConversion";
@@ -45,27 +45,29 @@ const PostHeader: React.FC<PostHeaderProps> = ({
     }
   }, [creatorAvatar]);
   let formattedDate = FormatDate(creationDate);
-  let PrivacyIconType = postPrivacyLevel === 0 ? FaGlobeAfrica : 
-                      postPrivacyLevel === 1 ? FaPeopleGroup : IoPeopleCircle;
+  let PrivacyIconType = postPrivacyLevel === 0 ? FaGlobeAfrica :
+    postPrivacyLevel === 1 ? FaPeopleGroup : IoPeopleCircle;
 
   return (
     <div className={styles.postheadercontainer}>
       <div className={styles.postHeaderInfoContainer}>
-        <div>
+        <div className={styles.profilepiccontainer}>
           {(profilePicUrl && (
-            <img
-              src={profilePicUrl}
-              alt="Profile pic"
-              className={styles.avatar}
-            />
-          )) || (
             <span className={styles.profileIconStyle}>
-              <IoPeopleCircle />
+              <img
+                src={profilePicUrl}
+                alt="Profile pic"
+                className={styles.avatar}
+              />
             </span>
-          )}
+          )) || (
+              <span className={styles.profileIconStyle}>
+                <IoPeopleCircle />
+              </span>
+            )}
         </div>
-        <div>
-          <Link to={"/dashboard/user/" + creatorDisplayName}>
+        <div style={{ margin: '5px' }}>
+          <Link to={"/dashboard/user/" + creatorDisplayName} style={{ color: '#fa4d6a', display: 'flex', alignItems: 'center', justifyContent: 'left' }}>
             {creatorDisplayName}
           </Link>
           <p>{formattedDate} <PrivacyIconType /></p>

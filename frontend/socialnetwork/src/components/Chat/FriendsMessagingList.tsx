@@ -44,6 +44,9 @@ const FriendsMessagingList: React.FC<FriendsMessagingListProps> = ({
     }, [message])
 
     const closeStyle: CSSProperties = {
+        position: 'sticky',
+        top: '10px',
+        left: '10px',
         margin: "10px",
         verticalAlign: "middle",
         color: "red",
@@ -53,55 +56,57 @@ const FriendsMessagingList: React.FC<FriendsMessagingListProps> = ({
         alignItems: "center",
         height: "3%",
         width: "3%",
+        zIndex: '2'
     };
 
     return (
         <>
-            <div
-                className={styles.messagingcontainer}>
-                {currentUserChat && currentUserChatDisplayName ?
-                    <div>
+
+            {currentUserChat && currentUserChatDisplayName ?
+                <div
+                    className={styles.messagingcontainer}>
+                    <div className={styles.conversationHeader}>
                         <span style={closeStyle} onClick={() => {
                             setCurrentUserChat(null)
                         }}>
                             <AiOutlineClose />
                         </span>
-                        <div>
-                            <Conversation
-                                message={message}
-                                sendMessage={sendMessage}
-                                receiverName={currentUserChatDisplayName}
-                                receiverID={currentUserChat} />
-                        </div>
+                        <h3>{currentUserChatDisplayName}</h3>
                     </div>
-                    : messagableUsers ? (
-                        <div
-                            className={styles.messagableUsersContainer}>
-                            {messagableUsers.map((user: any) => (
-                                <div
-                                    key={user.UUID}
-                                    onClick={() => {
-                                        console.log("clicked");
-                                        setCurrentUserChatDisplayName(user.Name)
-                                        setCurrentUserChat(user.UUID)
-                                        setMessageToSend({
-                                            type: "open_chat",
-                                            info: {
-                                                receiver: user.UUID,
-                                            },
-                                        });
-                                    }}
-                                    className={styles.userChatContainer}>
-                                    <UserChatDisplay 
-                                    follower_id={userContext.user ? userContext.user.userId : ""} 
-                                    followee_id={user.UUID} 
-                                    last_message={user.LastMessage} 
-                                    is_logged_in={user.LoggedInStatus}/>
-                                </div>
-                            ))}
-                        </div>
-                    ) : null}
-            </div>
+                    <Conversation
+                        message={message}
+                        sendMessage={sendMessage}
+                        receiverName={currentUserChatDisplayName}
+                        receiverID={currentUserChat} />
+                </div>
+                : messagableUsers ? (
+                    <div
+                        className={styles.messagableUsersContainer}>
+                        {messagableUsers.map((user: any) => (
+                            <div
+                                key={user.UUID}
+                                onClick={() => {
+                                    console.log("clicked");
+                                    setCurrentUserChatDisplayName(user.Name)
+                                    setCurrentUserChat(user.UUID)
+                                    setMessageToSend({
+                                        type: "open_chat",
+                                        info: {
+                                            receiver: user.UUID,
+                                        },
+                                    });
+                                }}
+                                className={styles.userChatContainer}>
+                                <UserChatDisplay
+                                    follower_id={userContext.user ? userContext.user.userId : ""}
+                                    followee_id={user.UUID}
+                                    last_message={user.LastMessage}
+                                    is_logged_in={user.LoggedInStatus} />
+                            </div>
+                        ))}
+                    </div>
+                ) : null}
+
         </>
     )
 }

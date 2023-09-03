@@ -65,7 +65,7 @@ const Post: React.FC<PostProps> = ({
             creatorAvatar={userData.avatar}
             postPrivacyLevel={privacy_level}
           />
-          <PostContent text={content} />
+          <PostContent text={content} image_path={image_path}/>
           <PostActions
             likes={likes}
             dislikes={dislikes}

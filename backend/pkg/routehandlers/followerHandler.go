@@ -126,6 +126,7 @@ func GetFollowerHandler(w http.ResponseWriter, r *http.Request) {
 	if specificFolloweeId != "" {
 		follower, err := followercontrollers.SelectFollowerInfo(dbutils.DB, userData.UserId, specificFolloweeId)
 		if err != nil {
+			log.Println(err)
 			http.Error(w, "failed to get follower", http.StatusInternalServerError)
 		}
 		data = follower

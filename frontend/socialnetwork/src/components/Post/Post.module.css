@@ -64,7 +64,7 @@
 .postHeaderInfoContainer {
   display: flex;
   flex-direction: row;
-  justify-content: center;
+  justify-content: left;
   align-items: center;
 }
 
@@ -105,37 +105,54 @@
   margin: 5%;
 }
 
+.profilepiccontainer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 20%;
+  height: 20%;
+}
+
 .profileIconStyle {
   margin-right: 8px;
   vertical-align: middle;
-  font-size: 2rem;
+  font-size: 3rem;
 }
 
 .avatar {
-  vertical-align: "middle";
-  width: 2%;
-  height: 2%;
+  width: 50px;
+  height: 50px;
   border-radius: 50%;
 }
 
 .createpostcontainer {
-  position: relative;
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
   border-radius: 5px;
-  width: 30%;
-  height: 60%;
+  width: 40%;
+  height: 70%;
   background-color: #fafafa;
   box-shadow: rgba(50, 50, 93, 0.25) 0px 2px 5px -1px,
     rgba(0, 0, 0, 0.3) 0px 1px 3px -1px;
 }
 
+.selectableprofilescontainer {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  height: 30%;
+  width: 70%;
+  overflow-y: auto;
+  background-color: rgb(233, 236, 242);
+  border-radius: 10px;
+}
+
 .formwrapper {
   display: flex;
   flex-direction: column;
-  justify-content: space-evenly;
+  justify-content: center;
   align-items: center;
   width: 100%;
   height: 100%;
@@ -153,13 +170,19 @@ h2 {
 }
 
 form {
-  display: block;
-  width: 80%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 5px;
+  width: 100%;
+  height: 80%;
 }
 
 .inputgroup {
   display: block;
-  margin: 2% 0;
+  width: 80%;
+  margin: 15px;
 }
 
 .inputgrouprow {
@@ -167,14 +190,31 @@ form {
   flex-direction: row;
   justify-content: space-between;
   align-items: center;
-  margin: 2% 0;
+  margin: 15px;
 }
 
 label {
   display: block;
-  text-transform: capitalize;
   font-size: 16px;
   color: #555;
+}
+
+.checkbox {
+  display: flex;
+  justify-content: left;
+  margin: 1px;
+  padding: 1px;
+  align-items: center;
+  width: 100%;
+}
+
+.checkbox input {
+  margin-left: 5%;
+}
+
+.checkbox label {
+  text-transform: none;
+  margin-left: 5%;
 }
 
 input[type="text"],
@@ -196,6 +236,7 @@ textarea {
 
 textarea {
   resize: none;
+  height: auto;
   background-color: #f0f2f5;
 }
 
@@ -203,16 +244,16 @@ button {
   width: 100%;
   padding: 3.5%;
   margin: 2% 0;
-  background-color: #4272d7;
+  background-color: #fa4d6a00;
   border-radius: 5px;
-  color: white;
+  color: #fa4d6a;
   border: none;
   cursor: pointer;
   transition: all 0.4s ease;
-  font-size: 1.5rem;
+  font-size: 2rem;
   font-weight: 900;
 }
 
 button:hover {
-  background-color: #0056b3;
+  color: #fa8fa1;
 }

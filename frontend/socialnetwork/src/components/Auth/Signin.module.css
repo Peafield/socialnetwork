@@ -79,11 +79,11 @@ textarea {
   background-color: #f0f2f5;
 }
 
-button {
+.button {
   width: 100%;
   padding: 3.5%;
   margin: 2% 0;
-  background-color: #4272d7;
+  background-color: #fa4d6a;
   border-radius: 5px;
   color: white;
   border: none;
@@ -93,6 +93,6 @@ button {
   font-weight: 900;
 }
 
-button:hover {
-  background-color: #0056b3;
+.button:hover {
+  background-color: #db435c;
 }

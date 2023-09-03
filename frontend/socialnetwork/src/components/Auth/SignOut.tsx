@@ -7,6 +7,7 @@ import { useNavigate } from "react-router-dom";
 export default function LogoutButton() {
   const navigate = useNavigate()
   const userContext = useContext(UserContext);
+  const [isHovered, setIsHovered] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const signOut = async () => {
@@ -31,17 +32,22 @@ export default function LogoutButton() {
     }
   };
 
+  const buttonStyle = {
+    width: 'auto',
+    height: 'auto',
+    backgroundColor: 'rgba(211, 211, 211, 0)',
+    fontSize: '2rem',
+    fontWeight: 'bold',
+    color: isHovered ? '#fa8fa1' : '#fa4d6a', // Change color on hover
+    transition: 'background-color 0.3s', // Add a transition for smooth color change
+  };
+
   return (
     <button
       onClick={signOut}
-      style={{
-        width: "auto",
-        height: "auto",
-        color: "black",
-        fontSize: "2rem",
-        fontWeight: "bold",
-        backgroundColor: "#fa4d6a00",
-      }}>
+      style={buttonStyle}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}>
       <MdOutlineLogout />
     </button>
   )

@@ -16,7 +16,12 @@ type Post struct {
 	CreationDate  time.Time `json:"creation_date"`
 }
 
+type PostData struct {
+	PostInfo    Post
+	PostPicture []byte
+}
+
 // Posts is slice of Post.
 type Posts struct {
-	Posts []Post
+	Posts []PostData
 }

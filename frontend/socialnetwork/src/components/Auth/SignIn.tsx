@@ -83,12 +83,20 @@ export default function SignIn() {
 
   return (
     <Container>
-      <div
-        className={styles.signinpage}>
+      <div className={styles.signinpage}>
         <div className={`${styles.logo} ${styles.flip}`}>
           <IoShareSocial />
         </div>
-        <h2 style={{ position: 'absolute', top: '10%', left: '66%', color: '#fa4d6a' }}>Social Network</h2>
+        <h2
+          style={{
+            position: "absolute",
+            top: "10%",
+            left: "66%",
+            color: "#fa4d6a",
+          }}
+        >
+          Social Network
+        </h2>
         <div className={styles.authcontainer}>
           <div className={styles.formwrapper}>
             <form onSubmit={handleSubmit}>
@@ -113,7 +121,14 @@ export default function SignIn() {
                 />
               </div>
               <div className={styles.inputgroup}>
-                <button className={styles.button} type="submit">
+                <button
+                  className={styles.button}
+                  type="submit"
+                  onClick={() => {
+                    setSnackbarOpen(false);
+                    setError(null);
+                  }}
+                >
                   Sign In
                 </button>
               </div>

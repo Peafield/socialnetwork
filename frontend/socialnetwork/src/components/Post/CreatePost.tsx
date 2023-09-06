@@ -2,7 +2,10 @@ import React, { useContext, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { UserContext } from "../../context/AuthContext";
 import { handleAPIRequest } from "../../controllers/Api";
-import { getFollowers, getFollowees } from "../../controllers/Follower/GetFollower";
+import {
+  getFollowers,
+  getFollowees,
+} from "../../controllers/Follower/GetFollower";
 import { getUserByUserID } from "../../controllers/GetUser";
 import { getCookie } from "../../controllers/SetUserContextAndCookie";
 import Container from "../Containers/Container";
@@ -13,22 +16,24 @@ import styles from "./Post.module.css";
 
 interface CreatePostFormData {
   content: string;
-  image_path: string
+  image_path: string;
   privacy_level: number;
-  selected_profiles: string[]
+  selected_profiles: string[];
 }
 
 const CreatePost: React.FC = () => {
   const navigate = useNavigate();
-  const userContext = useContext(UserContext)
+  const userContext = useContext(UserContext);
   const [formData, setFormData] = useState<CreatePostFormData>({
     content: "",
     image_path: "",
     privacy_level: 0,
-    selected_profiles: []
+    selected_profiles: [],
   });
-  const [showFollowers, setShowFollowers] = useState(false)
-  const [selectableProfiles, setSelectableProfiles] = useState<ProfileProps[]>([])
+  const [showFollowers, setShowFollowers] = useState(false);
+  const [selectableProfiles, setSelectableProfiles] = useState<ProfileProps[]>(
+    []
+  );
   const [error, setError] = useState<string | null>(null);
   const [snackbarOpen, setSnackbarOpen] = useState<boolean>(false);
   const [snackbarType, setSnackbarType] = useState<
@@ -37,27 +42,38 @@ const CreatePost: React.FC = () => {
 
   useEffect(() => {
     const fetchData = async () => {
-
       try {
         if (userContext.user) {
-          const followdataFollowers = await getFollowers(userContext.user?.userId)
-          const followdataFollowees = await getFollowees(userContext.user?.userId)
+          const followdataFollowers = await getFollowers(
+            userContext.user?.userId
+          );
+          const followdataFollowees = await getFollowees(
+            userContext.user?.userId
+          );
 
-          const followerUsersPromises = followdataFollowers.Followers.map(async (follower: FollowerProps) => {
-            const user: ProfileProps = await getUserByUserID(follower.follower_id);
-            return user;
-          });
+          const followerUsersPromises = followdataFollowers.Followers.map(
+            async (follower: FollowerProps) => {
+              const user: ProfileProps = await getUserByUserID(
+                follower.follower_id
+              );
+              return user;
+            }
+          );
 
-          const followeeUsersPromises = followdataFollowees.Followers.map(async (follower: FollowerProps) => {
-            const user: ProfileProps = await getUserByUserID(follower.followee_id);
-            return user;
-          });
+          const followeeUsersPromises = followdataFollowees.Followers.map(
+            async (follower: FollowerProps) => {
+              const user: ProfileProps = await getUserByUserID(
+                follower.followee_id
+              );
+              return user;
+            }
+          );
 
           // Use Promise.all to await all promises and get resolved users
           const followerUsers = await Promise.all(followerUsersPromises);
           const followeeUsers = await Promise.all(followeeUsersPromises);
 
-          const profiles = [...followerUsers, ...followeeUsers]
+          const profiles = [...followerUsers, ...followeeUsers];
 
           // Function to filter out duplicates based on user_id
           const uniqueProfiles = (array: any[]) => {
@@ -73,13 +89,13 @@ const CreatePost: React.FC = () => {
 
           const mergedProfiles = uniqueProfiles(profiles);
 
-          setSelectableProfiles(mergedProfiles)
+          setSelectableProfiles(mergedProfiles);
         }
       } catch (error) {
         if (error instanceof Error) {
           setError(error.message);
           if (error.cause === 401) {
-            navigate("/signin")
+            navigate("/signin");
           }
         } else {
           setError("An unexpected error occurred.");
@@ -88,9 +104,11 @@ const CreatePost: React.FC = () => {
     };
 
     fetchData(); // Call the async function
-  }, [])
+  }, []);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
     const { name, value } = e.target;
     if (e.target.type === "file") {
       const file = (e.target as HTMLInputElement)?.files?.[0] || null;
@@ -101,10 +119,9 @@ const CreatePost: React.FC = () => {
             ...prevState,
             image_path: reader.result as string,
           }));
-        }
-        reader.readAsDataURL(file)
+        };
+        reader.readAsDataURL(file);
       }
-
     } else {
       switch (name) {
         case "privacy_level":
@@ -112,22 +129,22 @@ const CreatePost: React.FC = () => {
             ...prevState,
             [name]: Number(value),
           }));
-          setShowFollowers(name === "privacy_level" && value === "2")
-          break
+          setShowFollowers(name === "privacy_level" && value === "2");
+          break;
         case "selected_profiles":
-          let sp = formData.selected_profiles
+          let sp = formData.selected_profiles;
           sp.includes(value) ? sp.splice(sp.indexOf(value), 1) : sp.push(value);
           setFormData((prevState) => ({
             ...prevState,
-            selected_profiles: sp
+            selected_profiles: sp,
           }));
-          break
+          break;
         default:
           setFormData((prevState) => ({
             ...prevState,
             [name]: value,
           }));
-          break
+          break;
       }
     }
   };
@@ -175,7 +192,8 @@ const CreatePost: React.FC = () => {
                 placeholder="Write something for your post!"
                 value={formData.content}
                 name="content"
-                onChange={handleChange} />
+                onChange={handleChange}
+              />
             </div>
             <div className={styles.inputgroup}>
               <label htmlFor="image_path">
@@ -218,31 +236,27 @@ const CreatePost: React.FC = () => {
               />
               <label htmlFor="selected_privacy_level">Selected</label>
             </div>
-            {showFollowers ?
-              <div
-                className={styles.selectableprofilescontainer}>
+            {showFollowers ? (
+              <div className={styles.selectableprofilescontainer}>
                 {selectableProfiles.map((profile) => (
-                  <div
-                    key={profile.display_name}
-                    className={styles.checkbox}>
+                  <div key={profile.display_name} className={styles.checkbox}>
                     <input
                       type="checkbox"
                       id={profile.display_name}
                       name="selected_profiles"
                       onChange={handleChange}
-                      value={profile.user_id} />
-                    <label
-                      htmlFor={profile.display_name}>
-                      {profile.display_name} {`(${profile.first_name} ${profile.last_name})`}
+                      value={profile.user_id}
+                    />
+                    <label htmlFor={profile.display_name}>
+                      {profile.display_name}{" "}
+                      {`(${profile.first_name} ${profile.last_name})`}
                     </label>
                   </div>
                 ))}
               </div>
-              : null}
+            ) : null}
             <div className={styles.inputgroup}>
-              <button type="submit">
-                Create Post
-              </button>
+              <button type="submit">Create Post</button>
             </div>
           </form>
         </div>

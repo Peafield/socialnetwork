@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"socialnetwork/pkg/controllers"
 	usercontrollers "socialnetwork/pkg/controllers/UserControllers"
 	"strings"
 )
@@ -39,6 +40,10 @@ func CreateFakeUsers(db *sql.DB) error {
 		if err != nil {
 			return fmt.Errorf("failed to insert fake users: %w", err)
 		}
+	}
+	err := controllers.SignOutAllUsers(db)
+	if err != nil {
+		return fmt.Errorf("failed to sign out all users during mocking: %w", err)
 	}
 
 	return nil

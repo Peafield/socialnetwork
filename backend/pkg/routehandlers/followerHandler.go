@@ -3,6 +3,7 @@ package routehandlers
 import (
 	"encoding/json"
 	"fmt"
+	"log"
 	"net/http"
 	followercontrollers "socialnetwork/pkg/controllers/FollowerControllers"
 	"socialnetwork/pkg/db/dbutils"
@@ -118,14 +119,29 @@ func GetFollowerHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	specificFolloweeId := r.URL.Query().Get("followee_id")
+	getFollowersId := r.URL.Query().Get("followers_id")
+	getFolloweesId := r.URL.Query().Get("followees_id")
 	var data interface{}
 
 	if specificFolloweeId != "" {
 		follower, err := followercontrollers.SelectFollowerInfo(dbutils.DB, userData.UserId, specificFolloweeId)
 		if err != nil {
+			log.Println(err)
 			http.Error(w, "failed to get follower", http.StatusInternalServerError)
 		}
 		data = follower
+	} else if getFollowersId != "" {
+		followers, err := followercontrollers.SelectFollowersOfSpecificUser(dbutils.DB, getFollowersId)
+		if err != nil {
+			http.Error(w, "failed to get followers", http.StatusInternalServerError)
+		}
+		data = followers
+	} else if getFolloweesId != "" {
+		followees, err := followercontrollers.SelectFolloweesOfSpecificUser(dbutils.DB, getFolloweesId)
+		if err != nil {
+			http.Error(w, "failed to get followees", http.StatusInternalServerError)
+		}
+		data = followees
 	}
 
 	response := readwritemodels.WriteData{
@@ -160,7 +176,11 @@ func UpdateFollowerHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err := followercontrollers.UpdateFollowStatus(dbutils.DB, userData.UserId, updateFollowerData.Data)
+	log.Println(updateFollowerData)
+
+	//Break down updateFollowerData.Data for the updatefollowingstatus function
+
+	err := followercontrollers.UpdateFollowingStatus(dbutils.DB, userData.UserId, updateFollowerData.Data)
 	if err != nil {
 		http.Error(w, "failed to update follower status", http.StatusInternalServerError)
 		return

@@ -1,6 +1,7 @@
 package routehandlers
 
 import (
+	"encoding/json"
 	"log"
 	"net/http"
 	"socialnetwork/pkg/controllers"
@@ -32,5 +33,17 @@ func SignOutHandler(w http.ResponseWriter, r *http.Request) {
 
 	r.Header.Del("Authorization")
 
+	response := readwritemodels.WriteData{
+		Status: "success",
+		Data:   1,
+	}
+
+	jsonReponse, err := json.Marshal(response)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
+	w.Write(jsonReponse)
 }

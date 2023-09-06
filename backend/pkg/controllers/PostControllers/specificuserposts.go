@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
+	"os"
 	crud "socialnetwork/pkg/db/CRUD"
 	"socialnetwork/pkg/db/dbstatements"
 	errorhandling "socialnetwork/pkg/errorHandling"
@@ -14,20 +15,24 @@ func SelectSpecificUserPosts(db *sql.DB, userId string, specifcUserId string) (*
 	values := []interface{}{
 		specifcUserId,
 		userId,
+		userId,
 		specifcUserId,
 		userId,
 		specifcUserId,
 	}
 
 	postsData, err := crud.SelectFromDatabase(db, "Posts", dbstatements.SelectSpecificUserPostsStmt, values)
-	if err != nil && errors.Is(err, errorhandling.ErrNoRowsAffected) {
-		return nil, fmt.Errorf("failed to select user viewable posts from database: %w", err)
+	if err != nil && !errors.Is(err, errorhandling.ErrNoResultsFound) {
+		return nil, fmt.Errorf("failed to select specific user posts from database: %w", err)
 	}
 
 	posts := &dbmodels.Posts{}
 	for _, v := range postsData {
 		if post, ok := v.(*dbmodels.Post); ok {
-			posts.Posts = append(posts.Posts, *post)
+			postData := &dbmodels.PostData{}
+			postData.PostInfo = *post
+			postData.PostPicture, err = os.ReadFile(post.ImagePath)
+			posts.Posts = append(posts.Posts, *postData)
 		} else {
 			return nil, fmt.Errorf("failed to assert post data")
 		}

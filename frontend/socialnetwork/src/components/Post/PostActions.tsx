@@ -83,31 +83,22 @@ const PostActions: React.FC<PostActionsProps> = ({
       <div className={styles.postactionsubcontainer}>
         <div className={styles.postactioninfo}>
           <span className={styles.postactionspan}>
-            <p>
-              {numOfLikes} <AiOutlineLike />
-            </p>
-            <p>
-              {numOfDislikes} <AiOutlineDislike />
-            </p>
+            <div className={styles.postaction}>
+              <div style={{paddingBottom: '20%'}}>
+                {numOfLikes} 
+                </div>
+                <div style={{color: '#fa4d6a'}} onClick={(e) => handleLikeDislike("like", e)}><AiOutlineLike /></div>
+            </div>
+            <div className={styles.postaction}>
+            <div style={{paddingBottom: '20%'}}>
+              {numOfDislikes} 
+              </div>
+              <div style={{color: '#fa4d6a'}} onClick={(e) => handleLikeDislike("dislike", e)}><AiOutlineDislike /></div>
+            </div>
+            <div className={styles.postaction}>{numOfComments} comments <GoComment style={{color: '#fa4d6a'}}/></div>
           </span>
-          <p>{numOfComments} comments</p>
         </div>
       </div>
-      <form>
-        <div
-          className={`${styles.postactionsubcontainer} ${styles.postactionsubcontainerbottom}`}
-        >
-          <button onClick={(e) => handleLikeDislike("like", e)}>
-            <AiOutlineLike /> Like
-          </button>
-          <button onClick={(e) => handleLikeDislike("dislike", e)}>
-            <AiOutlineDislike /> Dislike
-          </button>
-          <button>
-            <GoComment /> Comment
-          </button>
-        </div>
-      </form>
     </div>
   );
 };

@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
+	"os"
 	crud "socialnetwork/pkg/db/CRUD"
 	"socialnetwork/pkg/db/dbstatements"
 	errorhandling "socialnetwork/pkg/errorHandling"
@@ -46,7 +47,10 @@ func SelectUserViewablePosts(db *sql.DB, userId string) (*dbmodels.Posts, error)
 	posts := &dbmodels.Posts{}
 	for _, v := range postsData {
 		if post, ok := v.(*dbmodels.Post); ok {
-			posts.Posts = append(posts.Posts, *post)
+			postData := &dbmodels.PostData{}
+			postData.PostInfo = *post
+			postData.PostPicture, err = os.ReadFile(post.ImagePath)
+			posts.Posts = append(posts.Posts, *postData)
 		} else {
 			return nil, fmt.Errorf("failed to assert post data")
 		}

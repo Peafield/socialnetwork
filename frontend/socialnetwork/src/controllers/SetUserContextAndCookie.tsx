@@ -17,10 +17,7 @@ export function useSetUserContextAndCookie() {
             })
             .join("")
         )
-      );
-      
-      console.log(payload);
-      
+      );      
 
       const user = {
         userId: payload.user_id,

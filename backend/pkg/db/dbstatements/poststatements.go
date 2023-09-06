@@ -64,7 +64,7 @@ func initPostDBStatements(db *sql.DB) error {
 
 	SelectSpecificUserPostsStmt, err = db.Prepare(`
 	SELECT * FROM Posts 
-	WHERE creator_id = ? AND privacy_level = 0
+	WHERE (creator_id = ? AND privacy_level = 0) OR (creator_id = ?)
 	UNION
 	SELECT P.* FROM Posts P
 	JOIN Followers F ON P.creator_id = F.followee_id

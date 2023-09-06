@@ -1,52 +1,50 @@
-import React, { useState, useEffect, CSSProperties, useContext } from 'react';
-import { Link } from 'react-router-dom';
-import { UserContext } from '../context/AuthContext';
-import { BiUserCircle } from 'react-icons/bi'
-import { IoShareSocial } from 'react-icons/io5';
-
-//style properties for the navbar
-const navbarStyles: CSSProperties = {
-    position: 'sticky',
-    display: 'flex',
-    top: 0,
-    height: '100%',
-    width: '100%',
-    backgroundColor: '#fa4d6a',
-    alignItems: 'center',
-    justifyContent: 'space-around'
-}
-
-const logoStyles: CSSProperties = {
-    position: 'absolute',
-    display: 'flex',
-    height: '80%',
-    alignItems: 'center',
-    justifyContent: 'center',
-    fontSize: '300%',
-    color: 'white',
-    border: '2px black solid',
-    borderRadius: '20%'
-}
-
+import React, { useContext } from "react";
+import { Link } from "react-router-dom";
+import { UserContext } from "../context/AuthContext";
+import { BiUserCircle } from "react-icons/bi";
+import { IoShareSocial } from "react-icons/io5";
+import LogoutButton from "./Auth/SignOut";
+import { AiOutlinePlus } from "react-icons/ai";
+import styles from "./Dashboard.module.css";
 
 export const NavBar: React.FC = () => {
+  const userContext = useContext(UserContext);
 
-    const userContext = useContext(UserContext)
-    console.log(userContext);
-
-
-    return (
-        <nav style={navbarStyles}>
-            <span style={logoStyles}>
-                <IoShareSocial />
-            </span>
-            <h1>Social Network</h1>
-            <div>
-                <Link to={userContext.user ? "/dashboard/user/" + userContext.user.displayName : ""}>
-                    <BiUserCircle />
-                </Link>
+  return (
+    <nav className={styles.navbar}>
+      <div style={{width: '50%'}}>
+        <Link to={"/dashboard"}>
+          <span className={styles.logo} style={{marginLeft: '95.5%'}}>
+            <IoShareSocial />
+          </span>
+        </Link>
+      </div>
+      <div className={styles.navbarActions}>
+          <Link
+            to={
+                userContext.user
+                ? "/dashboard/user/" + userContext.user.displayName
+                : ""
+            }
+            >
+                <div style={{display: 'flex', alignItems: 'center'}}>
+              <div>
+            <BiUserCircle />{" "}
+        </div>
+            <div style={{paddingBottom: '5%', marginLeft: '2%'}}>
+            {userContext.user ? userContext.user.displayName : " "}
             </div>
-        </nav>
-    );
-
+            </div>
+          </Link>
+        <div>
+          <Link to={"/dashboard/createpost"}>
+            <AiOutlinePlus />
+          </Link>
+        </div>
+        <div>
+          <LogoutButton />
+        </div>
+      </div>
+    </nav>
+  );
 };

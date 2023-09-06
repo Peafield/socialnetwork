@@ -28,28 +28,26 @@ Example:
     If the receiving user accepts, you would change the request pending status from 1 back to 0,
     and the following status from 0 to 1.
 */
-func UpdateFollowStatus(db *sql.DB, userId string, updateFollowerData map[string]interface{}) error {
-	var args []interface{}
-	var query *sql.Stmt
+func UpdateFollowingStatus(db *sql.DB, userId string, updateFollowData map[string]interface{}) error {
+	args := make([]interface{}, 3)
 
-	if followingStatus, ok := updateFollowerData["following_status"].(string); ok {
-		query = dbstatements.UpdateFollowingStatusStmt
-		args = append(args, followingStatus)
-	}
-	if requestPendingStatus, ok := updateFollowerData["request_pending"].(string); ok {
-		query = dbstatements.UpdateRequestPendingStmt
-		args = append(args, requestPendingStatus)
-	}
-	if followeeId, ok := updateFollowerData["followee_id"].(string); ok {
-		args = append(args, followeeId)
-	}
-	if followerId, ok := updateFollowerData["follower_id"].(string); ok {
-		args = append(args, followerId)
+	followerId, ok := updateFollowData["follower_id"].(string)
+	if !ok {
+		return fmt.Errorf("follower_id is not a string or doesn't exist")
 	}
 
-	err := crud.InteractWithDatabase(db, query, args)
+	followingStatus, ok := updateFollowData["following_status"].(int)
+	if !ok {
+		return fmt.Errorf("following_status is not an int or doesn't exist")
+	}
+
+	args[0] = followingStatus
+	args[1] = followerId
+	args[2] = userId
+
+	err := crud.InteractWithDatabase(db, dbstatements.UpdateFollowingStatusStmt, args)
 	if err != nil {
-		return fmt.Errorf("failed to update post data: %w", err)
+		return fmt.Errorf("failed to update follower data: %w", err)
 	}
 	return nil
 }

@@ -1,0 +1,162 @@
+.messagingcontainer {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-evenly;
+    height: 100%;
+    width: 100%;
+    overflow-y: auto;
+    background-color: #f0f2f5;
+}
+
+.messagableUsersContainer {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
+    height: 90%;
+    width: 100%;
+    padding: 5px;
+    overflow-y: auto;
+}
+
+.userChatContainer {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    margin: 10px;
+    width: 90%;
+    border-bottom: 0.2mm solid grey;
+}
+
+.chatheadercontainer {
+    height: 50%;
+    width: 100%;
+    display: flex;
+    justify-content: left;
+    align-items: center;
+}
+
+.displaypicturecontainer {
+    width: auto;
+    height: auto;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 10px;
+    border: 1mm solid #ffb9c5;
+    border-radius: 50%;
+    padding: 2px;
+}
+
+.profileIconStyle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    vertical-align: middle;
+    font-size: 300%;
+}
+
+.avatar {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+}
+
+.nameinfocontainer {
+    display: flex;
+    justify-content: right;
+    align-items: center;
+    height: 100%;
+    width: auto;
+}
+
+.lastmessagecontainer {
+    display: flex;
+    justify-content: left;
+    width: 90%;
+    height: 50%;
+    margin: 10px;
+    color: rgb(128, 126, 126);
+}
+
+.conversationcontainer {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 90%;
+    width: 100%;
+    background-color: #f0f2f5;
+}
+
+.conversationHeader {
+    position: sticky;
+    height: 100px;
+    top: 0px;
+    display: flex;
+    align-items: center;
+    justify-content: left;
+    background-color: white;
+    box-shadow: rgba(50, 50, 93, 0.25) 0px 2px 5px -1px,
+        rgba(0, 0, 0, 0.3) 0px 1px 3px -1px;
+}
+
+.chatmessagescontainer {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
+    overflow-y: auto;
+    width: 100%;
+    transition: max-height 0.3s ease-in-out;
+}
+
+.receiverchatmessagecontainer {
+    display: flex;
+    justify-content: left;
+    align-items: center;
+    max-width: 40%;
+    width: auto;
+    height: auto;
+    background-color: rgb(219, 218, 218);
+    border-radius: 10px;
+    margin: 5px;
+    margin-right: 50%;
+    padding: 10px;
+}
+
+.userchatmessagecontainer {
+    display: flex;
+    justify-content: left;
+    align-items: center;
+    max-width: 40%;
+    width: auto;
+    height: auto;
+    background-color: #fa4d6a;
+    border-radius: 10px;
+    margin: 5px;
+    margin-left: 50%;
+    padding: 10px;
+}
+
+.sendmessagecontainer {
+    background-color: white;
+    position: sticky;
+    bottom: 0%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: auto;
+    width: 100%;
+    padding: 5px;
+}
+
+.sendmessagecontainer button {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: auto;
+    height: auto;
+    margin: 5px;
+}

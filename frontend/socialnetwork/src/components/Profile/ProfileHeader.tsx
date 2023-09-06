@@ -1,5 +1,6 @@
-import React, { useContext, useEffect, useState } from "react";
-import { FaUserCircle } from "react-icons/fa";
+import React, { ChangeEvent, MouseEventHandler, useContext, useEffect, useState } from "react";
+import { FaUserCircle, FaUserEdit } from "react-icons/fa";
+import { Link } from "react-router-dom";
 import { UserContext } from "../../context/AuthContext";
 import { handleAPIRequest } from "../../controllers/Api";
 import { getFollowerData } from "../../controllers/Follower/GetFollower";
@@ -20,6 +21,10 @@ interface ProfileHeaderProps {
   followers: number;
   following: number;
   about_me: string;
+  is_private: boolean;
+  is_own_profile: boolean;
+  profileTab: string;
+  getProfileTab: (tab: string) => void;
 }
 
 export interface FollowerProps {
@@ -39,7 +44,11 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
   num_of_posts,
   followers,
   following,
-  about_me
+  about_me,
+  is_private,
+  is_own_profile,
+  profileTab,
+  getProfileTab
 }) => {
   const userContext = useContext(UserContext)
   const [profilePicUrl, setProfilePicUrl] = useState<string | null>(null);
@@ -80,7 +89,9 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
         }
       }
     }
-    fetchData()
+    if (!is_own_profile) {
+      fetchData()
+    }
   }, [updateTrigger])
 
   const handleFollow = async () => {
@@ -115,11 +126,15 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
     }
   }
 
+  const handleTabChange = (e: React.MouseEvent<HTMLButtonElement>) => {
+    getProfileTab(e.currentTarget.value)
+  }
+
   return (
-    <Container>
+    <>
       <div className={styles.profileheadercontainer}>
         <div className={styles.displaypicturecontainer}>
-          {(profilePicUrl && (
+          {(profilePicUrl && (!is_private || is_own_profile) && (
             <img
               src={profilePicUrl}
               alt="Profile pic"
@@ -132,32 +147,48 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
             )}
         </div>
         <div className={styles.nameinfocontainer}>
-          <div>{first_name} {last_name}</div>
+          {is_private && !is_own_profile ?
+            <div>This profile is private</div>
+            : <div>{first_name} {last_name}</div>}
           <div style={{ color: "gray" }}>{display_name}</div>
           <div style={{
             fontSize: "small",
             fontStyle: "italic",
-            color: "gray"
+            color: "gray",
+            width: 'auto'
           }}>
-            {followerData.following_status == 1 ?
-              <button onClick={handleUnfollow}>Unfollow</button>
-              : followerData.request_pending == 1 ?
-                <button onClick={handleUnfollow}>Request Pending...</button>
-                : <button onClick={handleFollow}>Follow!</button>}
+            {!is_own_profile ?
+              followerData.following_status == 1 ?
+                <button onClick={handleUnfollow}>Unfollow</button>
+                : followerData.request_pending == 1 ?
+                  <button onClick={handleUnfollow}>Request Pending...</button>
+                  : <button onClick={handleFollow}>Follow!</button>
+              : <div>
+                <span
+                  style={{
+                    fontSize: "300%",
+                  }}>
+
+                  <Link to={userContext.user ? "/dashboard/user/edit/" + userContext.user.displayName : ""}>
+                    <FaUserEdit />
+                  </Link>
+                </span>
+              </div>}
           </div>
         </div>
         <div className={styles.otherprofileinfocontainer}>
           <div className={styles.profilestatscontainer}>
-            <div>{num_of_posts} Posts</div>
-            <div>{followers} Followers</div>
-            <div>Following {following}</div>
+            <div style={{ display: 'flex', alignItems: 'center' }}>{num_of_posts}<button onClick={handleTabChange} value="posts" style={profileTab == "posts" ? { textDecorationLine: 'underline' } : undefined}> Posts</button></div>
+            <div style={{ display: 'flex', alignItems: 'center' }}>{followers}<button onClick={handleTabChange} value="followers" style={profileTab == "followers" ? { textDecorationLine: 'underline' } : undefined}> Followers</button></div>
+            <div style={{ display: 'flex', alignItems: 'center' }}><button onClick={handleTabChange} value="followees" style={profileTab == "followees" ? { textDecorationLine: 'underline' } : undefined}>Following </button>{following}</div>
+
           </div>
           <div className={styles.aboutmecontainer}>
-            <div>{about_me}</div>
+            <div>{!is_private ? about_me : null}</div>
           </div>
         </div>
       </div>
-    </Container>
+    </>
   );
 };
 

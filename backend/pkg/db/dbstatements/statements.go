@@ -32,6 +32,7 @@ var (
 	UpdateAllUsersToSignedOut         *sql.Stmt
 	UpdateUserLoggedIn                *sql.Stmt
 	UpdateUserLoggedOut               *sql.Stmt
+	UpdateUserAccountStmt             *sql.Stmt
 	UpdatePostReaction                *sql.Stmt
 	UpdateCommentReaction             *sql.Stmt
 	UpdateCommentContent              *sql.Stmt
@@ -61,6 +62,11 @@ var (
 	SelectPostReactionStmt                       *sql.Stmt
 	SelectCommentReactionStmt                    *sql.Stmt
 	SelectFollowerInfoStmt                       *sql.Stmt
+	SelectFolloweesOfUserStmt                    *sql.Stmt
+	SelectFollowersOfUserStmt                    *sql.Stmt
+	SelectChatMessagesByChatIdStmt               *sql.Stmt
+	SelectChatBySenderAndRecieverIdStmt          *sql.Stmt
+	SelectAllChatsByUserIdStmt                   *sql.Stmt
 
 	/*Delete Statements*/
 	DeleteUserAccountStmt           *sql.Stmt
@@ -100,6 +106,11 @@ func InitDBStatements(db *sql.DB) error {
 		return fmt.Errorf("failed to prepare follower statements: %w", err)
 	}
 
+	err = initChatDBStatements(db)
+	if err != nil {
+		return fmt.Errorf("failed to prepare chat statements: %w", err)
+	}
+
 	InsertSessionsStmt, err = db.Prepare(`
 	INSERT INTO Sessions (
 		session_id,
@@ -111,29 +122,28 @@ func InitDBStatements(db *sql.DB) error {
 		return fmt.Errorf("failed to prepare insert sessions statement: %w", err)
 	}
 
-	InsertChatsStmt, err = db.Prepare(`
-	INSERT INTO Chats (
-		chat_id,
-		sender_id,
-		receiver_id
+	InsertPostsSelectedFollowerStmt, err = db.Prepare(`
+	INSERT INTO Posts_Selected_Followers  (
+		post_id,
+		allowed_follower_id
 	) VALUES (
-		?, ?, ?
+		?, ?
 	)`)
 	if err != nil {
-		return fmt.Errorf("failed to prepare insert chats statement: %w", err)
+		return fmt.Errorf("failed to prepare insert post follower statement: %w", err)
 	}
 
-	InsertChatsMessagesStmt, err = db.Prepare(`
-	INSERT INTO Chats_Messages (
-		message_id,
-		chat_id,
-		sender_id,
-		message
+	InsertReactionsStmt, err = db.Prepare(`
+	INSERT INTO Reactions (
+		user_id,
+		post_id,
+		comment_id,
+		reaction
 	) VALUES (
 		?, ?, ?, ?
 	)`)
 	if err != nil {
-		return fmt.Errorf("failed to prepare insert chats messages statement: %w", err)
+		return fmt.Errorf("failed to prepare insert reactions statement: %w", err)
 	}
 
 	InsertGroupsStmt, err = db.Prepare(`
@@ -243,6 +253,11 @@ func CloseDBStatements() {
 	SelectCommentReactionStmt.Close()
 	SelectPostCommentsStmt.Close()
 	SelectFollowerInfoStmt.Close()
+	SelectFolloweesOfUserStmt.Close()
+	SelectFollowersOfUserStmt.Close()
+	SelectChatMessagesByChatIdStmt.Close()
+	SelectChatBySenderAndRecieverIdStmt.Close()
+	SelectAllChatsByUserIdStmt.Close()
 
 	/*Update Statement Closure*/
 	UpdatePostImagePathStmt.Close()
@@ -251,6 +266,7 @@ func CloseDBStatements() {
 	UpdatePostIncreaseNumOfComments.Close()
 	UpdatePostDecreaseNumOfComments.Close()
 	UpdateAllUsersToSignedOut.Close()
+	UpdateUserAccountStmt.Close()
 	UpdateUserLoggedIn.Close()
 	UpdateUserLoggedOut.Close()
 	UpdatePostReaction.Close()

@@ -32,10 +32,27 @@ func initFollowerDBStatements(db *sql.DB) error {
 		return fmt.Errorf("failed to prepare select follower info statement: %w", err)
 	}
 
+	SelectFolloweesOfUserStmt, err = db.Prepare(`
+	SELECT * FROM Followers
+	WHERE follower_id = ? AND following_status = 1
+	`)
+	if err != nil {
+		return fmt.Errorf("failed to prepare select followees of user statement: %w", err)
+	}
+
+	SelectFollowersOfUserStmt, err = db.Prepare(`
+	SELECT * FROM Followers
+	WHERE followee_id = ? AND following_status = 1
+	`)
+	if err != nil {
+		return fmt.Errorf("failed to prepare select followers of user statement: %w", err)
+	}
+
 	/*UPDATE*/
 	UpdateFollowingStatusStmt, err = db.Prepare(`
-	UPDATE Followers SET following_status = ?
-	WHERE followee_id = ? AND Follower_id =?
+	UPDATE Followers
+	SET following_status = ?, request_pending = 0
+	WHERE follower_id = ? AND followee_id = ?
 	`)
 	if err != nil {
 		return fmt.Errorf("failed to prepare update following status statement: %w", err)

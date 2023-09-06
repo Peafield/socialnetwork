@@ -5,51 +5,69 @@
     justify-content: flex-start;
     align-items: center;
     border-radius: 5px;
-    width: 40%;
-    height: auto;
+    width: 60%;
+    height: 80%;
     overflow-y: auto;
+
+    /* Style the entire scrollbar */
+    scrollbar-width: thin;
+    /* For Firefox */
+    scrollbar-color: #fa4d6a #fafafa;
+    /* thumb color, track color */
+}
+
+/* Style the thumb (draggable part) of the scrollbar */
+.postfeedcontainer::-webkit-scrollbar-thumb:vertical {
+    background-color: #fa4d6a;
+    border-radius: 6px;
 }
 
 .postcontainer {
     background-color: white;
     display: flex;
     flex-direction: column;
-    justify-content: center;
+    justify-content: space-evenly;
     align-items: center;
     border-radius: 5px;
-    width: 90%;
+    width: 60%;
     height: auto;
-    margin: 10px;
+    margin: 2%;
+    padding: 2%;
     z-index: 0;
     box-shadow: rgba(50, 50, 93, 0.25) 0px 2px 5px -1px,
-        rgba(0, 0, 0, 0.3) 0px 1px 3px -1px;
-}
-
-.postmodalcontainer {
+      rgba(0, 0, 0, 0.3) 0px 1px 3px -1px;
+  }
+  
+  .postmodalcontainer {
     display: flex;
     flex-direction: row;
-    justify-content: space-between;
+    justify-content: space-evenly;
     align-items: center;
     width: 90%;
     height: 90%;
-}
-
-.postcommentscontainer {
+  }
+  
+  .postcommentscontainer {
     display: flex;
     flex-direction: column;
     justify-content: flex-start;
     align-items: center;
     overflow-y: auto;
-    margin: 10px;
+    margin: 2%;
     height: 90%;
-    width: 70%;
-}
-
-.commentformcontainer {
+    width: 40%;
+  }
+  
+  .commentformcontainer {
     display: flex;
-    justify-content: center;
+    flex-direction: row;
+    justify-content: space-evenly;
     align-items: center;
-}
+    width: 100%;
+    flex: 1;
+    margin: 2%;
+    margin-bottom: 1%;
+  }
 
 .profilecontainer {
     display: flex;
@@ -59,22 +77,36 @@
     border-radius: 5px;
     width: 90%;
     height: 100%;
-    margin: 10px;
     z-index: 0;
+}
+
+.profilecontainer>* {
+    margin: 10px;
 }
 
 .profileheadercontainer {
     background-color: white;
     display: flex;
     flex-direction: row;
-    justify-content: safe;
+    justify-content: center;
     align-items: center;
     border-radius: 5px;
+    width: 100%;
+    padding: 10px;
     margin: 10px;
-    width: 80%;
-    height: 70%;
+    height: 40%;
     box-shadow: rgba(50, 50, 93, 0.25) 0px 2px 5px -1px,
         rgba(0, 0, 0, 0.3) 0px 1px 3px -1px;
+}
+
+.profileheadercontainer a {
+    color: #fa4d6a;
+    font-size: 2rem;
+    font-weight: bold;
+}
+
+.profileheadercontainer a:hover {
+    color: #fa879a;
 }
 
 .displaypicturecontainer {
@@ -107,7 +139,7 @@
     font-size: xx-large;
     font-weight: bold;
     height: 100%;
-    width: 25%;
+    width: auto;
     margin: 10px;
 }
 
@@ -131,6 +163,19 @@
     font-weight: 500;
 }
 
+.profilestatscontainer button {
+    width: 100%;
+    background-color: #fa4d6a00;
+    border-radius: 5px;
+    color: black;
+    border: none;
+    cursor: pointer;
+    transition: all 0.4s ease;
+    font-size: 1.5rem;
+    text-decoration-color: #fa4d6a;
+    font-weight: 500;
+}
+
 .aboutmecontainer {
     display: flex;
     justify-content: center;
@@ -138,4 +183,43 @@
     vertical-align: bottom;
     width: 100%;
     height: 20%;
+}
+
+.editprofilecontainer {
+    margin: 10px;
+    padding: 10px;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
+    height: 90%;
+    width: 60%;
+    overflow-y: auto;
+    background-color: white;
+    box-shadow: rgba(50, 50, 93, 0.25) 0px 2px 5px -1px,
+        rgba(0, 0, 0, 0.3) 0px 1px 3px -1px;
+}
+
+.editprofilecontainer form {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    margin: 10px;
+    align-items: center;
+    width: 100%;
+    height: 100%;
+}
+
+.listUsers {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: flex-start;
+    height: 80%;
+    width: 80%;
+    overflow-y: auto;
+}
+
+.listUsers>* {
+    margin: 1%;
 }

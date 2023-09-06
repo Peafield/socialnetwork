@@ -35,7 +35,7 @@ const Group: React.FC = () => {
                     const newgroup = await getGroupByName(groupname)
                     setGroup(newgroup)
                 } else {
-                    setError("could not find profile username")
+                    setError("could not find group name")
                 }
             } catch (error) {
                 if (error instanceof Error) {
@@ -57,7 +57,7 @@ const Group: React.FC = () => {
         const fetchUserPostData = async () => {
             setGroupPostsLoading(true);
 
-            let url            
+            let url
 
             { group ? url = `/post?group_id=${encodeURIComponent(group.group_id)}` : url = "/post" }
 

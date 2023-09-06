@@ -3,7 +3,11 @@ package usercontrollers
 import (
 	"database/sql"
 	"fmt"
+	imagecontrollers "socialnetwork/pkg/controllers/ImageControllers"
 	crud "socialnetwork/pkg/db/CRUD"
+	"socialnetwork/pkg/db/dbstatements"
+	"socialnetwork/pkg/helpers"
+	"socialnetwork/pkg/models/dbmodels"
 	"strings"
 	"time"
 )
@@ -24,48 +28,95 @@ Errors:
   - failure to update the database
 */
 func UpdateUserAccount(db *sql.DB, userId string, updateUserData map[string]interface{}) error {
-	var columns []string
 	var args []interface{}
 
-	if email, ok := updateUserData["email"].(string); ok {
-		columns = append(columns, "email = ?")
-		args = append(args, email)
-	}
-	if firstName, ok := updateUserData["first_name"].(string); ok {
-		columns = append(columns, "first_name = ?")
-		args = append(args, firstName)
-	}
-	if lastName, ok := updateUserData["last_name"].(string); ok {
-		columns = append(columns, "last_name = ?")
-		args = append(args, lastName)
-	}
-	if dob, ok := updateUserData["data_of_birth"].(time.Time); ok {
-		columns = append(columns, "date_of_birth = ?")
-		args = append(args, dob)
-	}
-	if avatarPath, ok := updateUserData["avatar_path"].(string); ok {
-		columns = append(columns, "avatar_path = ?")
-		args = append(args, avatarPath)
-	}
-	if displayName, ok := updateUserData["display_name"].(string); ok {
-		args = append(args, displayName)
-	}
-	if aboutMe, ok := updateUserData["about_me"].(string); ok {
-		args = append(args, aboutMe)
+	user, err := getUserPrivate(db, userId, dbstatements.SelectUserByIDStmt, userId)
+	if err != nil {
+		return fmt.Errorf("error getting user")
 	}
 
-	query := fmt.Sprintf("UPDATE Users SET %s WHERE user_id = ?", strings.Join(columns, ", "))
-	updateUserDetailsStatment, err := db.Prepare(query)
+	err = validatePassword(user, updateUserData)
 	if err != nil {
-		return fmt.Errorf("failed to prepare update post statment: %w", err)
+		return err
 	}
-	defer updateUserDetailsStatment.Close()
+
+	userDataKeys := []string{
+		"email",
+		"display_name",
+		"new_password",
+		"first_name",
+		"last_name",
+		"dob",
+		"avatar_path",
+		"about_me",
+	}
+	userDataOldValues := []interface{}{
+		user.UserInfo.Email,
+		user.UserInfo.DisplayName,
+		user.UserInfo.HashedPassword,
+		user.UserInfo.FirstName,
+		user.UserInfo.LastName,
+		user.UserInfo.DOB,
+		user.UserInfo.AvatarPath,
+		user.UserInfo.AboutMe,
+	}
+
+	for i, v := range userDataKeys {
+		err := appendOldOrNew(v, updateUserData, userDataOldValues[i], &args)
+		if err != nil {
+			return fmt.Errorf("failed to append data to args: %w", err)
+		}
+	}
 
 	args = append(args, userId)
 
-	err = crud.InteractWithDatabase(db, updateUserDetailsStatment, args)
+	err = crud.InteractWithDatabase(db, dbstatements.UpdateUserAccountStmt, args)
 	if err != nil {
 		return fmt.Errorf("failed to update post data: %w", err)
+	}
+	return nil
+}
+
+func appendOldOrNew(valueStr string, updateUserData map[string]interface{}, oldValue interface{}, args *[]interface{}) error {
+	if value, ok := updateUserData[valueStr].(string); ok && value != "" {
+		if valueStr == "new_password" {
+			hashedPassword, err := helpers.HashPassword(value)
+			if err != nil {
+				return fmt.Errorf("failed to hash user's password: %s", err)
+			}
+			value = hashedPassword
+		}
+		if valueStr == "avatar_path" {
+			avatarFilePath, err := imagecontrollers.DecodeImage(value)
+			if err != nil {
+				return fmt.Errorf("error decoding image: %w", err)
+			}
+			value = avatarFilePath
+		}
+		if valueStr == "dob" {
+			value, _, _ = strings.Cut(value, "T00:00:00Z")
+			formattedDOB, err := time.Parse("2006-01-02", value)
+			if err != nil {
+				return fmt.Errorf("DOB string can't be parsed into time.Time: %w", err)
+			}
+			*args = append(*args, formattedDOB)
+		} else {
+			*args = append(*args, value)
+		}
+	} else {
+		*args = append(*args, oldValue)
+	}
+	return nil
+}
+
+func validatePassword(user *dbmodels.UserProfileData, updateUserData map[string]interface{}) error {
+	if oldPassword, ok := updateUserData["old_password"].(string); ok {
+		err := helpers.CompareHashedPassword(user.UserInfo.HashedPassword, oldPassword)
+		if err != nil {
+			return fmt.Errorf("inputted password incorrect: %s", err)
+		}
+	} else {
+		return fmt.Errorf("could not find and validate password")
 	}
 	return nil
 }

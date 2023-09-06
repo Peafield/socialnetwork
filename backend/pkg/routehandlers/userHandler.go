@@ -3,6 +3,7 @@ package routehandlers
 import (
 	"database/sql"
 	"encoding/json"
+	"log"
 	"net/http"
 	usercontrollers "socialnetwork/pkg/controllers/UserControllers"
 	"socialnetwork/pkg/db/dbstatements"
@@ -116,6 +117,7 @@ Specifically, it:
   - If all of the above steps are successful, it sends an HTTP 200 (OK) status to the client, indicating that the comment was successfully updated.
 */
 func UpdateUserHandler(w http.ResponseWriter, r *http.Request) {
+	var data interface{}
 	userData, ok := r.Context().Value(middleware.UserDataKey).(readwritemodels.Payload)
 	if !ok {
 		http.Error(w, "failed to read user data from context", http.StatusInternalServerError)
@@ -130,10 +132,30 @@ func UpdateUserHandler(w http.ResponseWriter, r *http.Request) {
 
 	err := usercontrollers.UpdateUserAccount(dbutils.DB, userData.UserId, updateUserData.Data)
 	if err != nil {
+		log.Println(err)
 		http.Error(w, "failed to update user account", http.StatusInternalServerError)
 		return
 	}
+
+	user, err := usercontrollers.GetUser(dbutils.DB, userData.UserId, dbstatements.SelectUserByIDStmt, userData.UserId)
+	if err != nil {
+		http.Error(w, "failed to get specific user data", http.StatusInternalServerError)
+	}
+
+	data = user
+
+	response := readwritemodels.WriteData{
+		Status: "success",
+		Data:   data,
+	}
+	jsonReponse, err := json.Marshal(response)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
+	w.Write(jsonReponse)
 }
 
 /*

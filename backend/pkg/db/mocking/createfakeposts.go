@@ -23,7 +23,7 @@ func CreateFakePosts(db *sql.DB) error {
 	for i := 1; i <= postAmount; i++ {
 		content := ContentGenerator()
 		postData["content"] = content
-		postData["privacy_level"] = rand.Intn(3)
+		postData["privacy_level"] = float64(rand.Intn(2))
 
 		err := postcontrollers.InsertPost(db, userIds[i-1], postData)
 		if err != nil {

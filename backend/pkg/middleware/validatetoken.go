@@ -86,6 +86,40 @@ func ValidateTokenMiddleware(next http.Handler) http.Handler {
 	})
 }
 
+// Validating "middleware" for websocket
+func ValidateTokenWebSocket(authorizationHeader string) (*readwritemodels.Payload, error) {
+	authType, token, found := strings.Cut(authorizationHeader, " ")
+	if !found || authType != "Bearer" {
+		return nil, fmt.Errorf("invalid or missing authorization header")
+	}
+
+	bearerToken := token
+
+	validToken, err := VerifyToken(bearerToken)
+	if !validToken || err != nil {
+		return nil, fmt.Errorf("Invalid token verification")
+	}
+
+	tokenParts := strings.Split(bearerToken, ".")
+	payloadEncoded := tokenParts[1]
+	payload, err := base64.StdEncoding.DecodeString(payloadEncoded)
+	if err != nil {
+		return nil, fmt.Errorf("failed to decode token")
+	}
+
+	var recievedPayload readwritemodels.Payload
+	err = json.Unmarshal(payload, &recievedPayload)
+	if err != nil {
+		return nil, fmt.Errorf("Invalid token when unmarshalling into payload struct")
+	}
+
+	err = ValidateLoggedInStatus(recievedPayload)
+	if err != nil {
+		return nil, fmt.Errorf(error.Error(err))
+	}
+	return &recievedPayload, nil
+}
+
 /*
 VerifyToken confirms with a token is valid or not.
 

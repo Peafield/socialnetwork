@@ -1,12 +1,22 @@
+.signuppage {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 100%;
+  padding: 50px;
+}
+
 .suauthcontainer {
   position: relative;
   display: flex;
   flex-direction: column;
-  justify-content: center;
+  justify-content: flex-start;
   align-items: center;
+  overflow-y: auto;
   border-radius: 5px;
   width: 40%;
-  height: 80%;
+  height: auto;
   background-color: #fafafa;
   box-shadow: rgba(50, 50, 93, 0.25) 0px 2px 5px -1px,
     rgba(0, 0, 0, 0.3) 0px 1px 3px -1px;
@@ -15,27 +25,25 @@
 .suauthcontainer .formwrapper {
   display: flex;
   flex-direction: column;
-  justify-content: space-evenly;
+  justify-content: flex-start;
   align-items: center;
   width: 100%;
-  height: 100%;
+  height: auto;
 }
 
 .suauthcontainer a {
   font-size: 1rem;
 }
 
-.suauthcontainer h2 {
-  display: block;
-  text-align: center;
-  margin-bottom: 0.5%;
-  font-size: 2rem;
-}
-
 .suauthcontainer form {
-  display: block;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: center;
+  overflow-y: auto;
   width: 80%;
-  height: 80%;
+  height: 100%;
+  padding: 2%;
 }
 
 .suauthcontainer input {
@@ -45,32 +53,35 @@
   border-radius: 5px;
   border: none;
   width: 100%;
-  padding: 2.5%;
-  margin-bottom: 1%;
-  font-size: 1rem;
+  height: auto;
+  margin: 1%;
+  padding: 2%;
   background-color: #f0f2f5;
 }
 
 .suauthcontainer .inputgroup {
-  display: block;
-  margin: 2%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 20%;
+  width: 100%;
 }
 
 .suauthcontainer .inputgrouprow {
   display: flex;
+  width: 100%;
   flex-direction: row;
   justify-content: space-between;
   align-items: center;
-  margin: 2%;
 }
 
 .suauthcontainer .inputgrouprow input {
-  flex: 1;
-  margin-right: 2%;
-}
-
-.suauthcontainer .inputgrouprow input:last-child {
-  margin-right: 0;
+  display: flex;
+  width: 100%;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  margin: 1%;
 }
 
 label {
@@ -81,7 +92,8 @@ label {
 }
 
 .suauthcontainer textarea {
-  padding: 1.5%;
+  width: auto;
+  height: auto;
   resize: none;
   background-color: #f0f2f5;
   font-size: 1rem;
@@ -90,18 +102,50 @@ label {
 
 .suauthcontainer button {
   width: 100%;
-  padding: 2%;
-  margin: 2% 0;
-  background-color: #4272d7;
+  height: auto;
+  background-color: #fafafa;
   border-radius: 5px;
-  color: white;
+  color: #fa4d6a;
   border: none;
   cursor: pointer;
   transition: all 0.4s ease;
   font-size: 1.5rem;
   font-weight: 900;
+  padding: 2%;
 }
 
 .suauthcontainer button:hover {
-  background-color: #0056b3;
+  color: #db435c;
+}
+
+.logo {
+  height: auto;
+  width: auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 4000%;
+  color: #fa4d6a;
+  border-radius: 20%;
+  padding: 2px;
+}
+
+/* Define a CSS class for the flip animation */
+.flip {
+  animation: flip 10s ease-in-out infinite;
+}
+
+/* Define the keyframes for the flip animation */
+@keyframes flip {
+  0% {
+    transform: rotateY(0deg);
+  }
+
+  50% {
+    transform: rotateY(180deg);
+  }
+
+  100% {
+    transform: rotateY(0deg);
+  }
 }

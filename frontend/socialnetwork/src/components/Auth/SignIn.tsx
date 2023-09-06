@@ -5,6 +5,7 @@ import Container from "../Containers/Container";
 import styles from "./Signin.module.css";
 import { useSetUserContextAndCookie } from "../../controllers/SetUserContextAndCookie";
 import Snackbar from "../feedback/Snackbar";
+import { IoShareSocial } from "react-icons/io5";
 
 interface SignInFormData {
   username_email: string;
@@ -82,48 +83,54 @@ export default function SignIn() {
 
   return (
     <Container>
-      <div className={styles.authcontainer}>
-        <div className={styles.formwrapper}>
-          <h2 className={styles.h2}>Sign In</h2>
-          <form onSubmit={handleSubmit}>
-            <div className={styles.inputgroup}>
-              <input
-                className={styles.input}
-                type="text"
-                placeholder="Username/Email"
-                value={formData.username_email}
-                name="username_email"
-                onChange={handleChange}
-              />
-            </div>
-            <div className={styles.inputgroup}>
-              <input
-                className={styles.input}
-                type="password"
-                placeholder="Password"
-                value={formData.password}
-                name="password"
-                onChange={handleChange}
-              />
-            </div>
-            <div className={styles.inputgroup}>
-              <button className={styles.button} type="submit">
-                Sign In
-              </button>
-            </div>
-          </form>
-          <Link to="/signup">Don't have an account? Sign up</Link>
+      <div
+        className={styles.signinpage}>
+        <div className={`${styles.logo} ${styles.flip}`}>
+          <IoShareSocial />
         </div>
+        <h2 style={{ position: 'absolute', top: '10%', left: '66%', color: '#fa4d6a' }}>Social Network</h2>
+        <div className={styles.authcontainer}>
+          <div className={styles.formwrapper}>
+            <form onSubmit={handleSubmit}>
+              <div className={styles.inputgroup}>
+                <input
+                  className={styles.input}
+                  type="text"
+                  placeholder="Username/Email"
+                  value={formData.username_email}
+                  name="username_email"
+                  onChange={handleChange}
+                />
+              </div>
+              <div className={styles.inputgroup}>
+                <input
+                  className={styles.input}
+                  type="password"
+                  placeholder="Password"
+                  value={formData.password}
+                  name="password"
+                  onChange={handleChange}
+                />
+              </div>
+              <div className={styles.inputgroup}>
+                <button className={styles.button} type="submit">
+                  Sign In
+                </button>
+              </div>
+            </form>
+            <Link to="/signup">Don't have an account? Sign up</Link>
+          </div>
+        </div>
+        <Snackbar
+          open={snackbarOpen}
+          onClose={() => {
+            setSnackbarOpen(false);
+            setError(null);
+          }}
+          message={error ? error : "Signed in successfully!"}
+          type={snackbarType}
+        />
       </div>
-      <Snackbar
-        open={snackbarOpen}
-        onClose={() => {
-          setSnackbarOpen(false);
-          setError(null);
-        }}
-        message={error ? error : "Signed in successfully!"}
-        type={snackbarType}
-      />
     </Container>
   );
 }

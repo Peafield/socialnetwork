@@ -75,7 +75,7 @@ const PostActions: React.FC<PostActionsProps> = ({
 
     currentTimeout.current = setTimeout(async () => {
       await HandleReaction(creatorId, "post", postId, reactionType);
-    }, 1000);
+    }, 5000);
   };
 
   return (

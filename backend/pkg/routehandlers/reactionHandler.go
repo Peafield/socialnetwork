@@ -1,6 +1,7 @@
 package routehandlers
 
 import (
+	"encoding/json"
 	"net/http"
 	notificationcontrollers "socialnetwork/pkg/controllers/NotificationControllers"
 	reactioncontrollers "socialnetwork/pkg/controllers/ReactionControllers"
@@ -89,8 +90,20 @@ func HandleReaction(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 	}
+	response := readwritemodels.WriteData{
+		Status: "success",
+	}
 
+	jsonReponse, err := json.Marshal(response)
+
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
+	w.Write(jsonReponse)
 }
 
 /*

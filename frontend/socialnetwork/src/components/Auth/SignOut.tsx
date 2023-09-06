@@ -18,10 +18,10 @@ export default function LogoutButton() {
         "Content-Type": "application/json",
       },
     };
-    try {      
+    try {
       const response = await handleAPIRequest("/signout", options)
       console.log(response);
-      
+
       navigate("/signin")
     } catch (error) {
       if (error instanceof Error) {
@@ -36,7 +36,7 @@ export default function LogoutButton() {
     width: 'auto',
     height: 'auto',
     backgroundColor: 'rgba(211, 211, 211, 0)',
-    fontSize: '2rem',
+    fontSize: 'x-large',
     fontWeight: 'bold',
     color: isHovered ? '#fa8fa1' : '#fa4d6a', // Change color on hover
     transition: 'background-color 0.3s', // Add a transition for smooth color change

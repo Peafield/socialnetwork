@@ -39,6 +39,15 @@
     margin: 2%;
 }
 
+.navbarbutton {
+    display: flex;
+    margin-bottom: 2.5%;
+    margin-left: 5%;
+    color: #fa4d6a;
+    font-weight: bold;
+    font-size: x-large;
+}
+
 .navbarcontainer a {
     color: #fa4d6a;
     font-size: rem;

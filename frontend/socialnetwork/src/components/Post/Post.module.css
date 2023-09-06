@@ -5,21 +5,39 @@
   justify-content: flex-start;
   align-items: center;
   border-radius: 5px;
-  width: 40%;
-  height: auto;
+  width: 60%;
+  height: 90%;
+  margin-bottom: 10%;
   overflow-y: auto;
+
+  /* Style the entire scrollbar */
+  scrollbar-width: thin;
+  /* For Firefox */
+  scrollbar-color: #fa4d6a #fafafa;
+  /* thumb color, track color */
+}
+
+/* Style the thumb (draggable part) of the scrollbar */
+.postfeedcontainer::-webkit-scrollbar-thumb:vertical {
+  background-color: #fa4d6a;
+  border-radius: 6px;
+}
+
+/* Style the track (background) of the scrollbar */
+.postfeedcontainer::-webkit-scrollbar-track {
+  background-color: #fafafa;
 }
 
 .postcontainer {
   background-color: white;
   display: flex;
   flex-direction: column;
-  justify-content: center;
+  justify-content: space-evenly;
   align-items: center;
   border-radius: 5px;
-  width: 90%;
+  width: 60%;
   height: auto;
-  margin: 10px;
+  margin: 2%;
   z-index: 0;
   box-shadow: rgba(50, 50, 93, 0.25) 0px 2px 5px -1px,
     rgba(0, 0, 0, 0.3) 0px 1px 3px -1px;
@@ -28,7 +46,7 @@
 .postmodalcontainer {
   display: flex;
   flex-direction: row;
-  justify-content: space-between;
+  justify-content: space-evenly;
   align-items: center;
   width: 90%;
   height: 90%;
@@ -40,25 +58,17 @@
   justify-content: flex-start;
   align-items: center;
   overflow-y: auto;
-  margin: 10px;
+  margin: 2%;
   height: 90%;
-  width: 70%;
+  width: 40%;
 }
 
 .commentformcontainer {
   display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-.postheadercontainer {
-  display: flex;
   flex-direction: row;
-  justify-content: flex-start;
+  justify-content: space-evenly;
   align-items: center;
-  width: 90%;
-  height: 100%;
-  margin: 5%;
+  width: 100%;
 }
 
 .postHeaderInfoContainer {
@@ -66,6 +76,12 @@
   flex-direction: row;
   justify-content: left;
   align-items: center;
+  width: 85%;
+  height: auto;
+}
+
+.postHeaderInfoContainer>* {
+  margin: 2%;
 }
 
 .postHeaderInfoContainer a {
@@ -88,21 +104,29 @@
 .postactionscontainer {
   display: flex;
   flex-direction: row;
-  justify-content: space-around;
+  justify-content: left;
   align-items: center;
-  width: 90%;
-  height: 100%;
-  margin: 5%;
+  width: 80%;
+  height: auto;
+  margin: 2%;
+}
+
+.postactionscontainer>* {
+  margin: 1%;
 }
 
 .postcontentcontainer {
   display: flex;
   flex-direction: column;
-  justify-content: space-around;
+  justify-content: left;
   align-items: center;
-  width: 90%;
-  height: 100%;
-  margin: 5%;
+  width: 80%;
+  height: auto;
+  margin: 2%;
+}
+
+.postcontentcontainer>* {
+  margin: 2%;
 }
 
 .profilepiccontainer {
@@ -114,9 +138,7 @@
 }
 
 .profileIconStyle {
-  margin-right: 8px;
-  vertical-align: middle;
-  font-size: 3rem;
+  font-size: 3.5rem;
 }
 
 .avatar {
@@ -132,7 +154,7 @@
   align-items: center;
   border-radius: 5px;
   width: 40%;
-  height: 70%;
+  height: auto;
   background-color: #fafafa;
   box-shadow: rgba(50, 50, 93, 0.25) 0px 2px 5px -1px,
     rgba(0, 0, 0, 0.3) 0px 1px 3px -1px;
@@ -256,4 +278,13 @@ button {
 
 button:hover {
   color: #fa8fa1;
+}
+
+.postpic {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: auto;
+  margin: 2%;
 }

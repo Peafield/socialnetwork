@@ -10,6 +10,8 @@ import { PostProps } from '../Post/Post'
 import { getFollowees, getFollowerData, getFollowers } from '../../controllers/Follower/GetFollower'
 import { UserContext } from '../../context/AuthContext'
 import { getUserPosts } from '../../controllers/GetPosts'
+import ListFollowees from './ListFollowees'
+import ListFollowers from './ListFollowers'
 
 export interface ProfileProps {
     user_id: string,
@@ -37,6 +39,7 @@ const Profile: React.FC = () => {
     })
     const [followers, setFollowers] = useState<FollowerProps[]>([])
     const [followees, setFollowees] = useState<FollowerProps[]>([])
+    const [currentProfileTab, setCurrentProfileTab] = useState<string>("posts")
     const [error, setError] = useState<string | null>(null);
     const { username } = useParams();
 
@@ -48,7 +51,7 @@ const Profile: React.FC = () => {
                 if (username) {
                     const newprofile = await getUserByDisplayName(username)
                     console.log(newprofile);
-                    
+
                     setProfile(newprofile)
 
                     const followdata = await getFollowerData(newprofile.user_id)
@@ -56,17 +59,11 @@ const Profile: React.FC = () => {
                     const followdataFollowees = await getFollowees(newprofile.user_id)
                     const userPosts = await getUserPosts(newprofile.user_id)
 
-                    console.log(userPosts);
-                    
-
                     const postData = userPosts.map((post: any) => {
                         const newpost = post.PostInfo
                         newpost.image_path = post.PostPicture
                         return newpost
                     })
-
-                    console.log(postData);
-                    
 
                     setFollowerData(followdata)
                     setFollowers(followdataFollowers.Followers)
@@ -92,6 +89,32 @@ const Profile: React.FC = () => {
         fetchData(); // Call the async function
     }, [username]);
 
+    const renderSwitch = (tab: string, profile: ProfileProps) => {
+        switch (tab) {
+            case "posts":
+                return (
+                    <ProfilePostsGrid
+                        user_id={profile.user_id}
+                        posts={profilePosts}
+                        is_private={followerData.following_status == 1 || userContext.user?.userId == profile.user_id || !profile.is_private ? false : true} />
+                )
+            case "followers":
+                return <ListFollowers followers={followers} />
+                break
+            case "followees":
+                return <ListFollowees followees={followees} />
+                break
+            default:
+                return (
+                    <ProfilePostsGrid
+                        user_id={profile.user_id}
+                        posts={profilePosts}
+                        is_private={followerData.following_status == 1 || userContext.user?.userId == profile.user_id || !profile.is_private ? false : true} />
+                )
+                break
+        }
+    }
+
     if (profileLoading) { return <p>Loading...</p> }
 
     return (
@@ -108,11 +131,10 @@ const Profile: React.FC = () => {
                     following={followees.length}
                     about_me={profile.about_me}
                     is_private={followerData.following_status == 1 || !profile.is_private ? false : true}
-                    is_own_profile={userContext.user?.userId == profile.user_id ? true : false} />
-                <ProfilePostsGrid
-                    user_id={profile.user_id}
-                    posts={profilePosts}
-                    is_private={followerData.following_status == 1 || userContext.user?.userId == profile.user_id || !profile.is_private ? false : true} />
+                    is_own_profile={userContext.user?.userId == profile.user_id ? true : false}
+                    profileTab={currentProfileTab}
+                    getProfileTab={setCurrentProfileTab} />
+                {renderSwitch(currentProfileTab, profile)}
             </div>
                 : null}
 

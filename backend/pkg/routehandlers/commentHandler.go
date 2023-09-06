@@ -9,6 +9,7 @@ import (
 	"socialnetwork/pkg/middleware"
 	"socialnetwork/pkg/models/dbmodels"
 	"socialnetwork/pkg/models/readwritemodels"
+	"sort"
 )
 
 /*
@@ -131,6 +132,10 @@ func GetComments(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 	}
+
+	sort.Slice(comments.Comments, func(i, j int) bool {
+		return comments.Comments[i].CreationDate.After(comments.Comments[j].CreationDate)
+	})
 
 	response := readwritemodels.WriteData{
 		Status: "success",

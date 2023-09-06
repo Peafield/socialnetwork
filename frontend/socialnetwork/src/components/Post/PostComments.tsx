@@ -124,46 +124,40 @@ const PostComments: React.FC<PostCommentsProps> = ({
 
   return (
     <>
-      <div
-      className={styles.postcommentscontainer}>
-        <div>Comments <FaComment /></div>
+      <div>Comments <FaComment /></div>
+      <form onSubmit={handleSubmit}>
         <div
-        className={styles.commentformcontainer}>
-          <form onSubmit={handleSubmit}>
-            <div>
-              <textarea
-                required
-                maxLength={100}
-                placeholder="Write a comment..."
-                id="content"
-                name="content"
-                value={commentFormData.content}
-                onChange={handleChange}
-              />
-            </div>
-            <div>
-              <button type="submit" style={{width: 'auto'}}>
-                <FaCommentMedical />
-              </button>
-            </div>
-          </form>
+          className={styles.commentformcontainer}>
+          <div style={{ width: '80%' }}>
+            <textarea
+              required
+              maxLength={100}
+              placeholder="Write a comment..."
+              id="content"
+              name="content"
+              value={commentFormData.content}
+              onChange={handleChange}
+            />
+          </div>
+          <div style={{ width: '10%' }}>
+            <button type="submit" style={{ width: 'auto' }}>
+              <FaCommentMedical />
+            </button>
+          </div>
         </div>
-        {postComments
-          ? postComments.map((commentprops) => (
-            <div
-              key={commentprops.comment_id}>
-              <Comment
-                key={commentprops.comment_id}
-                comment_id={commentprops.comment_id}
-                user_id={commentprops.user_id}
-                content={commentprops.content}
-                image={commentprops.image}
-                likes={commentprops.likes}
-                dislikes={commentprops.dislikes}
-                creation_date={commentprops.creation_date} />
-            </div>
-          )) : null}
-      </div>
+      </form>
+      {postComments
+        ? postComments.map((commentprops) => (
+          <Comment
+            key={commentprops.comment_id}
+            comment_id={commentprops.comment_id}
+            user_id={commentprops.user_id}
+            content={commentprops.content}
+            image={commentprops.image}
+            likes={commentprops.likes}
+            dislikes={commentprops.dislikes}
+            creation_date={commentprops.creation_date} />
+        )) : null}
     </>
   )
 }

@@ -15,7 +15,7 @@
     align-items: center;
     height: 90%;
     width: 100%;
-    margin: 10px;
+    padding: 5px;
     overflow-y: auto;
 }
 
@@ -25,7 +25,7 @@
     justify-content: center;
     align-items: center;
     margin: 10px;
-    width: 95%;
+    width: 90%;
     border-bottom: 0.2mm solid grey;
 }
 
@@ -58,9 +58,8 @@
 }
 
 .avatar {
-    vertical-align: middle;
-    width: 2%;
-    height: 2%;
+    width: 50px;
+    height: 50px;
     border-radius: 50%;
 }
 
@@ -117,6 +116,7 @@
     display: flex;
     justify-content: left;
     align-items: center;
+    max-width: 40%;
     width: auto;
     height: auto;
     background-color: rgb(219, 218, 218);
@@ -128,8 +128,9 @@
 
 .userchatmessagecontainer {
     display: flex;
-    justify-content: right;
+    justify-content: left;
     align-items: center;
+    max-width: 40%;
     width: auto;
     height: auto;
     background-color: #fa4d6a;

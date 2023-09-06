@@ -49,29 +49,27 @@ const PostHeader: React.FC<PostHeaderProps> = ({
     postPrivacyLevel === 1 ? FaPeopleGroup : IoPeopleCircle;
 
   return (
-    <div className={styles.postheadercontainer}>
-      <div className={styles.postHeaderInfoContainer}>
-        <div className={styles.profilepiccontainer}>
-          {(profilePicUrl && (
+    <div className={styles.postHeaderInfoContainer}>
+      <div className={styles.profilepiccontainer}>
+        {(profilePicUrl && (
+          <span className={styles.profileIconStyle}>
+            <img
+              src={profilePicUrl}
+              alt="Profile pic"
+              className={styles.avatar}
+            />
+          </span>
+        )) || (
             <span className={styles.profileIconStyle}>
-              <img
-                src={profilePicUrl}
-                alt="Profile pic"
-                className={styles.avatar}
-              />
+              <IoPeopleCircle />
             </span>
-          )) || (
-              <span className={styles.profileIconStyle}>
-                <IoPeopleCircle />
-              </span>
-            )}
-        </div>
-        <div style={{ margin: '5px' }}>
-          <Link to={"/dashboard/user/" + creatorDisplayName} style={{ color: '#fa4d6a', display: 'flex', alignItems: 'center', justifyContent: 'left' }}>
-            {creatorDisplayName}
-          </Link>
-          <p>{formattedDate} <PrivacyIconType /></p>
-        </div>
+          )}
+      </div>
+      <div style={{ width: '100%', margin: '1%' }}>
+        <Link to={"/dashboard/user/" + creatorDisplayName} style={{ color: '#fa4d6a', display: 'flex', alignItems: 'center', justifyContent: 'left' }}>
+          {creatorDisplayName}
+        </Link>
+        <p>{formattedDate} <PrivacyIconType /></p>
       </div>
     </div>
   );

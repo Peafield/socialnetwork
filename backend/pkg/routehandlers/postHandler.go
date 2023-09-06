@@ -141,18 +141,19 @@ func UserPosts(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, "failed to select user viewable posts", http.StatusInternalServerError)
 			return
 		}
-		sort.Slice(userPosts.Posts, func(i, j int) bool {
-			return userPosts.Posts[i].PostInfo.CreationDate.After(userPosts.Posts[j].PostInfo.CreationDate)
-		})
+
 	} else {
 		userPosts, err = postcontrollers.SelectSpecificUserPosts(dbutils.DB, userInfo.UserId, specificUserId)
-		log.Println(len(userPosts.Posts))
 		if err != nil {
 			log.Println(err)
 			http.Error(w, "failed to select specific user posts", http.StatusInternalServerError)
 			return
 		}
 	}
+
+	sort.Slice(userPosts.Posts, func(i, j int) bool {
+		return userPosts.Posts[i].PostInfo.CreationDate.After(userPosts.Posts[j].PostInfo.CreationDate)
+	})
 
 	response := readwritemodels.WriteData{
 		Status: "success",

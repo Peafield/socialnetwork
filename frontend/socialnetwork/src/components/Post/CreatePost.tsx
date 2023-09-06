@@ -15,6 +15,7 @@ interface CreatePostFormData {
   content: string;
   image_path: string
   privacy_level: number;
+  selected_profiles: string[]
 }
 
 const CreatePost: React.FC = () => {
@@ -24,6 +25,7 @@ const CreatePost: React.FC = () => {
     content: "",
     image_path: "",
     privacy_level: 0,
+    selected_profiles: []
   });
   const [showFollowers, setShowFollowers] = useState(false)
   const [selectableProfiles, setSelectableProfiles] = useState<ProfileProps[]>([])
@@ -104,20 +106,30 @@ const CreatePost: React.FC = () => {
       }
 
     } else {
-      if (name != "privacy_level") {
-        setFormData((prevState) => ({
-          ...prevState,
-          [name]: value,
-        }));
-      } else {
-        setFormData((prevState) => ({
-          ...prevState,
-          [name]: Number(value),
-        }));
+      switch (name) {
+        case "privacy_level":
+          setFormData((prevState) => ({
+            ...prevState,
+            [name]: Number(value),
+          }));
+          setShowFollowers(name == "privacy_level" && value == "2")
+          break
+        case "selected_profiles":
+          let sp = formData.selected_profiles
+          sp.includes(value) ? sp.splice(sp.indexOf(value), 1) : sp.push(value);
+          setFormData((prevState) => ({
+            ...prevState,
+            selected_profiles: sp
+          }));
+          break
+        default:
+          setFormData((prevState) => ({
+            ...prevState,
+            [name]: value,
+          }));
+          break
       }
-
     }
-    setShowFollowers(name == "privacy_level" && value == "2")
   };
 
   const handleSubmit = async (e: { preventDefault: () => void }) => {
@@ -211,13 +223,14 @@ const CreatePost: React.FC = () => {
                 className={styles.selectableprofilescontainer}>
                 {selectableProfiles.map((profile) => (
                   <div
+                    key={profile.display_name}
                     className={styles.checkbox}>
                     <input
-                      key={profile.display_name}
                       type="checkbox"
                       id={profile.display_name}
-                      name={profile.display_name}
-                      value={profile.display_name} />
+                      name="selected_profiles"
+                      onChange={handleChange}
+                      value={profile.user_id} />
                     <label
                       htmlFor={profile.display_name}>
                       {profile.display_name} {`(${profile.first_name} ${profile.last_name})`}

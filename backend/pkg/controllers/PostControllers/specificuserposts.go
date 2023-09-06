@@ -4,7 +4,6 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
-	"log"
 	"os"
 	crud "socialnetwork/pkg/db/CRUD"
 	"socialnetwork/pkg/db/dbstatements"
@@ -16,20 +15,20 @@ func SelectSpecificUserPosts(db *sql.DB, userId string, specifcUserId string) (*
 	values := []interface{}{
 		specifcUserId,
 		userId,
+		userId,
 		specifcUserId,
 		userId,
 		specifcUserId,
 	}
 
 	postsData, err := crud.SelectFromDatabase(db, "Posts", dbstatements.SelectSpecificUserPosts, values)
-	if err != nil && !errors.Is(err, errorhandling.ErrNoRowsAffected) {
-		return nil, fmt.Errorf("failed to select user viewable posts from database: %w", err)
+	if err != nil && !errors.Is(err, errorhandling.ErrNoResultsFound) {
+		return nil, fmt.Errorf("failed to select specific user posts from database: %w", err)
 	}
 
 	posts := &dbmodels.Posts{}
 	for _, v := range postsData {
 		if post, ok := v.(*dbmodels.Post); ok {
-			log.Println(post)
 			postData := &dbmodels.PostData{}
 			postData.PostInfo = *post
 			postData.PostPicture, err = os.ReadFile(post.ImagePath)

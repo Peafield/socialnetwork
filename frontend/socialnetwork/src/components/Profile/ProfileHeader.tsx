@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { ChangeEvent, MouseEventHandler, useContext, useEffect, useState } from "react";
 import { FaUserCircle, FaUserEdit } from "react-icons/fa";
 import { Link } from "react-router-dom";
 import { UserContext } from "../../context/AuthContext";
@@ -23,6 +23,8 @@ interface ProfileHeaderProps {
   about_me: string;
   is_private: boolean;
   is_own_profile: boolean;
+  profileTab: string;
+  getProfileTab: (tab: string) => void;
 }
 
 export interface FollowerProps {
@@ -44,7 +46,9 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
   following,
   about_me,
   is_private,
-  is_own_profile
+  is_own_profile,
+  profileTab,
+  getProfileTab
 }) => {
   const userContext = useContext(UserContext)
   const [profilePicUrl, setProfilePicUrl] = useState<string | null>(null);
@@ -56,7 +60,7 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
     creation_date: ""
   });
   const [updateTrigger, setUpdateTrigger] = useState<number>(0)
-  const [error, setError] = useState<string | null>(null)  
+  const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
     if (avatar) {
@@ -122,6 +126,10 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
     }
   }
 
+  const handleTabChange = (e: React.MouseEvent<HTMLButtonElement>) => {
+    getProfileTab(e.currentTarget.value)
+  }
+
   return (
     <>
       <div className={styles.profileheadercontainer}>
@@ -146,7 +154,8 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
           <div style={{
             fontSize: "small",
             fontStyle: "italic",
-            color: "gray"
+            color: "gray",
+            width: 'auto'
           }}>
             {!is_own_profile ?
               followerData.following_status == 1 ?
@@ -158,7 +167,6 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
                 <span
                   style={{
                     fontSize: "300%",
-                    color: "black"
                   }}>
 
                   <Link to={userContext.user ? "/dashboard/user/edit/" + userContext.user.displayName : ""}>
@@ -170,9 +178,10 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
         </div>
         <div className={styles.otherprofileinfocontainer}>
           <div className={styles.profilestatscontainer}>
-            <div>{num_of_posts} Posts</div>
-            <div>{followers} Followers</div>
-            <div>Following {following}</div>
+            <div style={{ display: 'flex', alignItems: 'center' }}>{num_of_posts}<button onClick={handleTabChange} value="posts" style={profileTab == "posts" ? { textDecorationLine: 'underline' } : undefined}> Posts</button></div>
+            <div style={{ display: 'flex', alignItems: 'center' }}>{followers}<button onClick={handleTabChange} value="followers" style={profileTab == "followers" ? { textDecorationLine: 'underline' } : undefined}> Followers</button></div>
+            <div style={{ display: 'flex', alignItems: 'center' }}><button onClick={handleTabChange} value="followees" style={profileTab == "followees" ? { textDecorationLine: 'underline' } : undefined}>Following </button>{following}</div>
+
           </div>
           <div className={styles.aboutmecontainer}>
             <div>{!is_private ? about_me : null}</div>

@@ -27,22 +27,23 @@ const PostContent: React.FC<PostContentProps> = ({
   }, [image_path]);
 
   return (
-    <>
-      <div className={styles.postcontentcontainer}>
+    <div className={styles.postcontentcontainer}>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'left', width: '100%' }}>
         <p>{text}</p>
       </div>
       {postURL ?
-        <div>
+        <div
+          className={styles.postpic}>
           <img
-          style={{width: '300px', height: '300px'}}
+            style={{ width: '100%', height: '100%' }}
             src={postURL}
             alt="Post Pic"
-            className={styles.postpic}
+
           />
         </div>
         : null
       }
-    </>
+    </div>
   )
 }
 

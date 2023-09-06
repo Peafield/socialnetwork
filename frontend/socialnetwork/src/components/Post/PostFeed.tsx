@@ -15,7 +15,7 @@ const PostFeed: React.FC = () => {
     const [userViewablePosts, setUserViewablePosts] = useState<
         PostProps[] | null
     >(null);
-    const [postsLoading, setPostsLoading] = useState<boolean>(false);
+    const [postsLoading, setPostsLoading] = useState<boolean>(true);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [modalPost, setModalPost] = useState<PostProps | null>(null)
     const [error, setError] = useState<string | null>(null);
@@ -39,7 +39,7 @@ const PostFeed: React.FC = () => {
                     newpost.image_path = post.PostPicture
                     return newpost
                 })
-                
+
                 setUserViewablePosts(postData);
             } catch (error) {
                 if (error instanceof Error) {
@@ -76,9 +76,9 @@ const PostFeed: React.FC = () => {
     return (
         <Container>
             <div className={styles.postfeedcontainer}>
-                <Modal 
-                open={isModalOpen}
-                onClose={() => setIsModalOpen(false)}>
+                <Modal
+                    open={isModalOpen}
+                    onClose={() => setIsModalOpen(false)}>
                     <span style={closeStyle} onClick={() => setIsModalOpen(false)}>
                         <AiOutlineClose />
                     </span>
@@ -109,11 +109,15 @@ const PostFeed: React.FC = () => {
                         : null
                     }
                 </Modal>
-        
+
                 {userViewablePosts
                     ? userViewablePosts.map((postProps) => (
                         <div
                             className={styles.postcontainer}
+                            style={{
+                                border: `${calculateScoreForPostCreationDate(new Date(postProps.creation_date))}mm solid #fa4d6a`,
+                                boxShadow: `inset 0 0 10px rgba(250, 77, 105, ${0.75 * calculateScoreForPostCreationDate(new Date(postProps.creation_date))})`
+                            }}
                             key={postProps.post_id}
                             onClick={() => {
                                 setIsModalOpen(true)
@@ -138,6 +142,23 @@ const PostFeed: React.FC = () => {
             </div>
         </Container>
     )
+}
+
+function calculateScoreForPostCreationDate(creationDate: Date): number {
+    // Get the current date and time
+    const currentDate = new Date();
+
+    // Calculate the time difference in seconds
+    const timeDifferenceInSeconds = (currentDate.getTime() - creationDate.getTime()) / 1000;
+
+    // Define the maximum time difference (e.g., one week)
+    const maxTimeDifferenceInSeconds = 24 * 60 * 60 * 7; // 1 week in seconds
+
+    // Calculate the score based on the linear mapping formula
+    const score = 0.5 - (timeDifferenceInSeconds / maxTimeDifferenceInSeconds) * 0.5;
+
+    // Ensure the score is between 0 and 0.5
+    return Math.min(Math.max(score, 0), 0.5);
 }
 
 export default PostFeed

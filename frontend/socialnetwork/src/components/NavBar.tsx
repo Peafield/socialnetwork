@@ -7,6 +7,7 @@ import { IoMdNotifications } from 'react-icons/io'
 import LogoutButton from "./Auth/SignOut";
 import { AiOutlinePlus } from "react-icons/ai";
 import styles from "./Dashboard.module.css";
+import Notification from "./Notifications/Notification";
 
 export const NavBar: React.FC = () => {
   const userContext = useContext(UserContext);
@@ -21,10 +22,7 @@ export const NavBar: React.FC = () => {
         </Link>
       </div>
       <div className={styles.navbarActions}>
-        <div
-          className={styles.navbarbutton}>
-          <IoMdNotifications />
-        </div>
+        <Notification/>
         <Link
           to={
             userContext.user

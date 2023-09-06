@@ -3,7 +3,6 @@ package routehandlers
 import (
 	"encoding/json"
 	"net/http"
-	notificationcontrollers "socialnetwork/pkg/controllers/NotificationControllers"
 	reactioncontrollers "socialnetwork/pkg/controllers/ReactionControllers"
 	"socialnetwork/pkg/db/dbutils"
 	"socialnetwork/pkg/middleware"
@@ -83,13 +82,8 @@ func HandleReaction(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		http.Error(w, "failed to insert reaction data", http.StatusInternalServerError)
 		return
-	} else {
-		err = notificationcontrollers.InsertNewNotification(dbutils.DB, userData.UserId, newReactionData.Data)
-		if err != nil {
-			http.Error(w, "failed to insert new notification data", http.StatusInternalServerError)
-			return
-		}
 	}
+
 	response := readwritemodels.WriteData{
 		Status: "success",
 	}

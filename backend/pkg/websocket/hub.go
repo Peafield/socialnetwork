@@ -39,6 +39,8 @@ func (h *Hub) Run() {
 		case client := <-h.register:
 			h.clients[client] = true
 		case client := <-h.unregister:
+			msg := createDisconnectOnlineReadMessage()
+			handleOnlineUser(msg, client)
 			if _, ok := h.clients[client]; ok {
 				delete(h.clients, client)
 				close(client.send)
@@ -74,4 +76,12 @@ func (h *Hub) GetClientByID(userID string) *Client {
 		}
 	}
 	return nil
+}
+
+func createDisconnectOnlineReadMessage() ReadMessage {
+	msg := ReadMessage{}
+	msg.Type = "online_user"
+	msg.Info = make(map[string]interface{}, 0)
+	msg.Info["online"] = false
+	return msg
 }

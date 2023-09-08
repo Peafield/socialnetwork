@@ -27,19 +27,48 @@ const FriendsMessagingList: React.FC<FriendsMessagingListProps> = ({
     const handleSendMessage = () => {
         if (messageToSend) {
             console.log(messageToSend);
-            sendMessage(messageToSend);
+            setTimeout(() => {
+                sendMessage(messageToSend)
+            }, 200)
         }
     };
 
     useEffect(() => {
-        if (currentUserChat) {
+        setMessageToSend({
+            type: "messagable_users",
+            info: {
+                receiver: userContext.user?.userId,
+            },
+        })
+    }, [currentUserChat])
+
+    useEffect(() => {
+        if (messageToSend) {
             handleSendMessage();
         }
-    }, [currentUserChat]);
+    }, [messageToSend]);
 
     useEffect(() => {
         if (message?.type == "messagable_users" && message.data) {
             setMessagableUsers(message.data.messagableUsers)
+        } else if (message?.type == "online_user" && message.data) {
+            console.log(message);
+
+            const newState = messagableUsers.map((user) => {
+                if (user.Name == message.data.username) {
+                    return { ...user, LoggedInStatus: message.data.online ? 1 : 0 }
+                }
+                return user
+            })
+
+            setMessagableUsers(newState)
+        } else if (message?.type == "private_message" && message.data) {
+            setMessageToSend({
+                type: "messagable_users",
+                info: {
+                    receiver: userContext.user?.userId,
+                },
+            })
         }
     }, [message])
 

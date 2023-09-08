@@ -103,6 +103,18 @@ func (c *Client) readPump() {
 		}
 
 		switch msg.Type {
+		case "messagable_users":
+			err := getMessagableUsers(msg, c)
+			if err != nil {
+				log.Printf("error: %v", err)
+			}
+			break
+		case "online_user":
+			err := handleOnlineUser(msg, c)
+			if err != nil {
+				log.Printf("error: %v", err)
+			}
+			break
 		case "open_chat":
 			err := handleOpenChat(msg, c)
 			if err != nil {
@@ -131,10 +143,8 @@ func (c *Client) readPump() {
 // executing all writes from this goroutine.
 func (c *Client) writePump() {
 	ticker := time.NewTicker(pingPeriod)
-	onlineUsersTicker := time.NewTicker(1 * time.Second)
 	defer func() {
 		ticker.Stop()
-		onlineUsersTicker.Stop()
 		c.conn.Close()
 	}()
 	for {
@@ -161,31 +171,6 @@ func (c *Client) writePump() {
 				w.Write(<-c.send)
 			}
 
-			if err := w.Close(); err != nil {
-				return
-			}
-		case <-onlineUsersTicker.C:
-			c.conn.SetWriteDeadline(time.Now().Add(writeWait))
-
-			messagableUsers, err := getMessagableUsers(c.UserID)
-			if err != nil {
-				log.Println(err)
-				return
-			}
-
-			w, err := c.conn.NextWriter(websocket.TextMessage)
-			if err != nil {
-				return
-			}
-			message := WriteMessage{
-				Type: "messagable_users",
-				Data: map[string][]BasicUserInfo{
-					"messagableUsers": messagableUsers,
-				},
-			}
-
-			jsonMessage, _ := json.Marshal(message)
-			w.Write(jsonMessage)
 			if err := w.Close(); err != nil {
 				return
 			}

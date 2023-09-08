@@ -25,15 +25,22 @@ export const useWebSocket = (url: string, options: { headers?: Record<string, st
                     socket.send(JSON.stringify({ type: 'header', header, value }));
                 }
             }
+
+            sendMessage({
+                type: "online_user",
+                info: {
+                    online: true,
+                },
+            })
         };
 
         socket.onclose = () => {
             console.log("WebSocket closed");
         };
 
-        socket.onmessage = (event) => {            
+        socket.onmessage = (event) => {
             let message = JSON.parse(event.data);
-            setMessage(message);            
+            setMessage(message);
         };
 
         ws.current = socket;

@@ -4,6 +4,12 @@
 
 package websocket
 
+import (
+	"log"
+	notificationcontrollers "socialnetwork/pkg/controllers/NotificationControllers"
+	"socialnetwork/pkg/db/dbutils"
+)
+
 // Hub maintains the set of active clients and broadcasts messages to the
 // clients.
 type Hub struct {
@@ -38,6 +44,7 @@ func (h *Hub) Run() {
 		select {
 		case client := <-h.register:
 			h.clients[client] = true
+			sendInitialNotifications(client)
 		case client := <-h.unregister:
 			msg := createDisconnectOnlineReadMessage()
 			handleOnlineUser(msg, client)
@@ -84,4 +91,13 @@ func createDisconnectOnlineReadMessage() ReadMessage {
 	msg.Info = make(map[string]interface{}, 0)
 	msg.Info["online"] = false
 	return msg
+}
+
+func sendInitialNotifications(client *Client) {
+	notifications, err := notificationcontrollers.SelectAllUserNotifications(dbutils.DB, client.UserID)
+	if err != nil {
+		log.Println("could not select all user notifications: %w", err)
+	}
+	messageToSend := createMarshalledWriteMessage("notification", notifications.Notifications)
+	client.send <- messageToSend
 }

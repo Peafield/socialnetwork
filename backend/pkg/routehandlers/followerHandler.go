@@ -86,8 +86,6 @@ func NewFollowerHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	fmt.Println(postFollowerData.Data)
-
 	err := followercontrollers.FollowUser(dbutils.DB, userData.UserId, postFollowerData.Data)
 	if err != nil {
 		fmt.Println(err)

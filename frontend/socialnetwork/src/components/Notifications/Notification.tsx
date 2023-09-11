@@ -1,26 +1,71 @@
-import React, { useState } from "react";
-import { IoMdNotifications } from "react-icons/io";
-import styles from "./Notification.module.css";
-import SideModal from "../Containers/SideModal";
-import NotificationsTable from "./NotificationsTable";
+import React, { useEffect, useState } from 'react'
+import { NotificationProps } from './NotificationsTable'
+import styles from './Notification.module.css'
+import { getUserByUserID } from '../../controllers/GetUser'
+import { group } from 'console'
+import { ProfileProps } from '../Profile/Profile'
 
-const Notification = () => {
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [notificationCount, setNotificationCount] = useState<number | null>(null);
+const Notification: React.FC<NotificationProps> = (props) => {
+    const [notificationMessage, setNotificationMessage] = useState<string>("")
+    const [error, setError] = useState<string | null>(null);
 
-  return (
-    <>
-      <div className={styles.notificationbutton} onClick={() => {}}>
-        <IoMdNotifications />
-        {notificationCount && notificationCount > 0 && (
-          <div className={styles.badge}>{notificationCount}</div>
-        )}
-      </div>
-      <SideModal open={isModalOpen} onClose={() => setIsModalOpen(false)}>
-        <NotificationsTable />
-      </SideModal>
-    </>
-  );
-};
+    useEffect(() => {
+        const fetchUserName = async () => {
+            try {
+                const user: ProfileProps = await getUserByUserID(props.sender_id)
 
-export default Notification;
+                if (user) {
+                    setNotificationMessage(composeNotificationMessage(props, user.display_name))
+                }
+            } catch (error) {
+                if (error instanceof Error) {
+                    setError(error.message);
+                } else {
+                    setError("An unexpected error occurred.");
+                }
+            }
+        }
+
+        fetchUserName();
+    }, [])
+
+    return (
+        <div
+            className={styles.notificationcontainer}>
+            {notificationMessage}
+        </div>
+    )
+}
+
+function composeNotificationMessage(props: NotificationProps, senderName: string) {
+    let message = ""
+
+    message += senderName + " "
+
+    if (props.reaction_type != "") {
+        message += props.reaction_type + "d your "
+        message += notificationTypeForLikingOrDisliking(props.post_id, props.event_id, props.comment_id)
+    } else {
+
+    }
+
+    return message
+}
+
+function notificationTypeForLikingOrDisliking(
+    postId: string,
+    eventId: string,
+    commentId: string,
+) {
+    if (postId != "") {
+        return "post"
+    }
+    if (eventId != "") {
+        return "event"
+    }
+    if (commentId != "") {
+        return "comment"
+    }
+}
+
+export default Notification

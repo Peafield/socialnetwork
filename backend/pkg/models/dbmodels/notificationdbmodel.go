@@ -6,7 +6,7 @@ import "time"
 type Notification struct {
 	NotificationId string    `json:"notification_id"`
 	SenderId       string    `json:"sender_id"`
-	ReceiverId     string    `json:"receiever_id"`
+	ReceiverId     string    `json:"receiver_id"`
 	GroupId        string    `json:"group_id"`
 	PostId         string    `json:"post_id"`
 	EventId        string    `json:"event_id"`

@@ -13,41 +13,44 @@ import { useWebSocket } from "../Socket";
 import { getCookie } from "../controllers/SetUserContextAndCookie";
 import { LuMessagesSquare } from 'react-icons/lu'
 import EditProfile from "./Profile/EditProfile";
+import { WebSocketProvider } from "../context/WebSocketContext";
+import NotificationsTable from "./Notifications/NotificationsTable";
 
 export default function Dashboard() {
-  const { message, sendMessage } = useWebSocket("ws://localhost:8080/ws", {
+  const ws = useWebSocket("ws://localhost:8080/ws", {
     headers: {
       Authorization: `Bearer ${getCookie("sessionToken")}`
     }
   });
 
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [sideModalDisplay, setSideModalDisplay] = useState<string | null>(null)
 
   return (
-    <Container>
-      <div className={styles.dashboardcontainer}>
-        <div className={styles.navbarcontainer}>
-          <NavBar />
+    <WebSocketProvider ws={ws}>
+      <Container>
+        <div className={styles.dashboardcontainer}>
+          <div className={styles.navbarcontainer}>
+            <NavBar setIsModalOpen={setIsModalOpen} setSideModalDisplay={setSideModalDisplay} />
+          </div>
+          <div className={styles.mainelementcontainer}>
+            <Routes>
+              <Route path="/" element={<PostFeed />} />
+              <Route path="/createpost" element={<CreatePost />} />
+              <Route path="/user/:username" element={<Profile />} />
+              <Route path="/user/edit/:username" element={<EditProfile />} />
+              <Route path="/group/:groupname" element={<Group />} />
+            </Routes>
+          </div>
+          <SideModal open={isModalOpen} onClose={() => setIsModalOpen(false)}>
+            {sideModalDisplay ?
+              sideModalDisplay === "chats" ?
+                <FriendsMessagingList /> :
+                <NotificationsTable />
+              : null}
+          </SideModal>
         </div>
-        <div className={styles.mainelementcontainer}>
-          <Routes>
-            <Route path="/" element={<PostFeed />} />
-            <Route path="/createpost" element={<CreatePost />} />
-            <Route path="/user/:username" element={<Profile />} />
-            <Route path="/user/edit/:username" element={<EditProfile />} />
-            <Route path="/group/:groupname" element={<Group />} />
-          </Routes>
-        </div>
-        <div className={styles.sidebarbuttoncontainer}>
-          <button onClick={() => { setIsModalOpen(true) }} style={{padding: "5px"}}>
-            <LuMessagesSquare />
-          </button>
-        </div>
-        <SideModal open={isModalOpen} onClose={() => setIsModalOpen(false)}>
-          <FriendsMessagingList message={message} sendMessage={sendMessage} />
-        </SideModal>
-      </div>
-
-    </Container>
+      </Container>
+    </WebSocketProvider>
   );
 }

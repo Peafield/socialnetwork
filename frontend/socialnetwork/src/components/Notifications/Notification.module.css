@@ -3,22 +3,46 @@
     cursor: pointer;
     display: flex;
     margin-bottom: 2.5%;
-    margin-left: 5%;
     color: #fa4d6a;
     font-weight: bold;
     font-size: x-large;
 }
 
+.notificationbutton:hover {
+    color: #fa8fa1;
+}
+
 .badge {
     position: absolute;
-    top: -5px;
-    right: -5px;
-    background-color: #4DFADD;
+    top: -2px;
+    right: -2px;
+    background-color: lightgreen;
     color: black;
     border-radius: 50%;
     padding: 3px;
-    font-size: 12px;
-    line-height: 1;
-    min-width: 20px;
+    font-size: 10px;
+    line-height: 0.5;
+    max-width: 12px;
+    max-height: 12px;
     text-align: center;
-  }
+}
+
+.allNotificationsContainer {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
+    width: 100%;
+    height: 90%;
+    overflow-y: auto;
+}
+
+.notificationcontainer {
+    display: flex;
+    justify-content: left;
+    align-items: center;
+    width: 90%;
+    height: 10%;
+    padding: 2%;
+    border-bottom: 0.2mm solid grey;
+}

@@ -67,6 +67,7 @@ var (
 	SelectChatMessagesByChatIdStmt               *sql.Stmt
 	SelectChatBySenderAndRecieverIdStmt          *sql.Stmt
 	SelectAllChatsByUserIdStmt                   *sql.Stmt
+	SelectAllUserNotifications                   *sql.Stmt
 
 	/*Delete Statements*/
 	DeleteUserAccountStmt           *sql.Stmt
@@ -109,6 +110,11 @@ func InitDBStatements(db *sql.DB) error {
 	err = initChatDBStatements(db)
 	if err != nil {
 		return fmt.Errorf("failed to prepare chat statements: %w", err)
+	}
+
+	err = initNotificationStatements(db)
+	if err != nil {
+		return fmt.Errorf("failed to prepare notification statements: %w", err)
 	}
 
 	InsertSessionsStmt, err = db.Prepare(`
@@ -201,24 +207,6 @@ func InitDBStatements(db *sql.DB) error {
 		return fmt.Errorf("failed to prepare insert groups events attendees statement: %w", err)
 	}
 
-	InsertNotificationsStmt, err = db.Prepare(`
-	INSERT INTO Notifications (
-		notification_id,
-		sender_id,
-		receiver_id,
-		group_id,
-		post_id,
-		event_id,
-		comment_id,
-		chat_id,
-		reaction_type
-	) VALUES (
-		?, ?, ?, ?, ?, ?, ?, ?, ?
-	)`)
-	if err != nil {
-		return fmt.Errorf("failed to prepare insert notifications statement: %w", err)
-	}
-
 	return nil
 }
 
@@ -258,6 +246,7 @@ func CloseDBStatements() {
 	SelectChatMessagesByChatIdStmt.Close()
 	SelectChatBySenderAndRecieverIdStmt.Close()
 	SelectAllChatsByUserIdStmt.Close()
+	SelectAllUserNotifications.Close()
 
 	/*Update Statement Closure*/
 	UpdatePostImagePathStmt.Close()

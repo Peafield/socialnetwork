@@ -49,6 +49,7 @@ func UpdateUserAccount(db *sql.DB, userId string, updateUserData map[string]inte
 		"dob",
 		"avatar_path",
 		"about_me",
+		"is_private",
 	}
 	userDataOldValues := []interface{}{
 		user.UserInfo.Email,
@@ -59,6 +60,7 @@ func UpdateUserAccount(db *sql.DB, userId string, updateUserData map[string]inte
 		user.UserInfo.DOB,
 		user.UserInfo.AvatarPath,
 		user.UserInfo.AboutMe,
+		user.UserInfo.IsPrivate,
 	}
 
 	for i, v := range userDataKeys {
@@ -78,6 +80,15 @@ func UpdateUserAccount(db *sql.DB, userId string, updateUserData map[string]inte
 }
 
 func appendOldOrNew(valueStr string, updateUserData map[string]interface{}, oldValue interface{}, args *[]interface{}) error {
+	if valueStr == "is_private" {
+		if value, ok := updateUserData[valueStr].(float64); ok {
+			*args = append(*args, int(value))
+		} else {
+			*args = append(*args, oldValue)
+		}
+		return nil
+	}
+
 	if value, ok := updateUserData[valueStr].(string); ok && value != "" {
 		if valueStr == "new_password" {
 			hashedPassword, err := helpers.HashPassword(value)

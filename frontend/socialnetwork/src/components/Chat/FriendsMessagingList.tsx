@@ -1,21 +1,15 @@
 import React, { CSSProperties, useContext, useEffect, useState } from 'react'
 import { AiOutlineClose } from 'react-icons/ai';
 import { UserContext } from '../../context/AuthContext';
+import { useWebSocketContext } from '../../context/WebSocketContext';
 import { WebSocketReadMessage, WebSocketWriteMessage } from '../../Socket';
 import styles from './Chat.module.css'
 import Conversation from './Conversation';
 import UserChatDisplay from './UserChatDisplay';
 
-interface FriendsMessagingListProps {
-    message: WebSocketWriteMessage | null,
-    sendMessage: (messegeToSend: WebSocketReadMessage) => void
-}
-
-const FriendsMessagingList: React.FC<FriendsMessagingListProps> = ({
-    message,
-    sendMessage
-}) => {
-    const userContext = useContext(UserContext)
+const FriendsMessagingList: React.FC = () => {
+    const userContext = useContext(UserContext);
+    const { message, sendMessage } = useWebSocketContext();
     const [messageToSend, setMessageToSend] = useState<WebSocketReadMessage>({
         type: "",
         info: ""
@@ -90,7 +84,6 @@ const FriendsMessagingList: React.FC<FriendsMessagingListProps> = ({
 
     return (
         <>
-
             {currentUserChat && currentUserChatDisplayName ?
                 <div
                     className={styles.messagingcontainer}>

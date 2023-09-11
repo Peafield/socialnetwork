@@ -16,6 +16,7 @@ interface EditProfileFormData {
   dob: string;
   avatar_path: string;
   about_me: string;
+  is_private: number
   old_password: string
 }
 
@@ -28,7 +29,7 @@ interface OwnProfileProps {
   last_name: string,
   dob: string,
   about_me: string,
-  is_private: string
+  is_private: number
 }
 
 const EditProfile: React.FC = () => {
@@ -47,6 +48,7 @@ const EditProfile: React.FC = () => {
     dob: "",
     avatar_path: "",
     about_me: "",
+    is_private: 0,
     old_password: ""
   });
   const [error, setError] = useState<string | null>(null)
@@ -91,6 +93,7 @@ const EditProfile: React.FC = () => {
         dob: profile.dob,
         avatar_path: profile.avatar,
         about_me: profile.about_me,
+        is_private: profile.is_private,
         old_password: ""
       })
     }
@@ -119,6 +122,9 @@ const EditProfile: React.FC = () => {
         [name]: value,
       }));
     }
+
+    console.log(formData);
+
   };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -153,6 +159,23 @@ const EditProfile: React.FC = () => {
     <div className={styles.editprofilecontainer}>
       <h2>Edit Profile</h2>
       <form onSubmit={handleSubmit}>
+        <div>
+          <label htmlFor='isPrivate'>Private Profile?</label>
+          <input
+            type="checkbox"
+            id='isPrivate'
+            name='is_private'
+            checked={formData.is_private === 1}
+            onChange={(e) => {
+              const newValue = e.target.checked ? 1 : 0;
+              setFormData((prevState) => ({
+                ...prevState,
+                is_private: newValue,
+              }));
+            }}
+          />
+
+        </div>
         <div>
           <label htmlFor="firstName">First Name:</label>
           <input

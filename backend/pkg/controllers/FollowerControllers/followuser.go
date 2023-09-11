@@ -3,6 +3,7 @@ package followercontrollers
 import (
 	"database/sql"
 	"fmt"
+	usercontrollers "socialnetwork/pkg/controllers/UserControllers"
 	crud "socialnetwork/pkg/db/CRUD"
 	"socialnetwork/pkg/db/dbstatements"
 	"socialnetwork/pkg/helpers"
@@ -36,11 +37,17 @@ func FollowUser(db *sql.DB, userId string, postFollowerData map[string]interface
 	}
 	follower.FolloweeId = followeeId
 
-	//set following status (0 because it will be pending)
-	follower.FollowingStatus = 0
-
-	//set request pending (1 as request has now been sent)
-	follower.RequestPending = 1
+	followee, err := usercontrollers.GetUser(db, userId, dbstatements.SelectUserByIDStmt, followeeId)
+	if err != nil {
+		return fmt.Errorf("could not find followee user")
+	}
+	if followee.UserInfo.IsPrivate == 1 {
+		follower.FollowingStatus = 0
+		follower.RequestPending = 1
+	} else {
+		follower.FollowingStatus = 1
+		follower.RequestPending = 0
+	}
 
 	//get follower struct values
 	values, err := helpers.StructFieldValues(follower)

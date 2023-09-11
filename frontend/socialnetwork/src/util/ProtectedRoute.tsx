@@ -2,7 +2,7 @@ import React, { ReactNode, useContext, useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom';
 import { UserContext } from '../context/AuthContext';
 import { getCookie } from '../controllers/SetUserContextAndCookie';
-import {useSetUserContextAndCookie} from '../controllers/SetUserContextAndCookie'
+import { useSetUserContextAndCookie } from '../controllers/SetUserContextAndCookie'
 
 interface ProtectedRouteProps {
     element: ReactNode
@@ -22,12 +22,12 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
             setIsLoggedIn(false);
             return navigate('/signin');
         }
-        setUserContextAndCookie(userToken) 
+        setUserContextAndCookie(userToken)
         setIsLoggedIn(true);
     }
     useEffect(() => {
-            checkUserToken();
-        }, [isLoggedIn]);
+        checkUserToken();
+    }, [isLoggedIn]);
     return (
         <React.Fragment>
             {

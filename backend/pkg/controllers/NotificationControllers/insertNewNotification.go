@@ -10,6 +10,9 @@ import (
 
 func InsertNewNotification(db *sql.DB, userId string, newNotificationData map[string]interface{}) error {
 	args := make([]interface{}, 9)
+	for i := range args {
+		args[i] = ""
+	}
 
 	notificationId, err := helpers.CreateUUID()
 	if err != nil {
@@ -19,33 +22,38 @@ func InsertNewNotification(db *sql.DB, userId string, newNotificationData map[st
 
 	args[1] = userId
 
-	creatorId, ok := newNotificationData["creatorId"].(string)
-	if ok {
-		args[2] = creatorId
-	}
-
-	notificationTypeId, ok := newNotificationData["reactionOnId"].(string)
+	creatorId, ok := newNotificationData["receiver"].(string)
 	if !ok {
-		return fmt.Errorf("reactionOnId is not a string")
+		return fmt.Errorf("receiver is not a string or doesn't exist")
 	}
+	args[2] = creatorId
 
-	reactionOn, ok := newNotificationData["reactionOn"].(string)
+	groupId, ok := newNotificationData["group_id"].(string)
 	if ok {
-		switch reactionOn {
-		case "group":
-			args[3] = notificationTypeId
-		case "post":
-			args[4] = notificationTypeId
-		case "event":
-			args[5] = notificationTypeId
-		case "comment":
-			args[6] = notificationTypeId
-		case "chat":
-			args[7] = notificationTypeId
-		}
+		args[3] = groupId
 	}
 
-	reactionType, ok := newNotificationData["reactionType"].(string)
+	postId, ok := newNotificationData["post_id"].(string)
+	if ok {
+		args[4] = postId
+	}
+
+	eventId, ok := newNotificationData["event_id"].(string)
+	if ok {
+		args[5] = eventId
+	}
+
+	commentId, ok := newNotificationData["comment_id"].(string)
+	if ok {
+		args[6] = commentId
+	}
+
+	chatId, ok := newNotificationData["chat_id"].(string)
+	if ok {
+		args[7] = chatId
+	}
+
+	reactionType, ok := newNotificationData["reaction_type"].(string)
 	if ok {
 		args[8] = reactionType
 	}

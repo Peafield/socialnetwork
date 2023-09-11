@@ -4,6 +4,8 @@ import styles from "./Post.module.css";
 import { AiOutlineLike, AiOutlineDislike } from "react-icons/ai";
 import { GoComment } from "react-icons/go";
 import { HandleReaction } from "../../helpers/HandleReaction";
+import { useWebSocketContext } from "../../context/WebSocketContext";
+import { WebSocketReadMessage } from "../../Socket";
 
 interface PostActionsProps {
   creatorId: string;
@@ -20,6 +22,11 @@ const PostActions: React.FC<PostActionsProps> = ({
   dislikes,
   AmountOfComments,
 }) => {
+  const { message, sendMessage } = useWebSocketContext();
+  let messageToSend: WebSocketReadMessage = {
+    type: "",
+    info: ""
+  }
   const [numOfLikes, setNumOfLikes] = useState(likes);
   const [numOfDislikes, setNumOfDisikes] = useState(dislikes);
   const [numOfComments, setNumOfComments] = useState(AmountOfComments);
@@ -57,6 +64,15 @@ const PostActions: React.FC<PostActionsProps> = ({
         setNumOfLikes((prev) => prev + 1);
         setHasLiked(true);
       }
+
+      messageToSend = {
+        type: "notification",
+        info: {
+          receiver: creatorId,
+          post_id: postId,
+          reaction_type: reactionType
+        }
+      }
     }
 
     if (reactionType === "dislike") {
@@ -70,12 +86,28 @@ const PostActions: React.FC<PostActionsProps> = ({
         }
         setNumOfDisikes((prev) => prev + 1);
         setHasDisliked(true);
+
+        messageToSend = {
+          type: "notification",
+          info: {
+            receiver: creatorId,
+            post_id: postId,
+            reaction_type: reactionType
+          }
+        }
       }
     }
 
     currentTimeout.current = setTimeout(async () => {
       await HandleReaction(creatorId, "post", postId, reactionType);
-    }, 5000);
+
+      sendMessage(messageToSend)
+
+      messageToSend = {
+        type: "",
+        info: ""
+      }
+    }, 2000);
   };
 
   return (

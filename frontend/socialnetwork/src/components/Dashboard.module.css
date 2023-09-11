@@ -40,33 +40,25 @@
 }
 
 .navbarbutton {
+    cursor: pointer;
     display: flex;
-    margin-bottom: 2.5%;
-    margin-left: 5%;
     color: #fa4d6a;
     font-weight: bold;
     font-size: x-large;
 }
 
+.navbarbutton:hover {
+    color: #fa8fa1;
+}
+
 .navbarcontainer a {
     color: #fa4d6a;
-    font-size: rem;
     font-weight: bold;
     text-decoration: none;
 }
 
 .navbarcontainer a:hover {
     color: #fa8fa1;
-}
-
-.sidebarbuttoncontainer {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: auto;
-    width: auto;
-    position: absolute;
-    right: 15px;
 }
 
 .mainelementcontainer {
@@ -79,6 +71,7 @@
 }
 
 .logo {
+    cursor: pointer;
     display: flex;
     flex-direction: column;
     height: 80%;

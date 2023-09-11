@@ -115,6 +115,18 @@ func (c *Client) readPump() {
 				log.Printf("error: %v", err)
 			}
 			break
+		case "open_notifications":
+			err := handleOpenNotifications(msg, c)
+			if err != nil {
+				log.Printf("error: %v", err)
+			}
+			break
+		case "notification":
+			err := handleNotification(msg, c)
+			if err != nil {
+				log.Printf("error: %v", err)
+			}
+			break
 		case "open_chat":
 			err := handleOpenChat(msg, c)
 			if err != nil {

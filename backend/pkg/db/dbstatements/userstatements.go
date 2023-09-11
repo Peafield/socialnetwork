@@ -88,7 +88,8 @@ func initUserDBStatements(db *sql.DB) error {
 	last_name = ?,
 	date_of_birth = ?,
 	avatar_path = ?,
-	about_me = ?
+	about_me = ?,
+	is_private = ?
 	WHERE user_id = ?
 	`)
 	if err != nil {

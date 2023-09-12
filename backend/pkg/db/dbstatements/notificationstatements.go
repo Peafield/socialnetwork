@@ -36,5 +36,23 @@ func initNotificationStatements(db *sql.DB) error {
 		return fmt.Errorf("failed to prepare select all user notifications statement: %w", err)
 	}
 
+	/*UPDATE*/
+	UpdateAllUserNotifications, err = db.Prepare(`
+	UPDATE Notifications
+	SET read_status = ?
+	WHERE notification_id = ?`)
+	if err != nil {
+		return fmt.Errorf("failed to prepare update all user notifications statement: %w", err)
+	}
+
+	/*DELETE*/
+	DeleteNotificationStmt, err = db.Prepare(`
+	DELETE FROM Notifications
+	WHERE notification_id = ?
+	`)
+	if err != nil {
+		return fmt.Errorf("failed to prepare delete notification statement: %w", err)
+	}
+
 	return nil
 }

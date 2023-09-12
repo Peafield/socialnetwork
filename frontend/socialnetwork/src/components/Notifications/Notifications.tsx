@@ -4,6 +4,7 @@ import styles from "./Notification.module.css";
 import { useWebSocketContext } from "../../context/WebSocketContext";
 import { WebSocketReadMessage } from "../../Socket";
 import { UserContext } from "../../context/AuthContext";
+import { NotificationProps } from "./NotificationsTable";
 
 interface NotificationsProps {
   setIsModalOpen: React.Dispatch<React.SetStateAction<boolean>>;
@@ -32,8 +33,8 @@ const Notifications: React.FC<NotificationsProps> = ({
 
   useEffect(() => {
     if (message?.type == "notification" || message?.type == "open_notifications") {
-      console.log(message.data);
-      setNotificationCount(message.data?.length)
+      const unreadMessagesCount = message.data?.filter((notification: NotificationProps) => notification.read_status == 0).length
+      setNotificationCount(unreadMessagesCount > 0 ? unreadMessagesCount : null)
     }
   }, [message])
 

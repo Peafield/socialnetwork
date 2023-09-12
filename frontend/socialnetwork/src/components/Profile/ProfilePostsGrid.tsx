@@ -63,7 +63,7 @@ const ProfilePostsGrid: React.FC<ProfilePostsGridProps> = ({
                                     </div>
                                     <div
                                         className={styles.postcommentscontainer}>
-                                        <PostComments post_id={modalPost.post_id} />
+                                        <PostComments post_id={modalPost.post_id} creator_id={modalPost.creator_id} />
                                     </div>
                                 </div>
                                 : null
@@ -95,22 +95,7 @@ const ProfilePostsGrid: React.FC<ProfilePostsGridProps> = ({
                             ))
                             : null}
                     </>
-                    : <div
-                    style={{
-                        display: "flex",
-                        flexDirection: "column",
-                        justifyContent: "center",
-                        alignItems: "center",
-                        margin: "10px",
-                        padding: "10px"
-                        }}>
-                        <span style={{fontSize: "300%"}}>
-                            <PiMaskSadDuotone />
-                        </span>
-                        <div>
-                            Nothing to see here
-                        </div>
-                    </div>}
+                    : null}
             </div>
         </>
     )

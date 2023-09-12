@@ -3,6 +3,7 @@ package followercontrollers
 import (
 	"database/sql"
 	"fmt"
+	"log"
 	crud "socialnetwork/pkg/db/CRUD"
 	"socialnetwork/pkg/db/dbstatements"
 )
@@ -36,14 +37,16 @@ func UpdateFollowingStatus(db *sql.DB, userId string, updateFollowData map[strin
 		return fmt.Errorf("follower_id is not a string or doesn't exist")
 	}
 
-	followingStatus, ok := updateFollowData["following_status"].(int)
+	followingStatus, ok := updateFollowData["following_status"].(float64)
 	if !ok {
 		return fmt.Errorf("following_status is not an int or doesn't exist")
 	}
 
-	args[0] = followingStatus
+	args[0] = int(followingStatus)
 	args[1] = followerId
 	args[2] = userId
+
+	log.Println(args)
 
 	err := crud.InteractWithDatabase(db, dbstatements.UpdateFollowingStatusStmt, args)
 	if err != nil {

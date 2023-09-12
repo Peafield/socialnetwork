@@ -176,6 +176,7 @@ func main() {
 	r.Handle("/comment", middleware.ValidateTokenMiddleware(middleware.ParseAndValidateData(http.HandlerFunc(routehandlers.CommentHandler))))
 	r.Handle("/reaction", middleware.ValidateTokenMiddleware(middleware.ParseAndValidateData(http.HandlerFunc(routehandlers.ReactionHandler))))
 	r.Handle("/follow", middleware.ValidateTokenMiddleware(middleware.ParseAndValidateData(http.HandlerFunc(routehandlers.FollowerHandler))))
+	r.Handle("/notification", middleware.ValidateTokenMiddleware(middleware.ParseAndValidateData(http.HandlerFunc(routehandlers.NotificationHandler))))
 
 	/*WEBSOCKET*/
 	r.Handle("/ws", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {

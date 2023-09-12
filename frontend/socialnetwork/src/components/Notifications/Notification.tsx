@@ -4,6 +4,7 @@ import styles from './Notification.module.css'
 import { getUserByUserID } from '../../controllers/GetUser'
 import { group } from 'console'
 import { ProfileProps } from '../Profile/Profile'
+import NotificationAction from './NotificationAction'
 
 const Notification: React.FC<NotificationProps> = (props) => {
     const [notificationMessage, setNotificationMessage] = useState<string>("")
@@ -32,7 +33,21 @@ const Notification: React.FC<NotificationProps> = (props) => {
     return (
         <div
             className={styles.notificationcontainer}>
-            {notificationMessage}
+            <div style={{ width: '60%' }}>
+                {notificationMessage}
+            </div>
+            <NotificationAction
+                notification_id={props.notification_id}
+                sender_id={props.sender_id}
+                receiver_id={props.receiver_id}
+                group_id={props.group_id}
+                post_id={props.post_id}
+                event_id={props.event_id}
+                comment_id={props.comment_id}
+                chat_id={props.chat_id}
+                action_type={props.action_type}
+                read_status={props.read_status}
+                creation_date={props.creation_date} />
         </div>
     )
 }
@@ -42,11 +57,27 @@ function composeNotificationMessage(props: NotificationProps, senderName: string
 
     message += senderName + " "
 
-    if (props.reaction_type != "") {
-        message += props.reaction_type + "d your "
-        message += notificationTypeForLikingOrDisliking(props.post_id, props.event_id, props.comment_id)
-    } else {
-
+    switch (props.action_type) {
+        case "like":
+            message += props.action_type + "d your "
+            message += notificationTypeForLikingOrDisliking(props.post_id, props.event_id, props.comment_id)
+            break
+        case "dislike":
+            message += props.action_type + "d your "
+            message += notificationTypeForLikingOrDisliking(props.post_id, props.event_id, props.comment_id)
+            break
+        case "follow":
+            message += props.action_type + "ed you"
+            break
+        case "request":
+            message += props.action_type + "ed to follow you"
+            break
+        case "comment":
+            message += props.action_type + "ed on your post"
+            break
+        case "invite":
+            message += props.action_type + "d you to a "
+            break
     }
 
     return message

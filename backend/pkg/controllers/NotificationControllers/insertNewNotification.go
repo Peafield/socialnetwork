@@ -53,7 +53,7 @@ func InsertNewNotification(db *sql.DB, userId string, newNotificationData map[st
 		args[7] = chatId
 	}
 
-	reactionType, ok := newNotificationData["reaction_type"].(string)
+	reactionType, ok := newNotificationData["action_type"].(string)
 	if ok {
 		args[8] = reactionType
 	}

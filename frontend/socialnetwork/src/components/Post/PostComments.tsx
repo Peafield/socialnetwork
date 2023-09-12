@@ -1,12 +1,15 @@
 import React, { useEffect, useState } from 'react'
 import { FaComment, FaCommentMedical } from 'react-icons/fa';
+import { useWebSocketContext } from '../../context/WebSocketContext';
 import { handleAPIRequest } from '../../controllers/Api';
 import { getCookie } from '../../controllers/SetUserContextAndCookie';
+import { WebSocketReadMessage } from '../../Socket';
 import Comment, { CommentProps } from '../Comment/Comment';
 import styles from './Post.module.css'
 
 interface PostCommentsProps {
   post_id: string
+  creator_id: string
 }
 
 interface CommentFormData {
@@ -16,8 +19,10 @@ interface CommentFormData {
 }
 
 const PostComments: React.FC<PostCommentsProps> = ({
-  post_id
+  post_id,
+  creator_id
 }) => {
+  const { message, sendMessage } = useWebSocketContext();
   const [postComments, setPostComments] = useState<
     CommentProps[] | null
   >(null);
@@ -49,7 +54,6 @@ const PostComments: React.FC<PostCommentsProps> = ({
       };
       try {
         const response = await handleAPIRequest(url, options);
-        console.log(response.data);
 
         const newpostcomments = response.data.Comments
 
@@ -110,6 +114,15 @@ const PostComments: React.FC<PostCommentsProps> = ({
       if (response && response.status === "success") {
         console.log("comment submit success");
         setUpdateTrigger(prevTigger => prevTigger + 1)
+        const messageToSend: WebSocketReadMessage = {
+          type: "notification",
+          info: {
+            receiver: creator_id,
+            post_id: commentFormData.post_id,
+            action_type: "comment"
+          }
+        }
+        sendMessage(messageToSend)
       }
     } catch (error) {
       if (error instanceof Error) {

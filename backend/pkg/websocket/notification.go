@@ -21,6 +21,9 @@ func handleNotification(msg ReadMessage, c *Client) error {
 	}
 
 	clientToNotify := c.hub.GetClientByID(receiverId)
+	if clientToNotify == nil {
+		return nil
+	}
 
 	notifications, err := notificationcontrollers.SelectAllUserNotifications(dbutils.DB, receiverId)
 	if err != nil {
@@ -29,7 +32,7 @@ func handleNotification(msg ReadMessage, c *Client) error {
 
 	//sort the chat messages based on time
 	sort.Slice(notifications.Notifications, func(i, j int) bool {
-		return notifications.Notifications[i].CreationDate.Before(notifications.Notifications[j].CreationDate)
+		return notifications.Notifications[i].CreationDate.After(notifications.Notifications[j].CreationDate)
 	})
 
 	messageToSend := createMarshalledWriteMessage("notification", notifications.Notifications)
@@ -44,9 +47,19 @@ func handleOpenNotifications(msg ReadMessage, c *Client) error {
 		return fmt.Errorf("could not select all user notifications: %w", err)
 	}
 
+	err = notificationcontrollers.UpdateAllNotificationsReadStatus(dbutils.DB, c.UserID, notifications, 1)
+	if err != nil {
+		return fmt.Errorf("could not update all user notifications: %w", err)
+	}
+
+	notifications, err = notificationcontrollers.SelectAllUserNotifications(dbutils.DB, c.UserID)
+	if err != nil {
+		return fmt.Errorf("could not select all user notifications: %w", err)
+	}
+
 	//sort the chat messages based on time
 	sort.Slice(notifications.Notifications, func(i, j int) bool {
-		return notifications.Notifications[i].CreationDate.Before(notifications.Notifications[j].CreationDate)
+		return notifications.Notifications[i].CreationDate.After(notifications.Notifications[j].CreationDate)
 	})
 
 	messageToSend := createMarshalledWriteMessage("open_notifications", notifications.Notifications)

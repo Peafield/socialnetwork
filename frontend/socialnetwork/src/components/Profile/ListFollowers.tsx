@@ -15,7 +15,7 @@ const ListFollowers: React.FC<ListFollowersProps> = ({
         <div
             className={styles.listUsers}>
             {followers.map((follower) => (
-                <div>
+                <div key={follower.follower_id}>
                     {follower.follower_id}
                 </div>
             ))}

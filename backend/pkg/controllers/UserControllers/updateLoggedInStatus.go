@@ -4,29 +4,24 @@ import (
 	"database/sql"
 	"fmt"
 	crud "socialnetwork/pkg/db/CRUD"
-	"strings"
+	"socialnetwork/pkg/db/dbstatements"
 )
 
 func UpdateLoggedInStatus(db *sql.DB, userId string, loggedInStatus int) error {
-	var columns []string
-	var args []interface{}
+	var statement *sql.Stmt
 
-	if loggedInStatus > 1 || loggedInStatus < 0 {
+	switch loggedInStatus {
+	case 0:
+		statement = dbstatements.UpdateUserLoggedOut
+		break
+	case 1:
+		statement = dbstatements.UpdateUserLoggedIn
+		break
+	default:
 		return fmt.Errorf("logged in status is not a valid value")
 	}
 
-	columns = append(columns, "is_logged_in = ?")
-	args = append(args, loggedInStatus)
-	args = append(args, userId)
-
-	query := fmt.Sprintf("UPDATE Users SET %s WHERE user_id = ?", strings.Join(columns, ", "))
-	updateLoggedInStatusStatment, err := db.Prepare(query)
-	if err != nil {
-		return fmt.Errorf("failed to prepare update logged in status: %w", err)
-	}
-	defer updateLoggedInStatusStatment.Close()
-
-	err = crud.InteractWithDatabase(db, updateLoggedInStatusStatment, args)
+	err := crud.InteractWithDatabase(db, statement, []interface{}{userId})
 	if err != nil {
 		fmt.Println(err)
 		return fmt.Errorf("failed to update logged in status: %w", err)

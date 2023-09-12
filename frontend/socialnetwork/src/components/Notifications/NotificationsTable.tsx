@@ -12,7 +12,7 @@ export interface NotificationProps {
   event_id: string
   comment_id: string
   chat_id: string
-  reaction_type: string
+  action_type: string
   read_status: number
   creation_date: string
 }
@@ -43,7 +43,7 @@ const NotificationsTable = () => {
             event_id={notification.event_id}
             comment_id={notification.comment_id}
             chat_id={notification.chat_id}
-            reaction_type={notification.reaction_type}
+            action_type={notification.action_type}
             read_status={notification.read_status}
             creation_date={notification.creation_date} />
         ))}

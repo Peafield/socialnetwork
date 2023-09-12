@@ -47,6 +47,7 @@ var (
 	UpdateCommentDecreaseDislikesStmt *sql.Stmt
 	UpdateFollowingStatusStmt         *sql.Stmt
 	UpdateRequestPendingStmt          *sql.Stmt
+	UpdateAllUserNotifications        *sql.Stmt
 
 	/*Select Statements*/
 	SelectAllUsersStmt                           *sql.Stmt
@@ -77,6 +78,7 @@ var (
 	DeleteCommentReaction           *sql.Stmt
 	DeleteFollowerStmt              *sql.Stmt
 	DeletePostsSelectedFollowerStmt *sql.Stmt
+	DeleteNotificationStmt          *sql.Stmt
 )
 
 func InitDBStatements(db *sql.DB) error {
@@ -272,6 +274,7 @@ func CloseDBStatements() {
 	UpdateCommentDecreaseDislikesStmt.Close()
 	UpdateFollowingStatusStmt.Close()
 	UpdateRequestPendingStmt.Close()
+	UpdateAllUserNotifications.Close()
 
 	/*Delete Statement Closure*/
 	DeleteUserAccountStmt.Close()
@@ -281,4 +284,5 @@ func CloseDBStatements() {
 	DeleteCommentReaction.Close()
 	DeleteFollowerStmt.Close()
 	DeletePostsSelectedFollowerStmt.Close()
+	DeleteNotificationStmt.Close()
 }

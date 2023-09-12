@@ -12,7 +12,7 @@ type Notification struct {
 	EventId        string    `json:"event_id"`
 	CommentId      string    `json:"comment_id"`
 	ChatId         string    `json:"chat_id"`
-	ReactionType   string    `json:"reaction_type"`
+	ActionType     string    `json:"action_type"`
 	ReadStatus     int       `json:"read_status"`
 	CreationDate   time.Time `json:"creation_date"`
 }

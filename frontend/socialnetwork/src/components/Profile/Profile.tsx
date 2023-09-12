@@ -12,16 +12,18 @@ import { UserContext } from '../../context/AuthContext'
 import { getUserPosts } from '../../controllers/GetPosts'
 import ListFollowees from './ListFollowees'
 import ListFollowers from './ListFollowers'
+import { PiMaskSadDuotone } from 'react-icons/pi'
 
 export interface ProfileProps {
     user_id: string,
+    email: string
     display_name: string,
     avatar: string
     first_name: string,
     last_name: string,
     dob: string,
     about_me: string,
-    is_private: string
+    is_private: number
 }
 
 const Profile: React.FC = () => {
@@ -40,6 +42,7 @@ const Profile: React.FC = () => {
     const [followers, setFollowers] = useState<FollowerProps[]>([])
     const [followees, setFollowees] = useState<FollowerProps[]>([])
     const [currentProfileTab, setCurrentProfileTab] = useState<string>("posts")
+    const [isprivate, setIsPrivate] = useState(true)
     const [error, setError] = useState<string | null>(null);
     const { username } = useParams();
 
@@ -50,7 +53,6 @@ const Profile: React.FC = () => {
             try {
                 if (username) {
                     const newprofile = await getUserByDisplayName(username)
-                    console.log(newprofile);
 
                     setProfile(newprofile)
 
@@ -89,27 +91,60 @@ const Profile: React.FC = () => {
         fetchData(); // Call the async function
     }, [username]);
 
-    const renderSwitch = (tab: string, profile: ProfileProps) => {
-        switch (tab) {
-            case "posts":
-                return (
-                    <ProfilePostsGrid
-                        user_id={profile.user_id}
-                        posts={profilePosts}
-                        is_private={followerData.following_status === 1 || userContext.user?.userId === profile.user_id || !profile.is_private ? false : true} />
-                )
-            case "followers":
-                return <ListFollowers followers={followers} />
-            case "followees":
-                return <ListFollowees followees={followees} />
-            default:
-                return (
-                    <ProfilePostsGrid
-                        user_id={profile.user_id}
-                        posts={profilePosts}
-                        is_private={followerData.following_status === 1 || userContext.user?.userId === profile.user_id || !profile.is_private ? false : true} />
-                )
+    useEffect(() => {
+        if (profile) {
+            setIsPrivate(isPrivate(
+                followerData.following_status,
+                userContext.user?.userId,
+                profile.user_id,
+                profile.is_private))
         }
+    }, [profile, followerData])
+
+
+    const renderSwitch = (tab: string, profile: ProfileProps) => {
+        if (!isprivate) {
+            switch (tab) {
+                case "posts":
+                    return (
+                        <ProfilePostsGrid
+                            user_id={profile.user_id}
+                            posts={profilePosts}
+                            is_private={isprivate} />
+                    )
+                case "followers":
+                    return <ListFollowers followers={followers} />
+                case "followees":
+                    return <ListFollowees followees={followees} />
+                default:
+                    return (
+                        <ProfilePostsGrid
+                            user_id={profile.user_id}
+                            posts={profilePosts}
+                            is_private={isprivate} />
+                    )
+            }
+        } else {
+            return (
+                <div
+                    style={{
+                        display: "flex",
+                        flexDirection: "column",
+                        justifyContent: "center",
+                        alignItems: "center",
+                        margin: "10px",
+                        padding: "10px"
+                    }}>
+                    <span style={{ fontSize: "300%" }}>
+                        <PiMaskSadDuotone />
+                    </span>
+                    <div>
+                        Nothing to see here
+                    </div>
+                </div>
+            )
+        }
+
     }
 
     if (profileLoading) { return <p>Loading...</p> }
@@ -121,12 +156,14 @@ const Profile: React.FC = () => {
                     profile_id={profile.user_id}
                     first_name={profile.first_name}
                     last_name={profile.last_name}
+                    email={profile.email}
                     display_name={profile.display_name}
                     avatar={profile.avatar}
                     num_of_posts={profilePosts.length}
                     followers={followers.length}
                     following={followees.length}
                     about_me={profile.about_me}
+                    dob={profile.dob}
                     is_private={followerData.following_status === 1 || !profile.is_private ? false : true}
                     is_own_profile={userContext.user?.userId === profile.user_id ? true : false}
                     profileTab={currentProfileTab}
@@ -137,6 +174,10 @@ const Profile: React.FC = () => {
 
         </>
     )
+}
+
+function isPrivate(followStatus: number, userId: string | undefined, profileId: string, isprivate: number) {
+    return followStatus === 1 || userId === profileId || isprivate === 0 ? false : true
 }
 
 export default Profile

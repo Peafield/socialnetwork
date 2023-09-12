@@ -46,3 +46,22 @@
     padding: 2%;
     border-bottom: 0.2mm solid grey;
 }
+
+.notificationaction {
+    width: 40%;
+    height: auto;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 2%;
+}
+
+.yesorno {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.yesorno>* {
+    margin: 7%;
+}

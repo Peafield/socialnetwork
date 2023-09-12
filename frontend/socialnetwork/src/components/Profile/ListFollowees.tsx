@@ -16,7 +16,9 @@ const ListFollowees: React.FC<ListFolloweesProps> = ({
         <div
             className={styles.listUsers}>
             {followees.map((follower) => (
-                <div style={{ width: 'auto' }}>
+                <div
+                    key={follower.followee_id}
+                    style={{ width: 'auto' }}>
                     {follower.followee_id}
                 </div>
             ))}

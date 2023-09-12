@@ -2,12 +2,14 @@ import React, { ChangeEvent, MouseEventHandler, useContext, useEffect, useState 
 import { FaUserCircle, FaUserEdit } from "react-icons/fa";
 import { Link } from "react-router-dom";
 import { UserContext } from "../../context/AuthContext";
+import { useWebSocketContext } from "../../context/WebSocketContext";
 import { handleAPIRequest } from "../../controllers/Api";
 import { getFollowerData } from "../../controllers/Follower/GetFollower";
 import { newFollower } from "../../controllers/Follower/NewFollower";
 import { unfollow } from "../../controllers/Follower/Unfollow";
 import { createImageURL } from "../../controllers/ImageURL";
 import { getCookie } from "../../controllers/SetUserContextAndCookie";
+import { WebSocketReadMessage } from "../../Socket";
 import Container from "../Containers/Container";
 import styles from "./Profile.module.css";
 
@@ -15,11 +17,13 @@ interface ProfileHeaderProps {
   profile_id: string,
   first_name: string,
   last_name: string,
+  email: string,
   display_name: string;
   avatar: string;
   num_of_posts: number;
   followers: number;
   following: number;
+  dob: string
   about_me: string;
   is_private: boolean;
   is_own_profile: boolean;
@@ -39,18 +43,21 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
   profile_id,
   first_name,
   last_name,
+  email,
   display_name,
   avatar,
   num_of_posts,
   followers,
   following,
+  dob,
   about_me,
   is_private,
   is_own_profile,
   profileTab,
   getProfileTab
 }) => {
-  const userContext = useContext(UserContext)
+  const userContext = useContext(UserContext);
+  const { message, sendMessage } = useWebSocketContext();
   const [profilePicUrl, setProfilePicUrl] = useState<string | null>(null);
   const [followerData, setFollowerData] = useState<FollowerProps>({
     follower_id: "",
@@ -100,6 +107,18 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
       if (response && response.status === "success") {
         console.log("follow submit success");
         setUpdateTrigger(prevTrigger => prevTrigger + 1)
+
+        const action = is_private ? "request" : "follow"
+
+        const messageToSend: WebSocketReadMessage = {
+          type: "notification",
+          info: {
+            receiver: profile_id,
+            action_type: action
+          }
+        }
+
+        sendMessage(messageToSend)
       }
     } catch (error) {
       if (error instanceof Error) {
@@ -184,8 +203,15 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
 
           </div>
           <div className={styles.aboutmecontainer}>
-            <div>{!is_private ? about_me : null}</div>
+            <div>{!is_private || is_own_profile ? about_me : null}</div>
           </div>
+          {is_own_profile ?
+            <div className={styles.personaldetails}>
+              <div>{email}</div>
+              <div>{dob.split("T00:00:00Z")}</div>
+              <div>{is_private ? "Private Profile" : "Public Profile"}</div>
+            </div>
+            : null}
         </div>
       </div>
     </>

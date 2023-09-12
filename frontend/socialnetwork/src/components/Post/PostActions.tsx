@@ -63,14 +63,14 @@ const PostActions: React.FC<PostActionsProps> = ({
         }
         setNumOfLikes((prev) => prev + 1);
         setHasLiked(true);
-      }
 
-      messageToSend = {
-        type: "notification",
-        info: {
-          receiver: creatorId,
-          post_id: postId,
-          reaction_type: reactionType
+        messageToSend = {
+          type: "notification",
+          info: {
+            receiver: creatorId,
+            post_id: postId,
+            action_type: reactionType
+          }
         }
       }
     }
@@ -92,7 +92,7 @@ const PostActions: React.FC<PostActionsProps> = ({
           info: {
             receiver: creatorId,
             post_id: postId,
-            reaction_type: reactionType
+            action_type: reactionType
           }
         }
       }

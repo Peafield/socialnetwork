@@ -14,7 +14,7 @@ import (
 func SelectSpecificUserPosts(db *sql.DB, userId string, specifcUserId string) (*dbmodels.Posts, error) {
 	values := []interface{}{
 		specifcUserId,
-		userId,
+		specifcUserId,
 		userId,
 		specifcUserId,
 		userId,

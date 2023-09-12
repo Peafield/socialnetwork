@@ -174,16 +174,24 @@ func UpdateFollowerHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	log.Println(updateFollowerData)
-
-	//Break down updateFollowerData.Data for the updatefollowingstatus function
-
 	err := followercontrollers.UpdateFollowingStatus(dbutils.DB, userData.UserId, updateFollowerData.Data)
 	if err != nil {
 		http.Error(w, "failed to update follower status", http.StatusInternalServerError)
 		return
 	}
+
+	response := readwritemodels.WriteData{
+		Status: "success",
+		Data:   "",
+	}
+	jsonReponse, err := json.Marshal(response)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
+	w.Write(jsonReponse)
 }
 
 /*

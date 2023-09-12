@@ -56,7 +56,7 @@ const GroupPosts: React.FC<GroupPostsProps> = ({
                             </div>
                             <div
                                 className={styles.postcommentscontainer}>
-                                <PostComments post_id={modalPost.post_id} />
+                                <PostComments post_id={modalPost.post_id} creator_id={modalPost.creator_id} />
                             </div>
                         </div>
                         : null

@@ -1,10 +1,10 @@
-import { handleAPIRequest } from "./Api";
-import { getCookie } from "./SetUserContextAndCookie";
+import { handleAPIRequest } from "../Api";
+import { getCookie } from "../SetUserContextAndCookie";
 
 export const GetNotifications = async () => {
     const url = `/notification`;
     const token = getCookie("sessionToken");
-  
+
     const options = {
         method: "GET",
         headers: {
@@ -12,14 +12,14 @@ export const GetNotifications = async () => {
             "Content-Type": "application/json",
         },
     };
-  
+
     try {
         const response = await handleAPIRequest(url, options);
-  
+
         if (response.status !== "success") {
             throw new Error(response.message);
         }
-  
+
         return response.data.Notifications;
     } catch (error) {
         if (error instanceof Error) {
@@ -28,5 +28,5 @@ export const GetNotifications = async () => {
             throw new Error("An unexpected error occurred while fetching user notifications.");
         }
     }
-  }
+}
 

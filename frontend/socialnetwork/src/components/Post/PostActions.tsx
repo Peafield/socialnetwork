@@ -1,7 +1,7 @@
 import React from "react";
 import { useState, useEffect, useRef } from "react";
 import styles from "./Post.module.css";
-import { AiOutlineLike, AiOutlineDislike } from "react-icons/ai";
+import { AiOutlineLike, AiOutlineDislike, AiFillDislike, AiFillLike } from "react-icons/ai";
 import { GoComment } from "react-icons/go";
 import { HandleReaction } from "../../helpers/HandleReaction";
 import { useWebSocketContext } from "../../context/WebSocketContext";
@@ -13,6 +13,7 @@ interface PostActionsProps {
   likes: number;
   dislikes: number;
   AmountOfComments: number;
+  userReaction: string | null
 }
 
 const PostActions: React.FC<PostActionsProps> = ({
@@ -21,6 +22,7 @@ const PostActions: React.FC<PostActionsProps> = ({
   likes,
   dislikes,
   AmountOfComments,
+  userReaction
 }) => {
   const { message, sendMessage } = useWebSocketContext();
   let messageToSend: WebSocketReadMessage = {
@@ -31,14 +33,16 @@ const PostActions: React.FC<PostActionsProps> = ({
   const [numOfDislikes, setNumOfDisikes] = useState(dislikes);
   const [numOfComments, setNumOfComments] = useState(AmountOfComments);
 
-  const [hasLiked, setHasLiked] = useState(false);
-  const [hasDisliked, setHasDisliked] = useState(false);
+  const [hasLiked, setHasLiked] = useState(userReaction === "like");
+  const [hasDisliked, setHasDisliked] = useState(userReaction === "dislike");
 
   useEffect(() => {
     setNumOfLikes(likes);
     setNumOfDisikes(dislikes);
     setNumOfComments(AmountOfComments);
-  }, [likes, dislikes, AmountOfComments]);
+    setHasLiked(userReaction === "like")
+    setHasDisliked(userReaction === "dislike")
+  }, [likes, dislikes, AmountOfComments, userReaction]);
 
   const currentTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -107,7 +111,7 @@ const PostActions: React.FC<PostActionsProps> = ({
         type: "",
         info: ""
       }
-    }, 2000);
+    }, 500);
   };
 
   return (
@@ -119,13 +123,13 @@ const PostActions: React.FC<PostActionsProps> = ({
               <div style={{ paddingBottom: '20%' }}>
                 {numOfLikes}
               </div>
-              <div style={{ color: '#fa4d6a' }} onClick={(e) => handleLikeDislike("like", e)}><AiOutlineLike /></div>
+              <div style={{ color: '#fa4d6a' }} onClick={(e) => handleLikeDislike("like", e)}>{hasLiked ? <AiFillLike /> : <AiOutlineLike />}</div>
             </div>
             <div className={styles.postaction}>
               <div style={{ paddingBottom: '20%' }}>
                 {numOfDislikes}
               </div>
-              <div style={{ color: '#fa4d6a' }} onClick={(e) => handleLikeDislike("dislike", e)}><AiOutlineDislike /></div>
+              <div style={{ color: '#fa4d6a' }} onClick={(e) => handleLikeDislike("dislike", e)}>{hasDisliked ? <AiFillDislike /> : <AiOutlineDislike />}</div>
             </div>
             <div className={styles.postaction}>{numOfComments} <GoComment style={{ color: '#fa4d6a' }} /></div>
           </span>

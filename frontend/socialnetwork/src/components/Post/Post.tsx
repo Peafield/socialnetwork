@@ -1,10 +1,12 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import PostHeader from "./PostHeader";
 import PostContent from "./PostContent";
 import PostActions from "./PostActions";
 import PostImage from "./PostImage";
 import { ProfileProps } from "../Profile/Profile";
 import { getUserByUserID } from "../../controllers/GetUser";
+import { UserContext } from "../../context/AuthContext";
+import { GetUserPostReaction } from "../../controllers/GetUserReaction";
 
 export interface PostProps {
   post_id: string;
@@ -31,7 +33,9 @@ const Post: React.FC<PostProps> = ({
   dislikes,
   creation_date,
 }) => {
+  const userContext = useContext(UserContext)
   const [userData, setUserData] = useState<ProfileProps | null>(null);
+  const [userReaction, setUserReaction] = useState<string | null>(null)
   const [userLoading, setUserLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -42,6 +46,15 @@ const Post: React.FC<PostProps> = ({
       try {
         const newUserData = await getUserByUserID(creator_id)
         setUserData(newUserData);
+
+        if (userContext.user) {
+          const reactionData = await GetUserPostReaction(post_id)
+          if (reactionData) {
+            console.log(reactionData);
+
+            setUserReaction(reactionData.reaction)
+          }
+        }
       } catch (error) {
         if (error instanceof Error) {
           setError(error.message);
@@ -54,7 +67,7 @@ const Post: React.FC<PostProps> = ({
 
     fetchData(); // Call the async function
   }, [creator_id]);
-  
+
   return (
     <>
       {userData ? (
@@ -66,13 +79,14 @@ const Post: React.FC<PostProps> = ({
             creatorAvatar={userData.avatar}
             postPrivacyLevel={privacy_level}
           />
-          <PostContent text={content} image_path={image_path}/>
+          <PostContent text={content} image_path={image_path} />
           <PostActions
-          creatorId={creator_id}
+            creatorId={creator_id}
             postId={post_id}
             likes={likes}
             dislikes={dislikes}
             AmountOfComments={num_of_comments}
+            userReaction={userReaction}
           />
         </>
       ) : null}

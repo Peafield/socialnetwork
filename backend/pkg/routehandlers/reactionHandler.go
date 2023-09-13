@@ -2,9 +2,12 @@ package routehandlers
 
 import (
 	"encoding/json"
+	"errors"
+	"log"
 	"net/http"
 	reactioncontrollers "socialnetwork/pkg/controllers/ReactionControllers"
 	"socialnetwork/pkg/db/dbutils"
+	errorhandling "socialnetwork/pkg/errorHandling"
 	"socialnetwork/pkg/middleware"
 	"socialnetwork/pkg/models/readwritemodels"
 )
@@ -39,9 +42,9 @@ func ReactionHandler(w http.ResponseWriter, r *http.Request) {
 	case http.MethodPost:
 		HandleReaction(w, r)
 		return
-	// case http.MethodGet:
-	// 	PostCommentReactions(w, r)
-	// 	return
+	case http.MethodGet:
+		GetReaction(w, r)
+		return
 	// case http.MethodPut:
 	// 	UpdateReaction(w, r)
 	// 	return
@@ -86,6 +89,60 @@ func HandleReaction(w http.ResponseWriter, r *http.Request) {
 
 	response := readwritemodels.WriteData{
 		Status: "success",
+	}
+
+	jsonReponse, err := json.Marshal(response)
+
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	w.Write(jsonReponse)
+}
+
+func GetReaction(w http.ResponseWriter, r *http.Request) {
+	var response readwritemodels.WriteData
+
+	userData, ok := r.Context().Value(middleware.UserDataKey).(readwritemodels.Payload)
+	if !ok {
+		http.Error(w, "failed to read user data from context", http.StatusInternalServerError)
+		return
+	}
+
+	postId := r.URL.Query().Get("post_id")
+	commentId := r.URL.Query().Get("comment_id")
+
+	if postId != "" {
+		userReaction, err := reactioncontrollers.GetUserPostReaction(dbutils.DB, userData.UserId, postId)
+		if err != nil && !errors.Is(err, errorhandling.ErrNoResultsFound) {
+			log.Println(err)
+			http.Error(w, "failed to get user reaction", http.StatusInternalServerError)
+			return
+		}
+
+		response = readwritemodels.WriteData{
+			Status: "success",
+			Data:   userReaction,
+		}
+	} else if commentId != "" {
+		userReaction, err := reactioncontrollers.GetUserCommentReaction(dbutils.DB, userData.UserId, commentId)
+		if err != nil && !errors.Is(err, errorhandling.ErrNoResultsFound) {
+			log.Println(err)
+			http.Error(w, "failed to get user reaction", http.StatusInternalServerError)
+			return
+		}
+
+		response = readwritemodels.WriteData{
+			Status: "success",
+			Data:   userReaction,
+		}
+	} else {
+		response = readwritemodels.WriteData{
+			Status: "success",
+		}
 	}
 
 	jsonReponse, err := json.Marshal(response)

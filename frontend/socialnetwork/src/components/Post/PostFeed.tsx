@@ -158,7 +158,7 @@ function calculateScoreForPostCreationDate(creationDate: Date): number {
     const score = 0.5 - (timeDifferenceInSeconds / maxTimeDifferenceInSeconds) * 0.5;
 
     // Ensure the score is between 0 and 0.5
-    return Math.min(Math.max(score, 0), 0.5);
+    return Math.min(Math.max(score, 0), 0.5) + 0.001;
 }
 
 export default PostFeed

@@ -56,27 +56,35 @@ const Conversation: React.FC<ConversationProps> = ({
     })
   }
 
+  const mapMessageData = (messageData: any) => {
+    let newChats: ChatProps[] = [];
+
+    messageData.map((chat: any) => {
+      let sender = ""
+      if (userContext.user && chat.sender_id == userContext.user?.userId) {
+        sender = userContext.user?.displayName
+      } else {
+        sender = receiverName
+      }
+      newChats.push({
+        messageId: chat.message_id,
+        senderName: sender,
+        timeSent: "",
+        message: chat.message
+      })
+    })
+
+    setChats(newChats)
+  }
+
   useEffect(() => {
     if (message?.type == "open_chat") {
-      let newChats: ChatProps[] = [];
-
-      setChatID(message.data[0].chat_id)
-
-      message.data.map((chat: any) => {
-        let sender = ""
-        if (userContext.user && chat.sender_id == userContext.user?.userId) {
-          sender = userContext.user?.displayName
-        } else {
-          sender = receiverName
-        }
-        newChats.push({
-          messageId: chat.message_id,
-          senderName: sender,
-          timeSent: "",
-          message: chat.message
-        })
-      })
-      setChats(newChats)
+      if (typeof message.data === 'string') {
+        setChatID(message.data)
+      } else {
+        setChatID(message.data[0].chat_id)
+        mapMessageData(message.data)
+      }
     } else if (message?.type == "private_message") {
       if (message.data.every((chat: any) => {
         return chat.chat_id == chatID

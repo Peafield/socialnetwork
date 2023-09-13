@@ -89,6 +89,7 @@ const Profile: React.FC = () => {
         };
 
         fetchData(); // Call the async function
+        setCurrentProfileTab("posts")
     }, [username]);
 
     useEffect(() => {

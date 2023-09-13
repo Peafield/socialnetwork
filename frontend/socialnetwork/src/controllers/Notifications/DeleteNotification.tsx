@@ -22,9 +22,6 @@ export const DeleteNotification = async (notification_id: string) => {
     try {
         const response = await handleAPIRequest(url, options);
 
-        console.log(response);
-
-
         if (response.status !== "success") {
             throw new Error(response.message);
         }

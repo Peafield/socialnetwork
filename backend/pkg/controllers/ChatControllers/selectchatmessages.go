@@ -19,8 +19,10 @@ func SelectChatMessages(db *sql.DB, userId string, receipientId string) (*dbmode
 	}
 
 	chatMessagesData, err := crud.SelectFromDatabase(db, "Chats_Messages", dbstatements.SelectChatMessagesByChatIdStmt, []interface{}{chat.ChatId})
-	if err != nil {
-		return nil, fmt.Errorf("error selecting chat messages: %w", err)
+	if err != nil && !errors.Is(err, errorhandling.ErrNoResultsFound) {
+		return nil, fmt.Errorf("could not select chat messages: %w", err)
+	} else if err != nil {
+		return nil, err
 	}
 
 	chatMessages := &dbmodels.ChatMessages{}

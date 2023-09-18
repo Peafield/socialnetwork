@@ -18,10 +18,11 @@ type Groups struct {
 
 // GroupMember is a struct that holds group member data.
 type GroupMember struct {
-	GroupId        string    `json:"group_id"`
-	MemberId       string    `json:"member_id"`
-	RequestPending int       `json:"request_pending"`
-	CreationDate   time.Time `json:"creation_date"`
+	GroupId         string    `json:"group_id"`
+	MemberId        string    `json:"member_id"`
+	RequestPending  int       `json:"request_pending"`
+	PermissionLevel int       `json:"permission_level"`
+	CreationDate    time.Time `json:"creation_date"`
 }
 
 // GroupMembers is a slice of GroupMember.

@@ -7,15 +7,18 @@ import {
   getFollowees,
 } from "../../controllers/Follower/GetFollower";
 import { getUserByUserID } from "../../controllers/GetUser";
+import { GetUserGroups } from "../../controllers/Group/GetGroup";
 import { getCookie } from "../../controllers/SetUserContextAndCookie";
 import Container from "../Containers/Container";
 import Snackbar from "../feedback/Snackbar";
+import { GroupProps } from "../Group/Group";
 import { ProfileProps } from "../Profile/Profile";
 import { FollowerProps } from "../Profile/ProfileHeader";
 import styles from "./Post.module.css";
 
 interface CreatePostFormData {
   content: string;
+  group_id: string
   image_path: string;
   privacy_level: number;
   selected_profiles: string[];
@@ -26,10 +29,13 @@ const CreatePost: React.FC = () => {
   const userContext = useContext(UserContext);
   const [formData, setFormData] = useState<CreatePostFormData>({
     content: "",
+    group_id: "",
     image_path: "",
     privacy_level: 0,
     selected_profiles: [],
   });
+  const [showGroups, setShowGroups] = useState(false);
+  const [selectableGroups, setSelectableGroups] = useState<GroupProps[]>([])
   const [showFollowers, setShowFollowers] = useState(false);
   const [selectableProfiles, setSelectableProfiles] = useState<ProfileProps[]>(
     []
@@ -44,52 +50,10 @@ const CreatePost: React.FC = () => {
     const fetchData = async () => {
       try {
         if (userContext.user) {
-          const followdataFollowers = await getFollowers(
-            userContext.user?.userId
-          );
-          const followdataFollowees = await getFollowees(
-            userContext.user?.userId
-          );
-
-          const followerUsersPromises = followdataFollowers.Followers.map(
-            async (follower: FollowerProps) => {
-              const user: ProfileProps = await getUserByUserID(
-                follower.follower_id
-              );
-              return user;
-            }
-          );
-
-          const followeeUsersPromises = followdataFollowees.Followers.map(
-            async (follower: FollowerProps) => {
-              const user: ProfileProps = await getUserByUserID(
-                follower.followee_id
-              );
-              return user;
-            }
-          );
-
-          // Use Promise.all to await all promises and get resolved users
-          const followerUsers = await Promise.all(followerUsersPromises);
-          const followeeUsers = await Promise.all(followeeUsersPromises);
-
-          const profiles = [...followerUsers, ...followeeUsers];
-
-          // Function to filter out duplicates based on user_id
-          const uniqueProfiles = (array: any[]) => {
-            const seen = new Set();
-            return array.filter((item) => {
-              if (seen.has(item.user_id)) {
-                return false;
-              }
-              seen.add(item.user_id);
-              return true;
-            });
-          };
-
-          const mergedProfiles = uniqueProfiles(profiles);
-
-          setSelectableProfiles(mergedProfiles);
+          const profiles = await getSelectableProfiles(userContext.user?.userId)
+          const groups = await getSelectableGroups(userContext.user?.userId)
+          setSelectableProfiles(profiles);
+          setSelectableGroups(groups);
         }
       } catch (error) {
         if (error instanceof Error) {
@@ -110,6 +74,8 @@ const CreatePost: React.FC = () => {
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
     const { name, value } = e.target;
+    console.log(name, value);
+
     if (e.target.type === "file") {
       const file = (e.target as HTMLInputElement)?.files?.[0] || null;
       if (file) {
@@ -124,12 +90,19 @@ const CreatePost: React.FC = () => {
       }
     } else {
       switch (name) {
+        case "group_id":
+          setFormData((prevState) => ({
+            ...prevState,
+            group_id: value,
+          }));
+          break;
         case "privacy_level":
           setFormData((prevState) => ({
             ...prevState,
             [name]: Number(value),
           }));
           setShowFollowers(name === "privacy_level" && value === "2");
+          setShowGroups(name === "privacy_level" && value === "3");
           break;
         case "selected_profiles":
           let sp = formData.selected_profiles;
@@ -147,6 +120,8 @@ const CreatePost: React.FC = () => {
           break;
       }
     }
+    console.log(formData);
+
   };
 
   const handleSubmit = async (e: { preventDefault: () => void }) => {
@@ -235,8 +210,17 @@ const CreatePost: React.FC = () => {
                 onChange={handleChange}
               />
               <label htmlFor="selected_privacy_level">Selected</label>
+              <input
+                className={styles.input}
+                type="radio"
+                id="group_privacy_level"
+                value={3}
+                name="privacy_level"
+                onChange={handleChange}
+              />
+              <label htmlFor="group_privacy_level">Group</label>
             </div>
-            {showFollowers ? (
+            {showFollowers && (
               <div className={styles.selectableprofilescontainer}>
                 {selectableProfiles.map((profile) => (
                   <div key={profile.display_name} className={styles.checkbox}>
@@ -254,13 +238,32 @@ const CreatePost: React.FC = () => {
                   </div>
                 ))}
               </div>
-            ) : null}
+            )}
+            {showGroups && (
+              <div className={styles.selectablegroupscontainer}>
+                {selectableGroups.map((group) => (
+                  <div key={group.group_id} className={styles.checkbox}>
+                    <input
+                      type="radio"
+                      id={group.group_id}
+                      name="group_id"
+                      checked={formData.group_id === group.group_id}
+                      onChange={handleChange}
+                      value={group.group_id}
+                    />
+                    <label htmlFor={group.group_id}>
+                      {group.title}
+                    </label>
+                  </div>
+                ))}
+              </div>
+            )}
             <div className={styles.inputgroup}>
               <button type="submit">Create Post</button>
             </div>
           </form>
         </div>
-      </div>
+      </div >
       <Snackbar
         open={snackbarOpen}
         onClose={() => {
@@ -270,8 +273,64 @@ const CreatePost: React.FC = () => {
         message={error ? error : "Post Sucessfully Created!"}
         type={snackbarType}
       />
-    </Container>
+    </Container >
   );
 };
 
 export default CreatePost;
+
+async function getSelectableProfiles(userId: string) {
+  const followdataFollowers = await getFollowers(
+    userId
+  );
+  const followdataFollowees = await getFollowees(
+    userId
+  );
+
+  const followerUsersPromises = followdataFollowers.Followers.map(
+    async (follower: FollowerProps) => {
+      const user: ProfileProps = await getUserByUserID(
+        follower.follower_id
+      );
+      return user;
+    }
+  );
+
+  const followeeUsersPromises = followdataFollowees.Followers.map(
+    async (follower: FollowerProps) => {
+      const user: ProfileProps = await getUserByUserID(
+        follower.followee_id
+      );
+      return user;
+    }
+  );
+
+  // Use Promise.all to await all promises and get resolved users
+  const followerUsers = await Promise.all(followerUsersPromises);
+  const followeeUsers = await Promise.all(followeeUsersPromises);
+
+  const profiles = [...followerUsers, ...followeeUsers];
+
+  // Function to filter out duplicates based on user_id
+  const uniqueProfiles = (array: any[]) => {
+    const seen = new Set();
+    return array.filter((item) => {
+      if (seen.has(item.user_id)) {
+        return false;
+      }
+      seen.add(item.user_id);
+      return true;
+    });
+  };
+
+  const mergedProfiles = uniqueProfiles(profiles);
+
+  return mergedProfiles
+
+}
+
+async function getSelectableGroups(userId: string) {
+  const userGroups: GroupProps[] = await GetUserGroups(userId)
+
+  return userGroups
+}

@@ -5,7 +5,7 @@
     justify-content: flex-start;
     align-items: center;
     border-radius: 5px;
-    width: 40%;
+    width: 60%;
     height: auto;
     overflow-y: auto;
 }
@@ -14,12 +14,13 @@
     background-color: white;
     display: flex;
     flex-direction: column;
-    justify-content: center;
+    justify-content: space-evenly;
     align-items: center;
     border-radius: 5px;
-    width: 90%;
+    width: 60%;
     height: auto;
-    margin: 10px;
+    margin: 2%;
+    padding: 2%;
     z-index: 0;
     box-shadow: rgba(50, 50, 93, 0.25) 0px 2px 5px -1px,
         rgba(0, 0, 0, 0.3) 0px 1px 3px -1px;
@@ -28,7 +29,7 @@
 .postmodalcontainer {
     display: flex;
     flex-direction: row;
-    justify-content: space-between;
+    justify-content: space-evenly;
     align-items: center;
     width: 90%;
     height: 90%;
@@ -40,7 +41,215 @@
     justify-content: flex-start;
     align-items: center;
     overflow-y: auto;
-    margin: 10px;
+    margin: 2%;
     height: 90%;
-    width: 70%;
+    width: 40%;
+}
+
+.groupslistcontainer {
+    display: flex;
+    flex-direction: column;
+    width: 40%;
+    height: auto;
+    justify-content: flex-start;
+    align-items: center;
+}
+
+.listofgroups {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    overflow-y: auto;
+    width: 100%;
+}
+
+.creategroupcontainer {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    margin: 2%;
+    border-radius: 5px;
+    width: 100%;
+    height: 50%;
+    background-color: #fafafa;
+    box-shadow: rgba(50, 50, 93, 0.25) 0px 2px 5px -1px,
+        rgba(0, 0, 0, 0.3) 0px 1px 3px -1px;
+}
+
+.inputgroup {
+    display: flex;
+    width: 80%;
+}
+
+input[type="text"],
+input[type="password"],
+input[type="date"],
+input[type="file"],
+textarea {
+    outline: none;
+    background: #fafafa;
+    box-shadow: inset 0 1px 3px 0 rgba(0, 0, 0, 0.08);
+    border-radius: 5px;
+    border: none;
+    width: 100%;
+    padding: 3%;
+    margin: 5px 0;
+    font-size: 1.5rem;
+    background-color: #f0f2f5;
+}
+
+textarea {
+    resize: none;
+    background-color: #f0f2f5;
+}
+
+.grouplink {
+    display: flex;
+    width: 95%;
+    height: auto;
+    justify-content: space-evenly;
+    align-items: center;
+    margin: 2%;
+    background-color: white;
+    box-shadow: rgba(50, 50, 93, 0.25) 0px 2px 5px -1px,
+        rgba(0, 0, 0, 0.3) 0px 1px 3px -1px;
+}
+
+.grouplink>* {
+    margin: 2%;
+}
+
+.grouppagecontainer {
+    display: flex;
+    flex-direction: column;
+    width: 90%;
+    height: 90%;
+    justify-content: flex-start;
+    align-items: center;
+    margin: 2%;
+}
+
+.groupheadercontainer {
+    width: 100%;
+    height: auto;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    background-color: white;
+    box-shadow: rgba(50, 50, 93, 0.25) 0px 2px 5px -1px,
+        rgba(0, 0, 0, 0.3) 0px 1px 3px -1px;
+}
+
+.groupheadercontainer>.toprow {
+    display: flex;
+    width: 100%;
+    justify-content: center;
+    align-items: center;
+}
+
+.groupheadercontainer>.toprow>* {
+    margin: 2%;
+}
+
+.groupheadercontainer>.middlerow {
+    display: flex;
+    width: 100%;
+    justify-content: center;
+    align-items: center;
+}
+
+.groupheadercontainer>.middlerow>* {
+    margin: 2%;
+}
+
+.groupheadercontainer>.bottomrow {
+    display: flex;
+    width: 100%;
+    justify-content: center;
+    align-items: center;
+}
+
+.groupheadercontainer>.bottomrow>* {
+    width: auto;
+    margin: 2%;
+}
+
+.groupheadercontainer button {
+    width: auto;
+    color: black;
+    text-decoration-color: #fa4d6a;
+}
+
+.groupmemberscontainer {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
+    overflow-y: auto;
+    width: 60%;
+    height: 90%;
+}
+
+.invitemembercontainer {
+    display: flex;
+    height: 50%;
+    width: 100%;
+}
+
+.invitemembercontainer form {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    height: 100%;
+    margin: 2%;
+    background-color: white;
+    box-shadow: rgba(50, 50, 93, 0.25) 0px 2px 5px -1px,
+        rgba(0, 0, 0, 0.3) 0px 1px 3px -1px;
+}
+
+.invitemembercontainer .selectableprofilescontainer {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    height: 80%;
+    width: 100%;
+    overflow-y: auto;
+    background-color: rgb(233, 236, 242);
+    border-radius: 10px;
+    margin: 2%;
+}
+
+.invitemembercontainer .selectableprofilescontainer .checkbox {
+    display: flex;
+    align-items: center;
+    justify-content: left;
+    margin: 1%;
+}
+
+.invitemembercontainer .submit {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: auto;
+    height: auto;
+}
+
+.groupmemberslist {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
+    width: 100%;
+    height: auto;
+    overflow-y: auto;
+    margin: 2%;
+}
+
+.groupmember {
+    color: black;
+    margin: 2%;
 }

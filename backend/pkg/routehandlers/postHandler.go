@@ -45,7 +45,7 @@ func PostHandler(w http.ResponseWriter, r *http.Request) {
 		NewPost(w, r)
 		return
 	case http.MethodGet:
-		UserPosts(w, r)
+		GetPosts(w, r)
 		return
 	case http.MethodPut:
 		UpdatePost(w, r)
@@ -109,7 +109,7 @@ func NewPost(w http.ResponseWriter, r *http.Request) {
 }
 
 /*
-UserPosts function is an HTTP handler for selecting all user viewable posts from the database.
+GetPosts function is an HTTP handler for selecting all user viewable posts from the database.
 This function extracts user data from the HTTP request context, then selects all posts a user should be able
 to view from the database.
 
@@ -122,7 +122,7 @@ Specifically, it:
   - Calls controllers.SelectUserViewablePosts to select all viewable posts. If it fails, it sends an HTTP 500 (Internal Server Error) status to the client, with an error message indicating that it failed to insert the post data.
   - If all of the above steps are successful, it writes the posts to a response and sends an HTTP 200 (OK) status to the client, indicating that the posts were successfully selected.
 */
-func UserPosts(w http.ResponseWriter, r *http.Request) {
+func GetPosts(w http.ResponseWriter, r *http.Request) {
 	userInfo, ok := r.Context().Value(middleware.UserDataKey).(readwritemodels.Payload)
 	if !ok {
 		http.Error(w, "failed to read user data from context", http.StatusInternalServerError)
@@ -130,34 +130,42 @@ func UserPosts(w http.ResponseWriter, r *http.Request) {
 	}
 
 	specificUserId := r.URL.Query().Get("user_id")
+	groupId := r.URL.Query().Get("group_id")
 
-	var userPosts *dbmodels.Posts
+	var posts *dbmodels.Posts
 	var err error
 
-	if specificUserId == "" {
-		userPosts, err = postcontrollers.SelectUserViewablePosts(dbutils.DB, userInfo.UserId)
-		if err != nil {
-			fmt.Println(err)
-			http.Error(w, "failed to select user viewable posts", http.StatusInternalServerError)
-			return
-		}
-
-	} else {
-		userPosts, err = postcontrollers.SelectSpecificUserPosts(dbutils.DB, userInfo.UserId, specificUserId)
+	if specificUserId != "" {
+		posts, err = postcontrollers.SelectSpecificUserPosts(dbutils.DB, userInfo.UserId, specificUserId)
 		if err != nil {
 			log.Println(err)
 			http.Error(w, "failed to select specific user posts", http.StatusInternalServerError)
 			return
 		}
+
+	} else if groupId != "" {
+		posts, err = postcontrollers.SelectGroupPosts(dbutils.DB, groupId)
+		if err != nil {
+			fmt.Println(err)
+			http.Error(w, "failed to select user viewable posts", http.StatusInternalServerError)
+			return
+		}
+	} else {
+		posts, err = postcontrollers.SelectUserViewablePosts(dbutils.DB, userInfo.UserId)
+		if err != nil {
+			fmt.Println(err)
+			http.Error(w, "failed to select user viewable posts", http.StatusInternalServerError)
+			return
+		}
 	}
 
-	sort.Slice(userPosts.Posts, func(i, j int) bool {
-		return userPosts.Posts[i].PostInfo.CreationDate.After(userPosts.Posts[j].PostInfo.CreationDate)
+	sort.Slice(posts.Posts, func(i, j int) bool {
+		return posts.Posts[i].PostInfo.CreationDate.After(posts.Posts[j].PostInfo.CreationDate)
 	})
 
 	response := readwritemodels.WriteData{
 		Status: "success",
-		Data:   userPosts,
+		Data:   posts,
 	}
 	jsonReponse, err := json.Marshal(response)
 	if err != nil {

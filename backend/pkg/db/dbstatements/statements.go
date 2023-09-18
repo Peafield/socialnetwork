@@ -48,6 +48,7 @@ var (
 	UpdateFollowingStatusStmt         *sql.Stmt
 	UpdateRequestPendingStmt          *sql.Stmt
 	UpdateAllUserNotifications        *sql.Stmt
+	UpdateGroupMemberStatusStmt       *sql.Stmt
 
 	/*Select Statements*/
 	SelectAllUsersStmt                           *sql.Stmt
@@ -69,6 +70,11 @@ var (
 	SelectChatBySenderAndRecieverIdStmt          *sql.Stmt
 	SelectAllChatsByUserIdStmt                   *sql.Stmt
 	SelectAllUserNotifications                   *sql.Stmt
+	SelectAllGroupsStmt                          *sql.Stmt
+	SelectGroupByTitleStmt                       *sql.Stmt
+	SelectAllGroupMembersStmt                    *sql.Stmt
+	SelectUserGroupsStmt                         *sql.Stmt
+	SelectGroupPostsStmt                         *sql.Stmt
 
 	/*Delete Statements*/
 	DeleteUserAccountStmt           *sql.Stmt
@@ -119,6 +125,11 @@ func InitDBStatements(db *sql.DB) error {
 		return fmt.Errorf("failed to prepare notification statements: %w", err)
 	}
 
+	err = initGroupDBStatements(db)
+	if err != nil {
+		return fmt.Errorf("failed to prepare group statements: %w", err)
+	}
+
 	InsertSessionsStmt, err = db.Prepare(`
 	INSERT INTO Sessions (
 		session_id,
@@ -152,61 +163,6 @@ func InitDBStatements(db *sql.DB) error {
 	)`)
 	if err != nil {
 		return fmt.Errorf("failed to prepare insert reactions statement: %w", err)
-	}
-
-	InsertGroupsStmt, err = db.Prepare(`
-	INSERT INTO Groups (
-		group_id,
-		title,
-		description,
-		creator_id
-	) VALUES (
-		?, ?, ?, ?
-	)`)
-	if err != nil {
-		return fmt.Errorf("failed to prepare insert groups statement: %w", err)
-	}
-
-	InsertGroupsMembersStmt, err = db.Prepare(`
-	INSERT INTO Groups_Members (
-		group_id,
-		member_id,
-		request_pending
-	) VALUES (
-		?, ?, ?
-	)`)
-	if err != nil {
-		return fmt.Errorf("failed to prepare insert groups members statement: %w", err)
-	}
-
-	InsertGroupsEventsStmt, err = db.Prepare(`
-	INSERT INTO Groups_Events (
-		event_id,
-		group_id,
-		creator_id,
-		title,
-		description,
-		event_start_time,
-		total_going,
-		total_not_going
-	) VALUES (
-		?, ?, ?, ?, ?, ?, ?, ?
-	)`)
-	if err != nil {
-		return fmt.Errorf("failed to prepare insert groups events statement: %w", err)
-	}
-
-	InsertGroupsEventsAttendees, err = db.Prepare(`
-	INSERT INTO Groups_Events_Attendees (
-		event_id,
-		attendee_id,
-		attending_status,
-		event_status
-	) VALUES (
-		?, ?, ?, ?
-	)`)
-	if err != nil {
-		return fmt.Errorf("failed to prepare insert groups events attendees statement: %w", err)
 	}
 
 	return nil
@@ -249,6 +205,11 @@ func CloseDBStatements() {
 	SelectChatBySenderAndRecieverIdStmt.Close()
 	SelectAllChatsByUserIdStmt.Close()
 	SelectAllUserNotifications.Close()
+	SelectAllGroupsStmt.Close()
+	SelectGroupByTitleStmt.Close()
+	SelectAllGroupMembersStmt.Close()
+	SelectUserGroupsStmt.Close()
+	SelectGroupPostsStmt.Close()
 
 	/*Update Statement Closure*/
 	UpdatePostImagePathStmt.Close()
@@ -275,6 +236,7 @@ func CloseDBStatements() {
 	UpdateFollowingStatusStmt.Close()
 	UpdateRequestPendingStmt.Close()
 	UpdateAllUserNotifications.Close()
+	UpdateGroupMemberStatusStmt.Close()
 
 	/*Delete Statement Closure*/
 	DeleteUserAccountStmt.Close()

@@ -70,13 +70,17 @@ function composeNotificationMessage(props: NotificationProps, senderName: string
             message += props.action_type + "ed you"
             break
         case "request":
-            message += props.action_type + "ed to follow you"
+            if (props.group_id !== "") {
+                message += props.action_type + "ed to join your group - %Group Name%"
+            } else {
+                message += props.action_type + "ed to follow you"
+            }
             break
         case "comment":
             message += props.action_type + "ed on your post"
             break
         case "invite":
-            message += props.action_type + "d you to a "
+            message += props.action_type + "d you to their group - %Group Name%"
             break
     }
 

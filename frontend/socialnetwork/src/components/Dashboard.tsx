@@ -15,6 +15,7 @@ import { LuMessagesSquare } from 'react-icons/lu'
 import EditProfile from "./Profile/EditProfile";
 import { WebSocketProvider } from "../context/WebSocketContext";
 import NotificationsTable from "./Notifications/NotificationsTable";
+import GroupsList from "./Group/GroupsList";
 
 export default function Dashboard() {
   const ws = useWebSocket("ws://localhost:8080/ws", {
@@ -39,6 +40,7 @@ export default function Dashboard() {
               <Route path="/createpost" element={<CreatePost />} />
               <Route path="/user/:username" element={<Profile />} />
               <Route path="/user/edit/:username" element={<EditProfile />} />
+              <Route path="/groups" element={<GroupsList />} />
               <Route path="/group/:groupname" element={<Group />} />
             </Routes>
           </div>

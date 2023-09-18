@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
+	"os"
 	crud "socialnetwork/pkg/db/CRUD"
 	"socialnetwork/pkg/db/dbstatements"
 	errorhandling "socialnetwork/pkg/errorHandling"
@@ -39,7 +40,10 @@ func SelectPostComments(db *sql.DB, postId string) (*dbmodels.Comments, error) {
 	comments := &dbmodels.Comments{}
 	for _, v := range commentsData {
 		if comment, ok := v.(*dbmodels.Comment); ok {
-			comments.Comments = append(comments.Comments, *comment)
+			commentData := &dbmodels.CommentData{}
+			commentData.CommentInfo = *comment
+			commentData.CommentPicture, err = os.ReadFile(comment.ImagePath)
+			comments.Comments = append(comments.Comments, *commentData)
 		} else {
 			return nil, fmt.Errorf("failed to assert comment data")
 		}

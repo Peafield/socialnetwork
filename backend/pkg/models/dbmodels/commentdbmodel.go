@@ -14,7 +14,12 @@ type Comment struct {
 	CreationDate time.Time `json:"creation_date"`
 }
 
+type CommentData struct {
+	CommentInfo    Comment
+	CommentPicture []byte
+}
+
 // Comments is a slice of Comment.
 type Comments struct {
-	Comments []Comment
+	Comments []CommentData
 }

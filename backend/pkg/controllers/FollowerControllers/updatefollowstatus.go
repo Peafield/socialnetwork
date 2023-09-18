@@ -3,7 +3,6 @@ package followercontrollers
 import (
 	"database/sql"
 	"fmt"
-	"log"
 	crud "socialnetwork/pkg/db/CRUD"
 	"socialnetwork/pkg/db/dbstatements"
 )
@@ -45,8 +44,6 @@ func UpdateFollowingStatus(db *sql.DB, userId string, updateFollowData map[strin
 	args[0] = int(followingStatus)
 	args[1] = followerId
 	args[2] = userId
-
-	log.Println(args)
 
 	err := crud.InteractWithDatabase(db, dbstatements.UpdateFollowingStatusStmt, args)
 	if err != nil {

@@ -55,9 +55,13 @@ const PostComments: React.FC<PostCommentsProps> = ({
       try {
         const response = await handleAPIRequest(url, options);
 
-        const newpostcomments = response.data.Comments
+        const commentData = response.data.Comments.map((comment: any) => {
+          const newcomment = comment.CommentInfo
+          newcomment.image = comment.CommentPicture
+          return newcomment
+        })
 
-        setPostComments(newpostcomments);
+        setPostComments(commentData);
 
       } catch (error) {
         if (error instanceof Error) {
@@ -137,28 +141,36 @@ const PostComments: React.FC<PostCommentsProps> = ({
 
   return (
     <>
-      <div>Comments <FaComment /></div>
-      <form onSubmit={handleSubmit}>
-        <div
-          className={styles.commentformcontainer}>
-          <div style={{ width: '80%' }}>
-            <textarea
-              required
-              maxLength={100}
-              placeholder="Write a comment..."
-              id="content"
-              name="content"
-              value={commentFormData.content}
-              onChange={handleChange}
-            />
+      <div className={styles.addcommentcontainer}>
+        <div>Comments <FaComment /></div>
+        <form onSubmit={handleSubmit}>
+          <div
+            className={styles.commentformcontainer}>
+            <div style={{ width: '80%' }}>
+              <textarea
+                required
+                maxLength={100}
+                placeholder="Write a comment..."
+                id="content"
+                name="content"
+                value={commentFormData.content}
+                onChange={handleChange}
+              />
+              <input
+                type="file"
+                id="image_path"
+                name="image_path"
+                onChange={handleChange}
+              />
+            </div>
+            <div style={{ width: '10%' }}>
+              <button type="submit" style={{ width: 'auto' }}>
+                <FaCommentMedical />
+              </button>
+            </div>
           </div>
-          <div style={{ width: '10%' }}>
-            <button type="submit" style={{ width: 'auto' }}>
-              <FaCommentMedical />
-            </button>
-          </div>
-        </div>
-      </form>
+        </form>
+      </div>
       {postComments
         ? postComments.map((commentprops) => (
           <Comment

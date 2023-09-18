@@ -88,7 +88,6 @@ const PostFeed: React.FC = () => {
                             <div
                                 className={styles.postcontainer}>
                                 <Post
-                                    key={modalPost.post_id}
                                     post_id={modalPost.post_id}
                                     group_id={modalPost.group_id}
                                     creator_id={modalPost.creator_id}

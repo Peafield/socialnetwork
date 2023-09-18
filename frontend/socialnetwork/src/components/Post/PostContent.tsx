@@ -35,7 +35,7 @@ const PostContent: React.FC<PostContentProps> = ({
         <div
           className={styles.postpic}>
           <img
-            style={{ width: '100%', height: '100%' }}
+            style={{ maxWidth: '300px', maxHeight: '200px' }}
             src={postURL}
             alt="Post Pic"
 

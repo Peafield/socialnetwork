@@ -3,6 +3,7 @@ package postcontrollers
 import (
 	"database/sql"
 	"fmt"
+	"log"
 	imagecontrollers "socialnetwork/pkg/controllers/ImageControllers"
 	postselectedfollowercontrollers "socialnetwork/pkg/controllers/PostSelectedFollowerControllers"
 	crud "socialnetwork/pkg/db/CRUD"
@@ -11,6 +12,7 @@ import (
 )
 
 func InsertPost(db *sql.DB, userId string, postData map[string]interface{}) error {
+	log.Println(postData)
 	args := make([]interface{}, 6)
 
 	postId, err := helpers.CreateUUID()

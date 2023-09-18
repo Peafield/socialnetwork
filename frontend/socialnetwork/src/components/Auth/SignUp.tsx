@@ -5,6 +5,7 @@ import styles from "./Signup.module.css";
 import Container from "../Containers/Container";
 import { useSetUserContextAndCookie } from "../../controllers/SetUserContextAndCookie";
 import { IoShareSocial } from "react-icons/io5";
+import Snackbar from "../feedback/Snackbar";
 
 interface SignUpFormData {
   email: string;
@@ -33,6 +34,10 @@ export default function SignUp() {
     avatar_path: "",
     about_me: "",
   });
+  const [snackbarOpen, setSnackbarOpen] = useState<boolean>(false);
+  const [snackbarType, setSnackbarType] = useState<
+    "success" | "error" | "warning"
+  >("error");
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
@@ -82,9 +87,20 @@ export default function SignUp() {
       }
     } catch (error) {
       if (error instanceof Error) {
-        setError(error.message);
+        if (error.cause && typeof error.cause === 'string') {
+          const causeString: string = error.cause;
+          if (causeString == '400') {
+            setError("Email or username already taken");
+          }
+        } else {
+          setError(error.message)
+        }
+        setSnackbarType("error");
+        setSnackbarOpen(true);
       } else {
         setError("An unexpected error occurred.");
+        setSnackbarType("error");
+        setSnackbarOpen(true);
       }
     }
   };
@@ -196,7 +212,6 @@ export default function SignUp() {
               </div>
               <div className={styles.inputgroup}>
                 <textarea
-                  required
                   maxLength={100}
                   placeholder="Tell us about yourself..."
                   id="about_me"
@@ -218,6 +233,15 @@ export default function SignUp() {
             </div>
           </div>
         </div>
+        <Snackbar
+          open={snackbarOpen}
+          onClose={() => {
+            setSnackbarOpen(false);
+            setError(null);
+          }}
+          message={error ? error : "Signed up successfully!"}
+          type={snackbarType}
+        />
       </div>
     </Container>
   );

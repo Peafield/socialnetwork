@@ -6,6 +6,7 @@ import (
 	imagecontrollers "socialnetwork/pkg/controllers/ImageControllers"
 	crud "socialnetwork/pkg/db/CRUD"
 	"socialnetwork/pkg/db/dbstatements"
+	errorhandling "socialnetwork/pkg/errorHandling"
 	"socialnetwork/pkg/helpers"
 	"socialnetwork/pkg/models/dbmodels"
 	"strings"
@@ -59,7 +60,7 @@ func RegisterUser(db *sql.DB, formData map[string]interface{}) (*dbmodels.User, 
 
 	formDataValues, err := validateAndSortIncomingFormData(formData, db)
 	if err != nil {
-		return nil, fmt.Errorf("error validating form data, error: %w", err)
+		return nil, err
 	}
 	args = append(args, formDataValues...)
 
@@ -121,7 +122,7 @@ func validateEmailAndDisplayName(formData map[string]interface{}, db *sql.DB) ([
 	//get user data as interface
 	users, err := crud.SelectFromDatabase(db, "Users", dbstatements.SelectUserByIDOrDisplayNameStmt, args)
 	if err == nil && len(users) > 0 {
-		return nil, fmt.Errorf("user display name or email already in use")
+		return nil, errorhandling.ErrUserExists
 	}
 
 	return args, nil

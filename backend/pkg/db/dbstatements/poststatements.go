@@ -57,6 +57,10 @@ func initPostDBStatements(db *sql.DB) error {
 	SELECT P.* FROM Posts P
 	JOIN Posts_Selected_Followers PSF ON P.post_id = PSF.post_id
 	WHERE PSF.allowed_follower_id = ?
+	UNION
+	SELECT P.* FROM Posts P
+	JOIN Groups_Members GM ON P.group_id = GM.group_id
+	WHERE P.privacy_level = 3 AND GM.member_id = ?
 	`)
 	if err != nil {
 		return fmt.Errorf("failed to prepare user viewable posts statement: %w", err)
@@ -76,6 +80,14 @@ func initPostDBStatements(db *sql.DB) error {
 	`)
 	if err != nil {
 		return fmt.Errorf("failed to prepare user specific posts statement: %w", err)
+	}
+
+	SelectGroupPostsStmt, err = db.Prepare(`
+	SELECT * FROM Posts
+	WHERE privacy_level = 3 AND group_id = ?
+	`)
+	if err != nil {
+		return fmt.Errorf("failed to prepare group posts statement: %w", err)
 	}
 
 	/*UPDATE*/

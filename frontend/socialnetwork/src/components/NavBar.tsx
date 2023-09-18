@@ -3,7 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { UserContext } from "../context/AuthContext";
 import { BiUserCircle } from "react-icons/bi";
 import { IoShareSocial } from "react-icons/io5";
-import { IoMdNotifications } from 'react-icons/io'
+import { HiUserGroup } from 'react-icons/hi'
 import LogoutButton from "./Auth/SignOut";
 import { AiOutlinePlus } from "react-icons/ai";
 import styles from "./Dashboard.module.css";
@@ -31,6 +31,11 @@ export const NavBar: React.FC<NavBarProps> = ({
         </span>
       </div>
       <div className={styles.navbarActions}>
+        <Link to={"/dashboard/groups"}>
+          <span>
+            <HiUserGroup />
+          </span>
+        </Link>
         <div
           className={styles.navbarbutton}
           style={{ marginBottom: '2.5%' }}

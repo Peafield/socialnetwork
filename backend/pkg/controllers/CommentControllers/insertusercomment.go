@@ -3,6 +3,7 @@ package commentcontrollers
 import (
 	"database/sql"
 	"fmt"
+	imagecontrollers "socialnetwork/pkg/controllers/ImageControllers"
 	crud "socialnetwork/pkg/db/CRUD"
 	"socialnetwork/pkg/db/dbstatements"
 	"socialnetwork/pkg/helpers"
@@ -32,8 +33,12 @@ func InsertComment(db *sql.DB, userId string, commentData map[string]interface{}
 	args[3] = contentData
 
 	imgPathData, ok := commentData["image"].(string)
-	if ok {
-		args[4] = imgPathData
+	if ok && imgPathData != "" {
+		imgFilePath, err := imagecontrollers.DecodeImage(imgPathData)
+		if err != nil {
+			return fmt.Errorf("problem decoding image")
+		}
+		args[4] = imgFilePath
 	} else {
 		args[4] = ""
 	}

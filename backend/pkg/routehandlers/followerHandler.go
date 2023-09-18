@@ -182,7 +182,6 @@ func UpdateFollowerHandler(w http.ResponseWriter, r *http.Request) {
 
 	response := readwritemodels.WriteData{
 		Status: "success",
-		Data:   "",
 	}
 	jsonReponse, err := json.Marshal(response)
 	if err != nil {

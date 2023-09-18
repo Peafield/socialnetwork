@@ -8,11 +8,10 @@ import (
 	"socialnetwork/pkg/controllers"
 	usercontrollers "socialnetwork/pkg/controllers/UserControllers"
 	"socialnetwork/pkg/db/dbutils"
+	errorhandling "socialnetwork/pkg/errorHandling"
 	"socialnetwork/pkg/middleware"
 	"socialnetwork/pkg/models/readwritemodels"
 )
-
-var ErrUserExists = errors.New("user display name or email already in use")
 
 /*
 SignUpHandler is a HTTP handler function that processes sign up requests.
@@ -80,7 +79,7 @@ func SignUpHandler(w http.ResponseWriter, r *http.Request) {
 
 	user, err := usercontrollers.RegisterUser(dbutils.DB, formData.Data)
 	if err != nil {
-		if errors.Is(err, ErrUserExists) {
+		if errors.Is(err, errorhandling.ErrUserExists) {
 			http.Error(w, "user display name or email already in use", http.StatusBadRequest)
 		} else {
 			fmt.Println(err)

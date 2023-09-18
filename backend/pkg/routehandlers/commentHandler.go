@@ -3,6 +3,7 @@ package routehandlers
 import (
 	"encoding/json"
 	"fmt"
+	"log"
 	"net/http"
 	commentcontrollers "socialnetwork/pkg/controllers/CommentControllers"
 	"socialnetwork/pkg/db/dbutils"
@@ -87,7 +88,8 @@ func NewComment(w http.ResponseWriter, r *http.Request) {
 
 	err := commentcontrollers.InsertComment(dbutils.DB, userData.UserId, newCommentData.Data)
 	if err != nil {
-		http.Error(w, "failed to insert post data", http.StatusInternalServerError)
+		log.Println(err)
+		http.Error(w, "failed to insert comment data", http.StatusInternalServerError)
 		return
 	}
 	response := readwritemodels.WriteData{
@@ -134,7 +136,7 @@ func GetComments(w http.ResponseWriter, r *http.Request) {
 	}
 
 	sort.Slice(comments.Comments, func(i, j int) bool {
-		return comments.Comments[i].CreationDate.After(comments.Comments[j].CreationDate)
+		return comments.Comments[i].CommentInfo.CreationDate.After(comments.Comments[j].CommentInfo.CreationDate)
 	})
 
 	response := readwritemodels.WriteData{

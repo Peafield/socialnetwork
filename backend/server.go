@@ -177,6 +177,8 @@ func main() {
 	r.Handle("/reaction", middleware.ValidateTokenMiddleware(middleware.ParseAndValidateData(http.HandlerFunc(routehandlers.ReactionHandler))))
 	r.Handle("/follow", middleware.ValidateTokenMiddleware(middleware.ParseAndValidateData(http.HandlerFunc(routehandlers.FollowerHandler))))
 	r.Handle("/notification", middleware.ValidateTokenMiddleware(middleware.ParseAndValidateData(http.HandlerFunc(routehandlers.NotificationHandler))))
+	r.Handle("/group", middleware.ValidateTokenMiddleware(middleware.ParseAndValidateData(http.HandlerFunc(routehandlers.GroupsHandler))))
+	r.Handle("/groupmembers", middleware.ValidateTokenMiddleware(middleware.ParseAndValidateData(http.HandlerFunc(routehandlers.GroupMembersHandler))))
 
 	/*WEBSOCKET*/
 	r.Handle("/ws", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {

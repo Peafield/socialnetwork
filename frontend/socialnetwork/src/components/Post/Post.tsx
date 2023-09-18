@@ -50,8 +50,6 @@ const Post: React.FC<PostProps> = ({
         if (userContext.user) {
           const reactionData = await GetUserPostReaction(post_id)
           if (reactionData) {
-            console.log(reactionData);
-
             setUserReaction(reactionData.reaction)
           }
         }

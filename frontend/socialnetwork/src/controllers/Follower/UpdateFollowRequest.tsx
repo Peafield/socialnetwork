@@ -19,7 +19,8 @@ export const updateFollowRequest = async (followerId: string, followingStatus: n
     try {
         const response = await handleAPIRequest("/follow", options);
         if (response && response.status === "success") {
-            return response
+            console.log("follow success");
+
         }
     } catch (error) {
         if (error instanceof Error) {

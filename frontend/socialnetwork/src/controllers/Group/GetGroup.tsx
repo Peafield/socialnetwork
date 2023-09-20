@@ -55,6 +55,32 @@ export const getGroupByName = async (name: string) => {
     }
 }
 
+export const getGroupByID = async (groupId: string) => {
+    const url = `/group?group_id=${encodeURIComponent(groupId)}`
+
+    const options = {
+        method: "GET",
+        headers: {
+            Authorization: "Bearer " + getCookie("sessionToken"),
+            "Content-Type": "application/json",
+        },
+    };
+    try {
+        const response = await handleAPIRequest(url, options);
+
+        const group = response.data
+
+        return group
+
+    } catch (error) {
+        if (error instanceof Error) {
+            throw new Error("Failed to fetch group: " + error.message);
+        } else {
+            throw new Error("An unexpected error occurred while fetching group.");
+        }
+    }
+}
+
 export const GetUserGroups = async (userId: string) => {
     const url = `/group?user_id=${encodeURIComponent(userId)}`
 

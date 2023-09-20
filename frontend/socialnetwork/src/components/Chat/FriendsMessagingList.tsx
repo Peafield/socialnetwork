@@ -7,6 +7,23 @@ import styles from './Chat.module.css'
 import Conversation from './Conversation';
 import UserChatDisplay from './UserChatDisplay';
 
+export interface ChatProps {
+    chat_id: string
+    sender_id: string
+    receiver_id: string
+    group_id: string
+    creation_date: string
+}
+
+export interface ChatInfo {
+    uuid: string
+    name: string
+    logged_in_status: number
+    last_message: string
+    last_message_time: string
+    is_group: boolean
+}
+
 const FriendsMessagingList: React.FC = () => {
     const userContext = useContext(UserContext);
     const { message, sendMessage } = useWebSocketContext();
@@ -15,8 +32,9 @@ const FriendsMessagingList: React.FC = () => {
         info: ""
     });
     const [currentUserChat, setCurrentUserChat] = useState<string | null>(null)
+    const [isChatGroup, setIsChatGroup] = useState(false)
     const [currentUserChatDisplayName, setCurrentUserChatDisplayName] = useState<string | null>(null)
-    const [messagableUsers, setMessagableUsers] = useState<any[]>([])
+    const [messagableUsers, setMessagableUsers] = useState<ChatInfo[]>([])
 
     const handleSendMessage = () => {
         if (messageToSend) {
@@ -44,13 +62,13 @@ const FriendsMessagingList: React.FC = () => {
 
     useEffect(() => {
         if (message?.type == "messagable_users" && message.data) {
+            console.log(message.data);
+
             setMessagableUsers(message.data.messagableUsers)
         } else if (message?.type == "online_user" && message.data) {
-            console.log(message);
-
             const newState = messagableUsers.map((user) => {
-                if (user.Name == message.data.username) {
-                    return { ...user, LoggedInStatus: message.data.online ? 1 : 0 }
+                if (user.name === message.data.username) {
+                    return { ...user, logged_in_status: message.data.online ? 1 : 0 }
                 }
                 return user
             })
@@ -99,31 +117,40 @@ const FriendsMessagingList: React.FC = () => {
                         message={message}
                         sendMessage={sendMessage}
                         receiverName={currentUserChatDisplayName}
-                        receiverID={currentUserChat} />
+                        receiverID={currentUserChat}
+                        isGroup={isChatGroup} />
                 </div>
                 : messagableUsers ? (
                     <div
                         className={styles.messagableUsersContainer}>
-                        {messagableUsers.map((user: any) => (
+                        {messagableUsers.map((user: ChatInfo) => (
                             <div
-                                key={user.UUID}
+                                key={user.uuid}
                                 onClick={() => {
                                     console.log("clicked");
-                                    setCurrentUserChatDisplayName(user.Name)
-                                    setCurrentUserChat(user.UUID)
+                                    setCurrentUserChatDisplayName(user.name)
+                                    setCurrentUserChat(user.uuid)
+                                    setIsChatGroup(user.is_group)
                                     setMessageToSend({
                                         type: "open_chat",
-                                        info: {
-                                            receiver: user.UUID,
-                                        },
+                                        info: user.is_group ?
+                                            {
+                                                group_id: user.uuid
+                                            }
+                                            :
+                                            {
+                                                receiver: user.uuid,
+                                            },
                                     });
                                 }}
                                 className={styles.userChatContainer}>
                                 <UserChatDisplay
                                     follower_id={userContext.user ? userContext.user.userId : ""}
-                                    followee_id={user.UUID}
-                                    last_message={user.LastMessage}
-                                    is_logged_in={user.LoggedInStatus} />
+                                    followee_id={user.uuid}
+                                    recipient_name={user.name}
+                                    last_message={user.last_message}
+                                    is_logged_in={user.logged_in_status}
+                                    is_group={user.is_group} />
                             </div>
                         ))}
                     </div>

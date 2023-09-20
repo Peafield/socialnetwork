@@ -53,6 +53,7 @@ const GroupMembers: React.FC<MembersProps> = ({ members, isUserMember }) => {
   const [selectableProfiles, setSelectableProfiles] = useState<ProfileProps[]>(
     []
   );
+  const [updateTrigger, setUpdateTrigger] = useState<number>(0)
   const [error, setError] = useState<string | null>(null);
   const [snackbarOpen, setSnackbarOpen] = useState<boolean>(false);
   const [snackbarType, setSnackbarType] = useState<
@@ -137,7 +138,7 @@ const GroupMembers: React.FC<MembersProps> = ({ members, isUserMember }) => {
     };
 
     fetchData(); // Call the async function
-  }, []);
+  }, [updateTrigger]);
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -191,7 +192,9 @@ const GroupMembers: React.FC<MembersProps> = ({ members, isUserMember }) => {
             }
           }
           sendMessage(messageToSend)
-          window.location.reload();
+          setUpdateTrigger((prev: number) => {
+            return prev + 1
+          })
         })
       }
     } catch (error) {

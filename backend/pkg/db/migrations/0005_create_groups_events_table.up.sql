@@ -5,7 +5,7 @@ CREATE TABLE Groups_Events (
   creator_id TEXT NOT NULL,
   title TEXT NOT NULL,
   description TEXT NOT NULL,
-  event_start_time TIMESTAMP,
+  event_start_time DATE NOT NULL,
   total_going INTEGER DEFAULT 0,
   total_not_going INTEGER DEFAULT 0,
   creation_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,

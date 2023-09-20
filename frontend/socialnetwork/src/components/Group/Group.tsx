@@ -122,9 +122,6 @@ const Group: React.FC = () => {
         fetchUserPostData(); // Call the async function
     }, [group]);
 
-    console.log(groupPosts);
-
-
     const renderSwitch = () => {
         if (isUserMember) {
             switch (currentGroupTab) {
@@ -133,7 +130,7 @@ const Group: React.FC = () => {
                 case "members":
                     return <GroupMembers members={groupMembers} isUserMember={isUserMember} />
                 case "events":
-                    return <GroupEvents />
+                    return <GroupEvents group_id={group ? group.group_id : ""} />
                 default:
                     return <GroupPosts posts={groupPosts} isUserMember={isUserMember} />
                     break;

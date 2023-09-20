@@ -253,3 +253,60 @@ textarea {
     color: black;
     margin: 2%;
 }
+
+.groupeventscontainer {
+    display: flex;
+    width: 90%;
+    height: 50%;
+    margin: 2%;
+    justify-content: space-evenly;
+    align-items: top;
+}
+
+.createevent {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    width: 30%;
+    height: 100%;
+    background-color: white;
+    padding: 2%;
+    margin: 2%;
+    box-shadow: rgba(50, 50, 93, 0.25) 0px 2px 5px -1px,
+        rgba(0, 0, 0, 0.3) 0px 1px 3px -1px;
+}
+
+.listofevents {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
+    overflow-y: auto;
+    width: 90%;
+    height: auto;
+}
+
+.event {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 40%;
+    width: 95%;
+    margin: 2%;
+    padding: 2%;
+    background-color: white;
+    box-shadow: rgba(50, 50, 93, 0.25) 0px 2px 5px -1px,
+        rgba(0, 0, 0, 0.3) 0px 1px 3px -1px;
+}
+
+.event>* {
+    display: flex;
+    justify-content: space-evenly;
+    align-items: center;
+    overflow-wrap: break-word;
+    margin: 2%;
+    padding: 2%;
+    height: 80%;
+    width: 20%;
+}

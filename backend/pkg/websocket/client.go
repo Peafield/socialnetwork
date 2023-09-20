@@ -50,12 +50,13 @@ type WriteMessage struct {
 	Data interface{} `json:"data"`
 }
 
-type BasicUserInfo struct {
-	UUID            string
-	Name            string
-	LoggedInStatus  int
-	LastMessage     string
-	LastMessageTime time.Time
+type ChatInfo struct {
+	UUID            string    `json:"uuid"`
+	Name            string    `json:"name"`
+	LoggedInStatus  int       `json:"logged_in_status"`
+	LastMessage     string    `json:"last_message"`
+	LastMessageTime time.Time `json:"last_message_time"`
+	IsGroup         bool      `json:"is_group"`
 }
 
 // Client is a middleman between the websocket connection and the hub.

@@ -37,7 +37,7 @@ func CreateFakeChats(db *sql.DB) error {
 
 			chat, err := chatcontrollers.SelectChat(dbutils.DB, userIds[currentUserId], followees.Followers[randomUser].FolloweeId)
 			if err != nil && !errors.Is(err, errorhandling.ErrNoResultsFound) {
-				return fmt.Errorf("error selecting mock chat")
+				return fmt.Errorf("error selecting mock chat: %w", err)
 			} else if errors.Is(err, errorhandling.ErrNoResultsFound) {
 				err := chatcontrollers.InsertChat(dbutils.DB, userIds[currentUserId], chatData)
 				if err != nil {
@@ -45,7 +45,7 @@ func CreateFakeChats(db *sql.DB) error {
 				}
 				chat, err = chatcontrollers.SelectChat(dbutils.DB, userIds[currentUserId], followees.Followers[randomUser].FolloweeId)
 				if err != nil {
-					return fmt.Errorf("error selecting mock chat")
+					return fmt.Errorf("error selecting mock chat: %w", err)
 				}
 			}
 

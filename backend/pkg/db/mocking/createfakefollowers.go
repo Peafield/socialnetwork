@@ -29,7 +29,7 @@ func CreateFakeFollowers(db *sql.DB) error {
 			usedUsers = append(usedUsers, randomUser)
 			followData["followee_id"] = userIds[randomUser]
 			updateFollowdata["follower_id"] = userIds[currentUserId]
-			updateFollowdata["following_status"] = 1
+			updateFollowdata["following_status"] = float64(1)
 
 			err := followercontrollers.FollowUser(db, userIds[currentUserId], followData)
 			if err != nil {

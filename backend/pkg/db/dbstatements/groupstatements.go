@@ -43,11 +43,9 @@ func initGroupDBStatements(db *sql.DB) error {
 		creator_id,
 		title,
 		description,
-		event_start_time,
-		total_going,
-		total_not_going
+		event_start_time
 	) VALUES (
-		?, ?, ?, ?, ?, ?, ?, ?
+		?, ?, ?, ?, ?, ?
 	)`)
 	if err != nil {
 		return fmt.Errorf("failed to prepare insert groups events statement: %w", err)
@@ -57,10 +55,9 @@ func initGroupDBStatements(db *sql.DB) error {
 	INSERT INTO Groups_Events_Attendees (
 		event_id,
 		attendee_id,
-		attending_status,
-		event_status
+		attending_status
 	) VALUES (
-		?, ?, ?, ?
+		?, ?, ?
 	)`)
 	if err != nil {
 		return fmt.Errorf("failed to prepare insert groups events attendees statement: %w", err)
@@ -78,6 +75,14 @@ func initGroupDBStatements(db *sql.DB) error {
 	SelectGroupByTitleStmt, err = db.Prepare(`
 	SELECT * FROM Groups
 	WHERE title = ?
+	`)
+	if err != nil {
+		return fmt.Errorf("failed to prepare select group statement: %w", err)
+	}
+
+	SelectGroupByIDStmt, err = db.Prepare(`
+	SELECT * FROM Groups
+	WHERE group_id = ?
 	`)
 	if err != nil {
 		return fmt.Errorf("failed to prepare select group statement: %w", err)
@@ -101,6 +106,22 @@ func initGroupDBStatements(db *sql.DB) error {
 		return fmt.Errorf("failed to prepare select all group members statement: %w", err)
 	}
 
+	SelectAllGroupEventsStmt, err = db.Prepare(`
+	SELECT * FROM Groups_Events
+	WHERE group_id = ?
+	`)
+	if err != nil {
+		return fmt.Errorf("failed to prepare select all group events statement: %w", err)
+	}
+
+	SelectAllEventAttendeesStmt, err = db.Prepare(`
+	SELECT * FROM Groups_Events_Attendees
+	WHERE event_id = ?
+	`)
+	if err != nil {
+		return fmt.Errorf("failed to prepare select all group events attendees statement: %w", err)
+	}
+
 	/*UPDATE*/
 
 	UpdateGroupMemberStatusStmt, err = db.Prepare(`
@@ -109,6 +130,15 @@ func initGroupDBStatements(db *sql.DB) error {
 	WHERE member_id = ? AND group_id = ?`)
 	if err != nil {
 		return fmt.Errorf("failed to prepare update group member status statement: %w", err)
+	}
+
+	UpdateAttendeeStatus, err = db.Prepare(`
+	UPDATE Groups_Events_Attendees
+	SET attending_status = ?
+	WHERE attendee_id = ? AND event_id = ?
+	`)
+	if err != nil {
+		return fmt.Errorf("failed to prepare update group event attendee status statement: %w", err)
 	}
 
 	return nil

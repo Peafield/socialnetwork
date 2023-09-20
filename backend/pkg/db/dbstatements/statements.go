@@ -22,6 +22,7 @@ var (
 	InsertGroupsEventsStmt          *sql.Stmt
 	InsertGroupsEventsAttendees     *sql.Stmt
 	InsertNotificationsStmt         *sql.Stmt
+	InsertGroupChatStmt             *sql.Stmt
 
 	/*Update Statments*/
 	UpdatePostImagePathStmt           *sql.Stmt
@@ -49,6 +50,7 @@ var (
 	UpdateRequestPendingStmt          *sql.Stmt
 	UpdateAllUserNotifications        *sql.Stmt
 	UpdateGroupMemberStatusStmt       *sql.Stmt
+	UpdateAttendeeStatus              *sql.Stmt
 
 	/*Select Statements*/
 	SelectAllUsersStmt                           *sql.Stmt
@@ -72,9 +74,13 @@ var (
 	SelectAllUserNotifications                   *sql.Stmt
 	SelectAllGroupsStmt                          *sql.Stmt
 	SelectGroupByTitleStmt                       *sql.Stmt
+	SelectGroupByIDStmt                          *sql.Stmt
 	SelectAllGroupMembersStmt                    *sql.Stmt
 	SelectUserGroupsStmt                         *sql.Stmt
 	SelectGroupPostsStmt                         *sql.Stmt
+	SelectAllGroupEventsStmt                     *sql.Stmt
+	SelectAllEventAttendeesStmt                  *sql.Stmt
+	SelectGroupChatStmt                          *sql.Stmt
 
 	/*Delete Statements*/
 	DeleteUserAccountStmt           *sql.Stmt
@@ -184,6 +190,7 @@ func CloseDBStatements() {
 	InsertGroupsEventsStmt.Close()
 	InsertGroupsEventsAttendees.Close()
 	InsertNotificationsStmt.Close()
+	InsertGroupChatStmt.Close()
 
 	/*Select Statment Closure*/
 	SelectAllUsersStmt.Close()
@@ -207,9 +214,13 @@ func CloseDBStatements() {
 	SelectAllUserNotifications.Close()
 	SelectAllGroupsStmt.Close()
 	SelectGroupByTitleStmt.Close()
+	SelectGroupByIDStmt.Close()
 	SelectAllGroupMembersStmt.Close()
 	SelectUserGroupsStmt.Close()
 	SelectGroupPostsStmt.Close()
+	SelectAllGroupEventsStmt.Close()
+	SelectAllEventAttendeesStmt.Close()
+	SelectGroupChatStmt.Close()
 
 	/*Update Statement Closure*/
 	UpdatePostImagePathStmt.Close()
@@ -237,6 +248,7 @@ func CloseDBStatements() {
 	UpdateRequestPendingStmt.Close()
 	UpdateAllUserNotifications.Close()
 	UpdateGroupMemberStatusStmt.Close()
+	UpdateAttendeeStatus.Close()
 
 	/*Delete Statement Closure*/
 	DeleteUserAccountStmt.Close()

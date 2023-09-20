@@ -13,9 +13,10 @@ func initChatDBStatements(db *sql.DB) error {
 	INSERT INTO Chats (
 		chat_id,
 		sender_id,
-		receiver_id
+		receiver_id,
+		group_id
 	) VALUES (
-		?, ?, ?
+		?, ?, ?, ?
 	)`)
 	if err != nil {
 		return fmt.Errorf("failed to prepare insert chats statement: %w", err)
@@ -35,6 +36,14 @@ func initChatDBStatements(db *sql.DB) error {
 	}
 
 	/*SELECT*/
+
+	SelectGroupChatStmt, err = db.Prepare(`
+	SELECT * FROM Chats
+	WHERE group_id = ?
+	`)
+	if err != nil {
+		return fmt.Errorf("failed to prepare select group chat statement: %w", err)
+	}
 
 	SelectChatMessagesByChatIdStmt, err = db.Prepare(`
 	SELECT * FROM Chats_Messages

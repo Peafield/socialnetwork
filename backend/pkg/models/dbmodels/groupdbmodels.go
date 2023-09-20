@@ -52,8 +52,7 @@ type GroupEvents struct {
 type GroupEventAttendee struct {
 	EventId         string    `json:"event_id"`
 	AttendeeId      string    `json:"attendee_id"`
-	AttendingStatus string    `json:"attending_status"`
-	EventStatus     int       `json:"event_status"`
+	AttendingStatus int       `json:"attending_status"`
 	CreationDate    time.Time `json:"creation_date"`
 }
 

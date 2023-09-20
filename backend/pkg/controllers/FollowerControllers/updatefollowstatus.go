@@ -38,7 +38,7 @@ func UpdateFollowingStatus(db *sql.DB, userId string, updateFollowData map[strin
 
 	followingStatus, ok := updateFollowData["following_status"].(float64)
 	if !ok {
-		return fmt.Errorf("following_status is not an int or doesn't exist")
+		return fmt.Errorf("following_status is not a float64 or doesn't exist")
 	}
 
 	args[0] = int(followingStatus)

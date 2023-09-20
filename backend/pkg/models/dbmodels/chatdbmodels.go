@@ -7,6 +7,7 @@ type Chat struct {
 	ChatId       string    `json:"chat_id"`
 	SenderId     string    `json:"sender_id"`
 	ReceiverId   string    `json:"receiever_id"`
+	GroupId      string    `json:"group_id"`
 	CreationDate time.Time `json:"creation_date"`
 }
 

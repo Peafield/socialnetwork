@@ -1,0 +1,22 @@
+version: "3"
+
+networks:
+  mynetwork:
+    driver: bridge
+
+services:
+  backend:
+    image: backend-image
+    networks:
+      - mynetwork
+    ports:
+      - "8080:8080"
+    environment:
+      - DBOPEN_FLAG=socialNetwork
+
+  frontend:
+    image: frontend-image
+    networks:
+      - mynetwork
+    ports:
+      - "3000:3000"

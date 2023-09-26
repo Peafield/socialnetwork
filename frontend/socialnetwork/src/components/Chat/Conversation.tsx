@@ -89,7 +89,6 @@ const Conversation: React.FC<ConversationProps> = ({
       });
     }
 
-    console.log(newChats);
     setChats(newChats);
   };
 

@@ -1,6 +1,7 @@
 import { useSetUserContextAndCookie } from "./SetUserContextAndCookie";
 
-const API_URL = "http://localhost:8080";
+const API_URL = "http://0.0.0.0:8080";
+//const API_URL = 'http://backend-image:8080';
 
 export async function handleAPIRequest(url: string, options: object) {
   try {

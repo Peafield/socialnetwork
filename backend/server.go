@@ -4,6 +4,7 @@ import (
 	"flag"
 	"log"
 	"net/http"
+	"os"
 	"socialnetwork/pkg/controllers"
 	"socialnetwork/pkg/db/dbstatements"
 	"socialnetwork/pkg/db/dbutils"
@@ -28,6 +29,7 @@ func main() {
 	/*FLAGS*/
 	dbinit := flag.Bool("dbinit", false, "Initialises a database")
 	dbopen := flag.Bool("dbopen", false, "Opens a database and prepares database statements")
+	dbOpenFlag := os.Getenv("DBOPEN_FLAG")
 	dbup := flag.Bool("dbup", false, "Migrate database changes up")
 	dbdown := flag.Bool("dbdown", false, "Migrate database changes down")
 	dbmock := flag.Bool("dbmock", false, "Creates mock data for the database. You must run dbopen before running dbmock")
@@ -53,8 +55,13 @@ func main() {
 		return
 	}
 
-	if *dbopen {
-		dbName := flag.Arg(0)
+	if *dbopen || dbOpenFlag != "" {
+		var dbName string
+		if dbOpenFlag != "" {
+			dbName = dbOpenFlag
+		} else {
+			dbName = flag.Arg(0)
+		}
 		if len(dbName) < 1 {
 			log.Println("Missing database name")
 		}
@@ -160,7 +167,7 @@ func main() {
 
 	srv := &http.Server{
 		Handler:      r,
-		Addr:         "localhost:8080",
+		Addr:         "0.0.0.0:8080",
 		WriteTimeout: 15 * time.Second,
 		ReadTimeout:  15 * time.Second,
 	}

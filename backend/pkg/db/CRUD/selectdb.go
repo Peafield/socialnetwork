@@ -3,6 +3,7 @@ package crud
 import (
 	"database/sql"
 	"fmt"
+	"log"
 	errorhandling "socialnetwork/pkg/errorHandling"
 	"socialnetwork/pkg/helpers"
 )
@@ -40,6 +41,9 @@ func SelectFromDatabase(db *sql.DB, table string, queryStatement *sql.Stmt, quer
 	}
 
 	objectArray := make([]interface{}, 0)
+
+	log.Println(queryStatement)
+	log.Println(queryValues)
 
 	result, err := queryStatement.Query(queryValues...)
 	if err != nil {
